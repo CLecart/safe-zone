@@ -27,6 +27,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * REST controller for user management operations.
+ * Provides endpoints for user CRUD operations and role management.
+ *
+ * <p>Most endpoints require authentication. Admin role required for
+ * user deletion and role management operations.</p>
+ *
+ * @author SafeZone Team
+ * @version 1.0.0
+ * @since 2026-01-06
+ * @see UserService
+ */
 @RestController
 @RequestMapping("/api/v1/users")
 @Tag(name = "Users", description = "User management endpoints")
@@ -34,6 +46,11 @@ public class UserController {
 
     private final UserService userService;
 
+    /**
+     * Constructs a UserController with the required service.
+     *
+     * @param userService the user service for business operations
+     */
     public UserController(UserService userService) {
         this.userService = userService;
     }

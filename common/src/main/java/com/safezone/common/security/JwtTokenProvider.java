@@ -18,6 +18,17 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * JWT token provider for authentication and authorization.
+ * Handles token generation, validation, and claim extraction.
+ *
+ * <p>This component uses HMAC-SHA algorithm for signing tokens
+ * and supports configurable expiration times.</p>
+ *
+ * @author SafeZone Team
+ * @version 1.0.0
+ * @since 2026-01-06
+ */
 @Component
 public class JwtTokenProvider {
 
@@ -26,6 +37,12 @@ public class JwtTokenProvider {
     private final SecretKey secretKey;
     private final long expirationMs;
 
+    /**
+     * Constructs a new JwtTokenProvider with the specified configuration.
+     *
+     * @param secret       the secret key for signing tokens (minimum 256 bits)
+     * @param expirationMs token expiration time in milliseconds
+     */
     public JwtTokenProvider(
             @Value("${jwt.secret:defaultSecretKeyThatShouldBeChangedInProduction123456}") String secret,
             @Value("${jwt.expiration:86400000}") long expirationMs) {
@@ -33,6 +50,13 @@ public class JwtTokenProvider {
         this.expirationMs = expirationMs;
     }
 
+    /**
+     * Generates a JWT token for the specified user.
+     *
+     * @param username the username to include as the subject
+     * @param roles    the list of roles to include in the token claims
+     * @return the generated JWT token string
+     */
     public String generateToken(String username, List<String> roles) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expirationMs);
@@ -46,10 +70,22 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    /**
+     * Extracts the username (subject) from a JWT token.
+     *
+     * @param token the JWT token to parse
+     * @return an Optional containing the username, or empty if token is invalid
+     */
     public Optional<String> extractUsername(String token) {
         return extractClaims(token).map(Claims::getSubject);
     }
 
+    /**
+     * Extracts the roles claim from a JWT token.
+     *
+     * @param token the JWT token to parse
+     * @return the list of roles, or an empty list if token is invalid
+     */
     @SuppressWarnings("unchecked")
     public List<String> extractRoles(String token) {
         return extractClaims(token)
@@ -57,10 +93,22 @@ public class JwtTokenProvider {
                 .orElse(List.of());
     }
 
+    /**
+     * Validates a JWT token for authenticity and expiration.
+     *
+     * @param token the JWT token to validate
+     * @return true if the token is valid, false otherwise
+     */
     public boolean validateToken(String token) {
         return extractClaims(token).isPresent();
     }
 
+    /**
+     * Extracts all claims from a JWT token.
+     *
+     * @param token the JWT token to parse
+     * @return an Optional containing the claims, or empty if token is invalid
+     */
     private Optional<Claims> extractClaims(String token) {
         try {
             Claims claims = Jwts.parser()

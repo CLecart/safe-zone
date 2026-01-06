@@ -13,11 +13,34 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.List;
 
+/**
+ * Global exception handler for REST controllers.
+ * Provides centralized exception handling and consistent error response formatting.
+ *
+ * <p>Handles the following exception types:</p>
+ * <ul>
+ *   <li>{@link ResourceNotFoundException} - HTTP 404</li>
+ *   <li>{@link BusinessException} - HTTP 400</li>
+ *   <li>{@link MethodArgumentNotValidException} - HTTP 400 with field errors</li>
+ *   <li>Generic exceptions - HTTP 500</li>
+ * </ul>
+ *
+ * @author SafeZone Team
+ * @version 1.0.0
+ * @since 2026-01-06
+ */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    /**
+     * Handles resource not found exceptions.
+     *
+     * @param ex      the exception
+     * @param request the HTTP request
+     * @return HTTP 404 response with error details
+     */
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleResourceNotFoundException(
             ResourceNotFoundException ex, HttpServletRequest request) {
@@ -34,6 +57,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
+    /**
+     * Handles business logic exceptions.
+     *
+     * @param ex      the exception
+     * @param request the HTTP request
+     * @return HTTP 400 response with error details
+     */
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> handleBusinessException(
             BusinessException ex, HttpServletRequest request) {
@@ -50,6 +80,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
+    /**
+     * Handles validation exceptions from request body validation.
+     *
+     * @param ex      the exception
+     * @param request the HTTP request
+     * @return HTTP 400 response with field-level validation errors
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(
             MethodArgumentNotValidException ex, HttpServletRequest request) {
@@ -72,6 +109,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
+    /**
+     * Handles all uncaught exceptions.
+     *
+     * @param ex      the exception
+     * @param request the HTTP request
+     * @return HTTP 500 response with generic error message
+     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(
             Exception ex, HttpServletRequest request) {

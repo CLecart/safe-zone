@@ -26,6 +26,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * REST controller for order management operations.
+ * Provides endpoints for order creation, retrieval, and status management.
+ *
+ * <p>All endpoints require authentication. Admin role required for
+ * viewing all orders and updating order status.</p>
+ *
+ * @author SafeZone Team
+ * @version 1.0.0
+ * @since 2026-01-06
+ * @see OrderService
+ */
 @RestController
 @RequestMapping("/api/v1/orders")
 @Tag(name = "Orders", description = "Order management endpoints")
@@ -33,6 +45,11 @@ public class OrderController {
 
     private final OrderService orderService;
 
+    /**
+     * Constructs an OrderController with the required service.
+     *
+     * @param orderService the order service for business operations
+     */
     public OrderController(OrderService orderService) {
         this.orderService = orderService;
     }
