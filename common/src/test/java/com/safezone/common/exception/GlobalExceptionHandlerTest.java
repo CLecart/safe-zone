@@ -1,6 +1,7 @@
 package com.safezone.common.exception;
 
 import com.safezone.common.dto.ErrorResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.context.request.WebRequest;
 
 import java.util.List;
 
@@ -26,7 +26,7 @@ class GlobalExceptionHandlerTest {
     private GlobalExceptionHandler exceptionHandler;
 
     @Mock
-    private WebRequest webRequest;
+    private HttpServletRequest httpServletRequest;
 
     @Mock
     private MethodArgumentNotValidException methodArgumentNotValidException;
@@ -37,6 +37,7 @@ class GlobalExceptionHandlerTest {
     @BeforeEach
     void setUp() {
         exceptionHandler = new GlobalExceptionHandler();
+        given(httpServletRequest.getRequestURI()).willReturn("/api/test");
     }
 
     @Test
@@ -44,7 +45,7 @@ class GlobalExceptionHandlerTest {
     void shouldHandleResourceNotFoundException() {
         ResourceNotFoundException exception = new ResourceNotFoundException("User", "id", 1L);
 
-        ResponseEntity<ErrorResponse> response = exceptionHandler.handleResourceNotFoundException(exception, webRequest);
+        ResponseEntity<ErrorResponse> response = exceptionHandler.handleResourceNotFoundException(exception, httpServletRequest);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(response.getBody()).isNotNull();
@@ -57,7 +58,7 @@ class GlobalExceptionHandlerTest {
     void shouldHandleBusinessException() {
         BusinessException exception = new BusinessException("Invalid operation");
 
-        ResponseEntity<ErrorResponse> response = exceptionHandler.handleBusinessException(exception, webRequest);
+        ResponseEntity<ErrorResponse> response = exceptionHandler.handleBusinessException(exception, httpServletRequest);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
@@ -72,11 +73,12 @@ class GlobalExceptionHandlerTest {
         given(methodArgumentNotValidException.getBindingResult()).willReturn(bindingResult);
         given(bindingResult.getFieldErrors()).willReturn(List.of(fieldError));
 
-        ResponseEntity<ErrorResponse> response = exceptionHandler.handleValidationExceptions(methodArgumentNotValidException, webRequest);
+        ResponseEntity<ErrorResponse> response = exceptionHandler.handleValidationException(methodArgumentNotValidException, httpServletRequest);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().validationErrors()).containsEntry("email", "Email is required");
+        assertThat(response.getBody().fieldErrors()).hasSize(1);
+        assertThat(response.getBody().fieldErrors().get(0).field()).isEqualTo("email");
     }
 
     @Test
@@ -84,7 +86,7 @@ class GlobalExceptionHandlerTest {
     void shouldHandleGenericExceptions() {
         Exception exception = new Exception("Unexpected error");
 
-        ResponseEntity<ErrorResponse> response = exceptionHandler.handleAllExceptions(exception, webRequest);
+        ResponseEntity<ErrorResponse> response = exceptionHandler.handleGenericException(exception, httpServletRequest);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
         assertThat(response.getBody()).isNotNull();

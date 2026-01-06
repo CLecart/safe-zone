@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("JWT Token Provider Tests")
 class JwtTokenProviderTest {
@@ -42,7 +41,7 @@ class JwtTokenProviderTest {
             String token = jwtTokenProvider.generateToken("admin", List.of("ROLE_USER", "ROLE_ADMIN"));
 
             assertThat(token).isNotNull();
-            List<String> roles = jwtTokenProvider.getRoles(token);
+            List<String> roles = jwtTokenProvider.extractRoles(token);
             assertThat(roles).containsExactlyInAnyOrder("ROLE_USER", "ROLE_ADMIN");
         }
     }
@@ -95,7 +94,7 @@ class JwtTokenProviderTest {
         void shouldExtractUsernameFromToken() {
             String token = jwtTokenProvider.generateToken("testuser", List.of("ROLE_USER"));
 
-            String username = jwtTokenProvider.getUsername(token);
+            String username = jwtTokenProvider.extractUsername(token).orElse(null);
 
             assertThat(username).isEqualTo("testuser");
         }
@@ -105,7 +104,7 @@ class JwtTokenProviderTest {
         void shouldExtractRolesFromToken() {
             String token = jwtTokenProvider.generateToken("testuser", List.of("ROLE_USER", "ROLE_ADMIN"));
 
-            List<String> roles = jwtTokenProvider.getRoles(token);
+            List<String> roles = jwtTokenProvider.extractRoles(token);
 
             assertThat(roles).hasSize(2);
             assertThat(roles).contains("ROLE_USER", "ROLE_ADMIN");
