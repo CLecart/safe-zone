@@ -1,0 +1,48 @@
+# Git
+.git/
+.gitignore
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+*.jar
+!target/*.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
+
+# Test files
+src/test/
+
+# Documentation
+*.md
+docs/
+LICENSE*
+CHANGELOG*
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+Jenkinsfile
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.docker/
+
+# Misc
+.DS_Store
+Thumbs.db

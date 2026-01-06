@@ -1,0 +1,147 @@
+name: Slack Notification
+
+on:
+    workflow_run:
+        workflows: ["SonarQube Analysis", "PR Quality Gate"]
+        types:
+            - completed
+
+jobs:
+    notify:
+        name: Send Notification
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Send Slack notification on success
+              if: ${{ github.event.workflow_run.conclusion == 'success' }}
+              uses: slackapi/slack-github-action@v1.24.0
+              with:
+                  payload: |
+                      {
+                        "blocks": [
+                          {
+                            "type": "header",
+                            "text": {
+                              "type": "plain_text",
+                              "text": "✅ Build Successful",
+                              "emoji": true
+                            }
+                          },
+                          {
+                            "type": "section",
+                            "fields": [
+                              {
+                                "type": "mrkdwn",
+                                "text": "*Workflow:*\n${{ github.event.workflow_run.name }}"
+                              },
+                              {
+                                "type": "mrkdwn",
+                                "text": "*Branch:*\n${{ github.event.workflow_run.head_branch }}"
+                              },
+                              {
+                                "type": "mrkdwn",
+                                "text": "*Commit:*\n${{ github.event.workflow_run.head_sha }}"
+                              },
+                              {
+                                "type": "mrkdwn",
+                                "text": "*Author:*\n${{ github.event.workflow_run.actor.login }}"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "actions",
+                            "elements": [
+                              {
+                                "type": "button",
+                                "text": {
+                                  "type": "plain_text",
+                                  "text": "View Run"
+                                },
+                                "url": "${{ github.event.workflow_run.html_url }}"
+                              },
+                              {
+                                "type": "button",
+                                "text": {
+                                  "type": "plain_text",
+                                  "text": "View SonarQube"
+                                },
+                                "url": "${{ secrets.SONAR_HOST_URL }}/dashboard?id=safe-zone"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+              env:
+                  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+                  SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+            - name: Send Slack notification on failure
+              if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+              uses: slackapi/slack-github-action@v1.24.0
+              with:
+                  payload: |
+                      {
+                        "blocks": [
+                          {
+                            "type": "header",
+                            "text": {
+                              "type": "plain_text",
+                              "text": "❌ Build Failed",
+                              "emoji": true
+                            }
+                          },
+                          {
+                            "type": "section",
+                            "fields": [
+                              {
+                                "type": "mrkdwn",
+                                "text": "*Workflow:*\n${{ github.event.workflow_run.name }}"
+                              },
+                              {
+                                "type": "mrkdwn",
+                                "text": "*Branch:*\n${{ github.event.workflow_run.head_branch }}"
+                              },
+                              {
+                                "type": "mrkdwn",
+                                "text": "*Commit:*\n${{ github.event.workflow_run.head_sha }}"
+                              },
+                              {
+                                "type": "mrkdwn",
+                                "text": "*Author:*\n${{ github.event.workflow_run.actor.login }}"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "section",
+                            "text": {
+                              "type": "mrkdwn",
+                              "text": "⚠️ *Action Required:* Please review the failed build and fix any issues."
+                            }
+                          },
+                          {
+                            "type": "actions",
+                            "elements": [
+                              {
+                                "type": "button",
+                                "text": {
+                                  "type": "plain_text",
+                                  "text": "View Run"
+                                },
+                                "style": "danger",
+                                "url": "${{ github.event.workflow_run.html_url }}"
+                              },
+                              {
+                                "type": "button",
+                                "text": {
+                                  "type": "plain_text",
+                                  "text": "View SonarQube"
+                                },
+                                "url": "${{ secrets.SONAR_HOST_URL }}/dashboard?id=safe-zone"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+              env:
+                  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+                  SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK

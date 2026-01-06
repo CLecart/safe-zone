@@ -1,0 +1,13 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+
+application:
+  jwt:
+    secret: dGVzdC1zZWNyZXQta2V5LWZvci1zYWZlem9uZS1hcHBsaWNhdGlvbi10ZXN0aW5nLW9ubHktdGhpcy1pcy1sb25nLWVub3VnaA==
+    expiration: 3600000
+
+logging:
+  level:
+    root: WARN
+    com.safezone: INFO

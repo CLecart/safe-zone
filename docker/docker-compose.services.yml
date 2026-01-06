@@ -1,0 +1,86 @@
+version: "3.8"
+
+services:
+  api-gateway:
+    build:
+      context: ../api-gateway
+      dockerfile: Dockerfile
+    container_name: safezone-api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      PRODUCT_SERVICE_URL: http://product-service:8081
+      ORDER_SERVICE_URL: http://order-service:8082
+      USER_SERVICE_URL: http://user-service:8083
+    depends_on:
+      - product-service
+      - order-service
+      - user-service
+    networks:
+      - safezone-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  product-service:
+    build:
+      context: ../product-service
+      dockerfile: Dockerfile
+    container_name: safezone-product-service
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    networks:
+      - safezone-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  order-service:
+    build:
+      context: ../order-service
+      dockerfile: Dockerfile
+    container_name: safezone-order-service
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      PRODUCT_SERVICE_URL: http://product-service:8081
+      USER_SERVICE_URL: http://user-service:8083
+    depends_on:
+      - product-service
+      - user-service
+    networks:
+      - safezone-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  user-service:
+    build:
+      context: ../user-service
+      dockerfile: Dockerfile
+    container_name: safezone-user-service
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    networks:
+      - safezone-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  safezone-network:
+    driver: bridge

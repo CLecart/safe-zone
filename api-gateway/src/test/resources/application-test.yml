@@ -1,0 +1,25 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: product-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/products/**
+        - id: order-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/orders/**
+        - id: user-service
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/users/**,/api/auth/**
+
+application:
+  jwt:
+    secret: dGVzdC1zZWNyZXQta2V5LWZvci1zYWZlem9uZS1hcHBsaWNhdGlvbi10ZXN0aW5nLW9ubHk=
+
+logging:
+  level:
+    root: WARN
+    com.safezone: INFO

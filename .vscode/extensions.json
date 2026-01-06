@@ -1,0 +1,15 @@
+{
+  "recommendations": [
+    "sonarsource.sonarlint-vscode",
+    "redhat.java",
+    "vscjava.vscode-java-pack",
+    "vscjava.vscode-spring-boot-dashboard",
+    "vmware.vscode-spring-boot",
+    "pivotal.vscode-spring-boot",
+    "vscjava.vscode-maven",
+    "shengchen.vscode-checkstyle",
+    "ms-azuretools.vscode-docker",
+    "eamodio.gitlens",
+    "usernamehw.errorlens"
+  ]
+}
