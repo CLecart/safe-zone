@@ -1,0 +1,56 @@
+# Patterns
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# IntelliJ IDEA
+*.iml
+.idea/
+!.idea/sonarlint.xml
+!.idea/sonarlint/
+
+# Eclipse
+.classpath
+.project
+.settings/
+bin/
+
+# VS Code
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# Maven
+log/
+*.log
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+*.env
+
+# Test Coverage
+coverage/
+*.exec
+
+# Build artifacts
+*.jar
+*.war
+*.ear
+
+# Temporary files
+*.tmp
+*.swp
+*~
+
+# Docker
+docker-compose.override.yml
+
+# Secrets (never commit these)
+secrets/
+*.pem
+*.key

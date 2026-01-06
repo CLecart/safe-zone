@@ -1,0 +1,65 @@
+# SafeZone E-Commerce Platform Code Owners
+
+# Each line is a file pattern followed by one or more owners
+
+# Global owners (will be requested for all PRs)
+
+- @safezone/platform-team
+
+# Product Service
+
+/product-service/ @safezone/product-team
+/product-service/src/main/java/com/safezone/product/controller/ @safezone/product-team @safezone/api-reviewers
+/product-service/src/main/java/com/safezone/product/service/ @safezone/product-team
+
+# Order Service
+
+/order-service/ @safezone/order-team
+/order-service/src/main/java/com/safezone/order/controller/ @safezone/order-team @safezone/api-reviewers
+/order-service/src/main/java/com/safezone/order/service/ @safezone/order-team
+
+# User Service
+
+/user-service/ @safezone/user-team
+/user-service/src/main/java/com/safezone/user/controller/ @safezone/user-team @safezone/api-reviewers
+/user-service/src/main/java/com/safezone/user/service/ @safezone/user-team
+/user-service/src/main/java/com/safezone/user/security/ @safezone/security-team
+
+# API Gateway
+
+/api-gateway/ @safezone/platform-team
+/api-gateway/src/main/java/com/safezone/gateway/filter/ @safezone/security-team
+
+# Common Library
+
+/common/ @safezone/platform-team
+/common/src/main/java/com/safezone/common/security/ @safezone/security-team
+
+# Configuration Files
+
+_.yml @safezone/platform-team @safezone/devops-team
+_.yaml @safezone/platform-team @safezone/devops-team
+\*.properties @safezone/platform-team
+
+# Docker Configuration
+
+/docker/ @safezone/devops-team
+Dockerfile @safezone/devops-team
+
+# CI/CD Configuration
+
+/.github/ @safezone/devops-team
+/.github/workflows/ @safezone/devops-team @safezone/platform-team
+
+# SonarQube Configuration
+
+sonar-project.properties @safezone/devops-team @safezone/platform-team
+
+# Maven Configuration
+
+pom.xml @safezone/platform-team
+
+# Documentation
+
+\*.md @safezone/platform-team
+/docs/ @safezone/platform-team
