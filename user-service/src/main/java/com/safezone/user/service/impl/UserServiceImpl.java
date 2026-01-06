@@ -25,6 +25,17 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Implementation of the {@link UserService} interface.
+ * Provides user management and authentication business logic.
+ *
+ * <p>Handles user registration, authentication, profile management,
+ * and role-based access control. Passwords are securely hashed.</p>
+ *
+ * @author SafeZone Team
+ * @version 1.0.0
+ * @since 2026-01-06
+ */
 @Service
 @Transactional
 public class UserServiceImpl implements UserService {
@@ -38,6 +49,15 @@ public class UserServiceImpl implements UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final long jwtExpiration;
 
+    /**
+     * Constructs a UserServiceImpl with required dependencies.
+     *
+     * @param userRepository   repository for user persistence
+     * @param userMapper       mapper for DTO/entity conversion
+     * @param passwordEncoder  encoder for secure password hashing
+     * @param jwtTokenProvider provider for JWT token operations
+     * @param jwtExpiration    JWT token expiration time in milliseconds
+     */
     public UserServiceImpl(
             UserRepository userRepository,
             UserMapper userMapper,

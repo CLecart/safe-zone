@@ -31,6 +31,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+/**
+ * REST controller for product management operations.
+ * Provides CRUD endpoints for products with role-based access control.
+ *
+ * <p>Endpoints support pagination, filtering, and search capabilities.
+ * Admin role required for write operations.</p>
+ *
+ * @author SafeZone Team
+ * @version 1.0.0
+ * @since 2026-01-06
+ * @see ProductService
+ */
 @RestController
 @RequestMapping("/api/v1/products")
 @Tag(name = "Products", description = "Product management endpoints")
@@ -38,6 +50,11 @@ public class ProductController {
 
     private final ProductService productService;
 
+    /**
+     * Constructs a ProductController with the required service.
+     *
+     * @param productService the product service for business operations
+     */
     public ProductController(ProductService productService) {
         this.productService = productService;
     }
@@ -173,6 +190,15 @@ public class ProductController {
         return ResponseEntity.ok(ApiResponse.success(available));
     }
 
+    /**
+     * Creates a Pageable object from pagination parameters.
+     *
+     * @param page    page number (zero-based)
+     * @param size    number of elements per page
+     * @param sortBy  field to sort by
+     * @param sortDir sort direction ("asc" or "desc")
+     * @return configured Pageable instance
+     */
     private Pageable createPageable(int page, int size, String sortBy, String sortDir) {
         Sort sort = sortDir.equalsIgnoreCase("desc")
                 ? Sort.by(sortBy).descending()
@@ -180,6 +206,13 @@ public class ProductController {
         return PageRequest.of(page, size, sort);
     }
 
+    /**
+     * Converts a Spring Data Page to a PageResponse DTO.
+     *
+     * @param page the source Page object
+     * @param <T>  the type of page content
+     * @return the converted PageResponse
+     */
     private <T> PageResponse<T> toPageResponse(Page<T> page) {
         return PageResponse.of(
                 page.getContent(),

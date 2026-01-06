@@ -19,6 +19,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * Implementation of the {@link ProductService} interface.
+ * Provides product management business logic with transactional support.
+ *
+ * <p>Handles product CRUD operations, stock management, and product search.
+ * All write operations are transactional.</p>
+ *
+ * @author SafeZone Team
+ * @version 1.0.0
+ * @since 2026-01-06
+ */
 @Service
 @Transactional
 public class ProductServiceImpl implements ProductService {
@@ -29,6 +40,12 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
 
+    /**
+     * Constructs a ProductServiceImpl with required dependencies.
+     *
+     * @param productRepository repository for product persistence
+     * @param productMapper     mapper for DTO/entity conversion
+     */
     public ProductServiceImpl(ProductRepository productRepository, ProductMapper productMapper) {
         this.productRepository = productRepository;
         this.productMapper = productMapper;

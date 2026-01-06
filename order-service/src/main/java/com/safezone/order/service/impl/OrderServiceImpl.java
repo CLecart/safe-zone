@@ -24,6 +24,17 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
+/**
+ * Implementation of the {@link OrderService} interface.
+ * Provides order management business logic with transactional support.
+ *
+ * <p>Handles order lifecycle from creation through fulfillment,
+ * integrating with Product Service for availability checks.</p>
+ *
+ * @author SafeZone Team
+ * @version 1.0.0
+ * @since 2026-01-06
+ */
 @Service
 @Transactional
 public class OrderServiceImpl implements OrderService {
@@ -35,6 +46,13 @@ public class OrderServiceImpl implements OrderService {
     private final OrderMapper orderMapper;
     private final ProductServiceClient productServiceClient;
 
+    /**
+     * Constructs an OrderServiceImpl with required dependencies.
+     *
+     * @param orderRepository      repository for order persistence
+     * @param orderMapper          mapper for DTO/entity conversion
+     * @param productServiceClient client for product service communication
+     */
     public OrderServiceImpl(
             OrderRepository orderRepository,
             OrderMapper orderMapper,
