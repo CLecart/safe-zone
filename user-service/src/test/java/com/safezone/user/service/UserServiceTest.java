@@ -1,5 +1,35 @@
 package com.safezone.user.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import com.safezone.common.exception.BusinessException;
 import com.safezone.common.exception.ResourceNotFoundException;
 import com.safezone.common.security.JwtTokenProvider;
@@ -13,33 +43,18 @@ import com.safezone.user.entity.UserRole;
 import com.safezone.user.mapper.UserMapper;
 import com.safezone.user.repository.UserRepository;
 import com.safezone.user.service.impl.UserServiceImpl;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-
+/**
+ * Unit tests for {@link UserServiceImpl}.
+ * <p>
+ * Tests cover user registration, authentication, profile management,
+ * and role operations including both success and error scenarios.
+ * </p>
+ *
+ * @author SafeZone Team
+ * @version 1.0.0
+ * @since 2024-01-06
+ */
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
@@ -55,6 +70,9 @@ class UserServiceTest {
     @Mock
     private JwtTokenProvider jwtTokenProvider;
 
+    @Captor
+    private ArgumentCaptor<User> userCaptor;
+
     private UserServiceImpl userService;
 
     private User testUser;
@@ -67,8 +85,7 @@ class UserServiceTest {
                 userMapper,
                 passwordEncoder,
                 jwtTokenProvider,
-                86400000L
-        );
+                86400000L);
 
         Set<UserRole> roles = new HashSet<>();
         roles.add(UserRole.USER);
@@ -98,8 +115,7 @@ class UserServiceTest {
                 Set.of(UserRole.USER),
                 true,
                 LocalDateTime.now(),
-                null
-        );
+                null);
     }
 
     @Nested
@@ -115,14 +131,13 @@ class UserServiceTest {
                     "Password123",
                     "New",
                     "User",
-                    null
-            );
+                    null);
 
             given(userRepository.existsByUsername("newuser")).willReturn(false);
             given(userRepository.existsByEmail("new@example.com")).willReturn(false);
             given(userMapper.toEntity(request)).willReturn(testUser);
             given(passwordEncoder.encode("Password123")).willReturn("encodedPassword");
-            given(userRepository.save(any(User.class))).willReturn(testUser);
+            given(userRepository.save(Objects.requireNonNull(testUser))).willReturn(testUser);
             given(userMapper.toResponse(testUser)).willReturn(testUserResponse);
             given(jwtTokenProvider.generateToken(anyString(), anyList())).willReturn("jwt-token");
 
@@ -130,7 +145,8 @@ class UserServiceTest {
 
             assertThat(result).isNotNull();
             assertThat(result.token()).isEqualTo("jwt-token");
-            verify(userRepository).save(any(User.class));
+            verify(userRepository).save(Objects.requireNonNull(testUser));
+            assertThat(testUser).isNotNull();
         }
 
         @Test
@@ -142,8 +158,7 @@ class UserServiceTest {
                     "Password123",
                     null,
                     null,
-                    null
-            );
+                    null);
 
             given(userRepository.existsByUsername("existinguser")).willReturn(true);
 
@@ -161,8 +176,7 @@ class UserServiceTest {
                     "Password123",
                     null,
                     null,
-                    null
-            );
+                    null);
 
             given(userRepository.existsByUsername("newuser")).willReturn(false);
             given(userRepository.existsByEmail("existing@example.com")).willReturn(true);
@@ -184,7 +198,7 @@ class UserServiceTest {
 
             given(userRepository.findByUsername("testuser")).willReturn(Optional.of(testUser));
             given(passwordEncoder.matches("password123", "encodedPassword")).willReturn(true);
-            given(userRepository.save(any(User.class))).willReturn(testUser);
+            given(userRepository.save(Objects.requireNonNull(testUser))).willReturn(testUser);
             given(userMapper.toResponse(testUser)).willReturn(testUserResponse);
             given(jwtTokenProvider.generateToken(anyString(), anyList())).willReturn("jwt-token");
 
@@ -266,7 +280,9 @@ class UserServiceTest {
         @DisplayName("Should get all users with pagination")
         void shouldGetAllUsersWithPagination() {
             Pageable pageable = PageRequest.of(0, 10);
-            Page<User> userPage = new PageImpl<>(List.of(testUser), pageable, 1);
+            List<User> userList = new ArrayList<>();
+            userList.add(testUser);
+            Page<User> userPage = new PageImpl<>(userList, pageable, 1);
 
             given(userRepository.findAll(pageable)).willReturn(userPage);
             given(userMapper.toResponse(testUser)).willReturn(testUserResponse);
@@ -288,17 +304,17 @@ class UserServiceTest {
                     "UpdatedFirst",
                     "UpdatedLast",
                     null,
-                    null
-            );
+                    null);
 
             given(userRepository.findById(1L)).willReturn(Optional.of(testUser));
-            given(userRepository.save(any(User.class))).willReturn(testUser);
+            given(userRepository.save(Objects.requireNonNull(testUser))).willReturn(testUser);
             given(userMapper.toResponse(testUser)).willReturn(testUserResponse);
 
             UserResponse result = userService.updateUser(1L, request);
 
             assertThat(result).isNotNull();
-            verify(userRepository).save(any(User.class));
+            verify(userRepository).save(Objects.requireNonNull(testUser));
+            assertThat(testUser).isNotNull();
         }
 
         @Test
@@ -308,8 +324,7 @@ class UserServiceTest {
                     null,
                     null,
                     "existing@example.com",
-                    null
-            );
+                    null);
 
             given(userRepository.findById(1L)).willReturn(Optional.of(testUser));
             given(userRepository.existsByEmail("existing@example.com")).willReturn(true);
@@ -328,13 +343,14 @@ class UserServiceTest {
         @DisplayName("Should add role to user")
         void shouldAddRoleToUser() {
             given(userRepository.findById(1L)).willReturn(Optional.of(testUser));
-            given(userRepository.save(any(User.class))).willReturn(testUser);
+            given(userRepository.save(Objects.requireNonNull(testUser))).willReturn(testUser);
             given(userMapper.toResponse(testUser)).willReturn(testUserResponse);
 
             UserResponse result = userService.addRole(1L, UserRole.ADMIN);
 
             assertThat(result).isNotNull();
-            verify(userRepository).save(any(User.class));
+            verify(userRepository).save(Objects.requireNonNull(testUser));
+            assertThat(testUser).isNotNull();
         }
 
         @Test

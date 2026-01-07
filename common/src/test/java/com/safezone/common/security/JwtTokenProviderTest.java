@@ -1,19 +1,35 @@
 package com.safezone.common.security;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
+/**
+ * Unit tests for {@link JwtTokenProvider}.
+ * Verifies token generation, validation, and claim extraction functionality.
+ *
+ * @author SafeZone Team
+ * @version 1.0.0
+ * @since 2026-01-06
+ */
 @DisplayName("JWT Token Provider Tests")
 class JwtTokenProviderTest {
 
+    /** The JWT token provider under test. */
     private JwtTokenProvider jwtTokenProvider;
+
+    /** Test secret key for JWT signing (Base64 encoded, 256+ bits). */
     private static final String SECRET = "dGVzdC1zZWNyZXQta2V5LWZvci1zYWZlem9uZS1hcHBsaWNhdGlvbi10ZXN0aW5nLW9ubHktdGhpcy1pcy1sb25nLWVub3VnaA==";
+
+    /** Test token expiration time in milliseconds (1 hour). */
     private static final long EXPIRATION = 3600000L;
 
     @BeforeEach
@@ -30,9 +46,10 @@ class JwtTokenProviderTest {
         void shouldGenerateValidToken() {
             String token = jwtTokenProvider.generateToken("testuser", List.of("ROLE_USER"));
 
-            assertThat(token).isNotNull();
-            assertThat(token).isNotEmpty();
-            assertThat(token.split("\\.")).hasSize(3);
+            assertThat(token)
+                    .isNotNull()
+                    .isNotEmpty()
+                    .satisfies(t -> assertThat(t.split("\\.")).hasSize(3));
         }
 
         @Test
@@ -60,26 +77,12 @@ class JwtTokenProviderTest {
             assertThat(isValid).isTrue();
         }
 
-        @Test
-        @DisplayName("Should reject invalid token")
-        void shouldRejectInvalidToken() {
-            boolean isValid = jwtTokenProvider.validateToken("invalid.token.here");
-
-            assertThat(isValid).isFalse();
-        }
-
-        @Test
-        @DisplayName("Should reject null token")
-        void shouldRejectNullToken() {
-            boolean isValid = jwtTokenProvider.validateToken(null);
-
-            assertThat(isValid).isFalse();
-        }
-
-        @Test
-        @DisplayName("Should reject empty token")
-        void shouldRejectEmptyToken() {
-            boolean isValid = jwtTokenProvider.validateToken("");
+        @ParameterizedTest(name = "Should reject invalid token: {0}")
+        @NullAndEmptySource
+        @ValueSource(strings = { "invalid.token.here" })
+        @DisplayName("Should reject invalid, null or empty token")
+        void shouldRejectInvalidNullOrEmptyToken(String invalidToken) {
+            boolean isValid = jwtTokenProvider.validateToken(invalidToken);
 
             assertThat(isValid).isFalse();
         }
@@ -106,8 +109,9 @@ class JwtTokenProviderTest {
 
             List<String> roles = jwtTokenProvider.extractRoles(token);
 
-            assertThat(roles).hasSize(2);
-            assertThat(roles).contains("ROLE_USER", "ROLE_ADMIN");
+            assertThat(roles)
+                    .hasSize(2)
+                    .contains("ROLE_USER", "ROLE_ADMIN");
         }
     }
 }

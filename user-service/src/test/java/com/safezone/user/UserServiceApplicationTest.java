@@ -8,6 +8,17 @@ import org.springframework.context.ApplicationContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * Integration tests for the User Service Application.
+ * <p>
+ * Verifies that the Spring application context loads correctly
+ * and all required beans are properly configured.
+ * </p>
+ *
+ * @author SafeZone Team
+ * @version 1.0.0
+ * @since 2024-01-06
+ */
 @SpringBootTest
 @DisplayName("User Service Application Tests")
 class UserServiceApplicationTest {

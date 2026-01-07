@@ -1,5 +1,17 @@
 package com.safezone.order.service.impl;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Objects;
+import java.util.UUID;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.safezone.common.exception.BusinessException;
 import com.safezone.common.exception.ResourceNotFoundException;
 import com.safezone.order.client.ProductServiceClient;
@@ -13,23 +25,15 @@ import com.safezone.order.entity.OrderStatus;
 import com.safezone.order.mapper.OrderMapper;
 import com.safezone.order.repository.OrderRepository;
 import com.safezone.order.service.OrderService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.UUID;
 
 /**
  * Implementation of the {@link OrderService} interface.
  * Provides order management business logic with transactional support.
  *
- * <p>Handles order lifecycle from creation through fulfillment,
- * integrating with Product Service for availability checks.</p>
+ * <p>
+ * Handles order lifecycle from creation through fulfillment,
+ * integrating with Product Service for availability checks.
+ * </p>
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -109,7 +113,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     public Page<OrderResponse> getAllOrders(Pageable pageable) {
         logger.debug("Fetching all orders with pagination");
-        return orderRepository.findAll(pageable)
+        return orderRepository.findAll(Objects.requireNonNull(pageable))
                 .map(orderMapper::toResponse);
     }
 
@@ -164,7 +168,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private Order findOrderById(Long id) {
-        return orderRepository.findById(id)
+        return orderRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new ResourceNotFoundException(ORDER_RESOURCE, "id", id));
     }
 

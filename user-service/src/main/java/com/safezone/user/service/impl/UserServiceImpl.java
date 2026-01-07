@@ -1,5 +1,18 @@
 package com.safezone.user.service.impl;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.safezone.common.exception.BusinessException;
 import com.safezone.common.exception.ResourceNotFoundException;
 import com.safezone.common.security.JwtTokenProvider;
@@ -13,24 +26,15 @@ import com.safezone.user.entity.UserRole;
 import com.safezone.user.mapper.UserMapper;
 import com.safezone.user.repository.UserRepository;
 import com.safezone.user.service.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * Implementation of the {@link UserService} interface.
  * Provides user management and authentication business logic.
  *
- * <p>Handles user registration, authentication, profile management,
- * and role-based access control. Passwords are securely hashed.</p>
+ * <p>
+ * Handles user registration, authentication, profile management,
+ * and role-based access control. Passwords are securely hashed.
+ * </p>
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -101,11 +105,11 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException("INVALID_CREDENTIALS", "Invalid username or password");
         }
 
-        if (!user.getEnabled()) {
+        if (Boolean.FALSE.equals(user.getEnabled())) {
             throw new BusinessException("ACCOUNT_DISABLED", "Account is disabled");
         }
 
-        if (user.getLocked()) {
+        if (Boolean.TRUE.equals(user.getLocked())) {
             throw new BusinessException("ACCOUNT_LOCKED", "Account is locked");
         }
 
@@ -137,7 +141,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public Page<UserResponse> getAllUsers(Pageable pageable) {
         logger.debug("Fetching all users with pagination");
-        return userRepository.findAll(pageable)
+        return userRepository.findAll(Objects.requireNonNull(pageable, "Pageable must not be null"))
                 .map(userMapper::toResponse);
     }
 
@@ -172,7 +176,7 @@ public class UserServiceImpl implements UserService {
             user.setPhone(request.phone());
         }
 
-        User updatedUser = userRepository.save(user);
+        User updatedUser = userRepository.save(Objects.requireNonNull(user, "User must not be null"));
         logger.info("User updated successfully: {}", id);
         return userMapper.toResponse(updatedUser);
     }
@@ -226,7 +230,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private User findUserById(Long id) {
-        return userRepository.findById(id)
+        return userRepository.findById(Objects.requireNonNull(id, "User ID must not be null"))
                 .orElseThrow(() -> new ResourceNotFoundException(USER_RESOURCE, "id", id));
     }
 
