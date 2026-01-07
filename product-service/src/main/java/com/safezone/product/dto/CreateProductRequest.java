@@ -9,6 +9,21 @@ import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 
+/**
+ * Data Transfer Object for product creation requests.
+ * Contains validated fields required to create a new product in the catalog.
+ *
+ * @param name          the product display name (2-100 characters)
+ * @param description   optional product description (max 1000 characters)
+ * @param price         the product price (must be greater than 0)
+ * @param stockQuantity the initial stock quantity (non-negative)
+ * @param sku           the unique Stock Keeping Unit identifier (3-50 characters)
+ * @param category      the product category
+ *
+ * @author SafeZone Team
+ * @version 1.0.0
+ * @since 2026-01-06
+ */
 public record CreateProductRequest(
         @NotBlank(message = "Product name is required")
         @Size(min = 2, max = 100, message = "Product name must be between 2 and 100 characters")

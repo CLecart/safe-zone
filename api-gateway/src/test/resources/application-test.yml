@@ -15,11 +15,10 @@ spring:
           predicates:
             - Path=/api/users/**,/api/auth/**
 
-application:
-  jwt:
-    secret: dGVzdC1zZWNyZXQta2V5LWZvci1zYWZlem9uZS1hcHBsaWNhdGlvbi10ZXN0aW5nLW9ubHk=
+jwt:
+  secret: dGVzdC1zZWNyZXQta2V5LWZvci1zYWZlem9uZS1hcHBsaWNhdGlvbi10ZXN0aW5nLW9ubHk=
 
 logging:
   level:
     root: WARN
-    com.safezone: INFO
+    "[com.safezone]": INFO

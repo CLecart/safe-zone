@@ -1,5 +1,35 @@
 package com.safezone.product.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 import com.safezone.common.exception.BusinessException;
 import com.safezone.common.exception.ResourceNotFoundException;
 import com.safezone.product.dto.CreateProductRequest;
@@ -10,45 +40,41 @@ import com.safezone.product.entity.ProductCategory;
 import com.safezone.product.mapper.ProductMapper;
 import com.safezone.product.repository.ProductRepository;
 import com.safezone.product.service.impl.ProductServiceImpl;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-
+/**
+ * Unit tests for {@link ProductServiceImpl}.
+ * Tests product management business logic with mocked dependencies.
+ *
+ * @author SafeZone Team
+ * @version 1.0.0
+ * @since 2026-01-06
+ */
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
 
+    /** Mock product repository for persistence operations. */
     @Mock
     private ProductRepository productRepository;
 
+    /** Mock product mapper for DTO conversions. */
     @Mock
     private ProductMapper productMapper;
 
+    /** The service under test. */
     @InjectMocks
     private ProductServiceImpl productService;
 
+    /** Captor for Product arguments. */
+    @Captor
+    private ArgumentCaptor<Product> productCaptor;
+
+    /** Test product entity. */
     private Product testProduct;
+
+    /** Test product response DTO. */
     private ProductResponse testProductResponse;
+
+    /** Test product creation request. */
     private CreateProductRequest createRequest;
 
     @BeforeEach
@@ -76,8 +102,7 @@ class ProductServiceTest {
                 ProductCategory.ELECTRONICS,
                 true,
                 LocalDateTime.now(),
-                LocalDateTime.now()
-        );
+                LocalDateTime.now());
 
         createRequest = new CreateProductRequest(
                 "Test Product",
@@ -85,8 +110,7 @@ class ProductServiceTest {
                 BigDecimal.valueOf(99.99),
                 100,
                 "TEST-001",
-                ProductCategory.ELECTRONICS
-        );
+                ProductCategory.ELECTRONICS);
     }
 
     @Nested
@@ -98,7 +122,7 @@ class ProductServiceTest {
         void shouldCreateProductSuccessfully() {
             given(productRepository.existsBySku(createRequest.sku())).willReturn(false);
             given(productMapper.toEntity(createRequest)).willReturn(testProduct);
-            given(productRepository.save(any(Product.class))).willReturn(testProduct);
+            given(productRepository.save(Objects.requireNonNull(testProduct))).willReturn(testProduct);
             given(productMapper.toResponse(testProduct)).willReturn(testProductResponse);
 
             ProductResponse result = productService.createProduct(createRequest);
@@ -106,7 +130,8 @@ class ProductServiceTest {
             assertThat(result).isNotNull();
             assertThat(result.name()).isEqualTo(testProductResponse.name());
             assertThat(result.sku()).isEqualTo(testProductResponse.sku());
-            verify(productRepository).save(any(Product.class));
+            verify(productRepository).save(Objects.requireNonNull(testProduct));
+            assertThat(testProduct).isNotNull();
         }
 
         @Test
@@ -118,7 +143,7 @@ class ProductServiceTest {
                     .isInstanceOf(BusinessException.class)
                     .hasMessageContaining("already exists");
 
-            verify(productRepository, never()).save(any(Product.class));
+            then(productRepository).should(never()).save(Objects.requireNonNull(testProduct));
         }
     }
 
@@ -164,7 +189,9 @@ class ProductServiceTest {
         @DisplayName("Should return paginated products")
         void shouldReturnPaginatedProducts() {
             Pageable pageable = PageRequest.of(0, 10);
-            Page<Product> productPage = new PageImpl<>(List.of(testProduct), pageable, 1);
+            List<Product> productList = new ArrayList<>();
+            productList.add(testProduct);
+            Page<Product> productPage = new PageImpl<>(productList, pageable, 1);
 
             given(productRepository.findAll(pageable)).willReturn(productPage);
             given(productMapper.toResponse(testProduct)).willReturn(testProductResponse);
@@ -189,29 +216,30 @@ class ProductServiceTest {
                     BigDecimal.valueOf(149.99),
                     null,
                     null,
-                    null
-            );
+                    null);
 
             given(productRepository.findById(1L)).willReturn(Optional.of(testProduct));
-            given(productRepository.save(any(Product.class))).willReturn(testProduct);
+            given(productRepository.save(Objects.requireNonNull(testProduct))).willReturn(testProduct);
             given(productMapper.toResponse(testProduct)).willReturn(testProductResponse);
 
             ProductResponse result = productService.updateProduct(1L, updateRequest);
 
             assertThat(result).isNotNull();
-            verify(productRepository).save(any(Product.class));
+            verify(productRepository).save(Objects.requireNonNull(testProduct));
+            assertThat(testProduct).isNotNull();
         }
 
         @Test
         @DisplayName("Should soft delete product")
         void shouldSoftDeleteProduct() {
             given(productRepository.findById(1L)).willReturn(Optional.of(testProduct));
-            given(productRepository.save(any(Product.class))).willReturn(testProduct);
+            given(productRepository.save(Objects.requireNonNull(testProduct))).willReturn(testProduct);
 
             productService.deleteProduct(1L);
 
             assertThat(testProduct.getActive()).isFalse();
-            verify(productRepository).save(testProduct);
+            verify(productRepository).save(Objects.requireNonNull(testProduct));
+            assertThat(testProduct).isNotNull();
         }
     }
 
@@ -223,7 +251,7 @@ class ProductServiceTest {
         @DisplayName("Should update stock successfully")
         void shouldUpdateStockSuccessfully() {
             given(productRepository.findById(1L)).willReturn(Optional.of(testProduct));
-            given(productRepository.save(any(Product.class))).willReturn(testProduct);
+            given(productRepository.save(Objects.requireNonNull(testProduct))).willReturn(testProduct);
             given(productMapper.toResponse(testProduct)).willReturn(testProductResponse);
 
             ProductResponse result = productService.updateStock(1L, 50);
@@ -281,7 +309,9 @@ class ProductServiceTest {
         @DisplayName("Should search products by term")
         void shouldSearchProductsByTerm() {
             Pageable pageable = PageRequest.of(0, 10);
-            Page<Product> productPage = new PageImpl<>(List.of(testProduct), pageable, 1);
+            List<Product> productList = new ArrayList<>();
+            productList.add(testProduct);
+            Page<Product> productPage = new PageImpl<>(productList, pageable, 1);
 
             given(productRepository.searchProducts("test", pageable)).willReturn(productPage);
             given(productMapper.toResponse(testProduct)).willReturn(testProductResponse);
@@ -295,7 +325,9 @@ class ProductServiceTest {
         @DisplayName("Should filter products by category")
         void shouldFilterProductsByCategory() {
             Pageable pageable = PageRequest.of(0, 10);
-            Page<Product> productPage = new PageImpl<>(List.of(testProduct), pageable, 1);
+            List<Product> productList = new ArrayList<>();
+            productList.add(testProduct);
+            Page<Product> productPage = new PageImpl<>(productList, pageable, 1);
 
             given(productRepository.findByCategoryAndActiveTrue(ProductCategory.ELECTRONICS, pageable))
                     .willReturn(productPage);

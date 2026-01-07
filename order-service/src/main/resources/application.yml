@@ -12,7 +12,7 @@ spring:
     show-sql: false
     properties:
       hibernate:
-        format_sql: true
+        "[format_sql]": true
   h2:
     console:
       enabled: true
@@ -48,4 +48,4 @@ springdoc:
 
 logging:
   level:
-    com.safezone: DEBUG
+    "[com.safezone]": DEBUG

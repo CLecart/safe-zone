@@ -1,12 +1,14 @@
 package com.safezone.product.mapper;
 
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingConstants;
+
 import com.safezone.product.dto.CreateProductRequest;
 import com.safezone.product.dto.ProductResponse;
 import com.safezone.product.entity.Product;
-import org.mapstruct.Mapper;
-import org.mapstruct.MappingConstants;
-
-import java.util.List;
 
 /**
  * MapStruct mapper for Product entity and DTO conversions.
@@ -21,10 +23,15 @@ public interface ProductMapper {
 
     /**
      * Converts a creation request to a Product entity.
+     * Fields id, active, createdAt, updatedAt are ignored as they are set by JPA.
      *
      * @param request the product creation request
      * @return the mapped Product entity
      */
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "active", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     Product toEntity(CreateProductRequest request);
 
     /**

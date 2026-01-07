@@ -15,13 +15,31 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * REST controller for authentication operations.
+ * <p>
+ * Provides public endpoints for user registration and login.
+ * Returns JWT tokens for authenticated sessions.
+ * </p>
+ *
+ * @author SafeZone Team
+ * @version 1.0.0
+ * @since 2024-01-06
+ * @see UserService
+ */
 @RestController
 @RequestMapping("/api/v1/auth")
 @Tag(name = "Authentication", description = "Authentication endpoints")
 public class AuthController {
 
+    /** User service for authentication operations. */
     private final UserService userService;
 
+    /**
+     * Constructs an AuthController with the required service.
+     *
+     * @param userService the user service for authentication operations
+     */
     public AuthController(UserService userService) {
         this.userService = userService;
     }

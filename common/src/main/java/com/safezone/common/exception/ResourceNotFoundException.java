@@ -4,8 +4,10 @@ package com.safezone.common.exception;
  * Exception thrown when a requested resource cannot be found.
  * Typically results in an HTTP 404 response.
  *
- * <p>Provides detailed information about which resource was not found
- * and the criteria used for the search.</p>
+ * <p>
+ * Provides detailed information about which resource was not found
+ * and the criteria used for the search.
+ * </p>
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -13,9 +15,11 @@ package com.safezone.common.exception;
  */
 public class ResourceNotFoundException extends RuntimeException {
 
+    private static final long serialVersionUID = 1L;
+
     private final String resourceName;
     private final String fieldName;
-    private final Object fieldValue;
+    private final transient Object fieldValue;
 
     /**
      * Constructs a ResourceNotFoundException with resource details.

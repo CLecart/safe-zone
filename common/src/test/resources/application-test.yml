@@ -10,4 +10,4 @@ application:
 logging:
   level:
     root: WARN
-    com.safezone: INFO
+    "[com.safezone]": INFO

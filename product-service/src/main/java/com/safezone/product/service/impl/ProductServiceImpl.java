@@ -1,5 +1,15 @@
 package com.safezone.product.service.impl;
 
+import java.util.List;
+import java.util.Objects;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.safezone.common.exception.BusinessException;
 import com.safezone.common.exception.ResourceNotFoundException;
 import com.safezone.product.dto.CreateProductRequest;
@@ -10,21 +20,15 @@ import com.safezone.product.entity.ProductCategory;
 import com.safezone.product.mapper.ProductMapper;
 import com.safezone.product.repository.ProductRepository;
 import com.safezone.product.service.ProductService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 /**
  * Implementation of the {@link ProductService} interface.
  * Provides product management business logic with transactional support.
  *
- * <p>Handles product CRUD operations, stock management, and product search.
- * All write operations are transactional.</p>
+ * <p>
+ * Handles product CRUD operations, stock management, and product search.
+ * All write operations are transactional.
+ * </p>
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -88,7 +92,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(readOnly = true)
     public Page<ProductResponse> getAllProducts(Pageable pageable) {
         logger.debug("Fetching all products with pagination");
-        return productRepository.findAll(pageable)
+        return productRepository.findAll(Objects.requireNonNull(pageable, "Pageable must not be null"))
                 .map(productMapper::toResponse);
     }
 
@@ -123,7 +127,7 @@ public class ProductServiceImpl implements ProductService {
         Product product = findProductById(id);
 
         updateProductFields(product, request);
-        Product updatedProduct = productRepository.save(product);
+        Product updatedProduct = productRepository.save(Objects.requireNonNull(product, "Product must not be null"));
 
         logger.info("Product updated successfully with ID: {}", id);
         return productMapper.toResponse(updatedProduct);
@@ -149,7 +153,8 @@ public class ProductServiceImpl implements ProductService {
         int newStock = product.getStockQuantity() + quantity;
         if (newStock < 0) {
             throw new BusinessException("INSUFFICIENT_STOCK",
-                    "Insufficient stock. Available: " + product.getStockQuantity() + ", Requested: " + Math.abs(quantity));
+                    "Insufficient stock. Available: " + product.getStockQuantity() + ", Requested: "
+                            + Math.abs(quantity));
         }
 
         product.setStockQuantity(newStock);
@@ -174,11 +179,25 @@ public class ProductServiceImpl implements ProductService {
         return product.getActive() && product.getStockQuantity() >= quantity;
     }
 
+    /**
+     * Finds a product by ID or throws ResourceNotFoundException.
+     *
+     * @param id the product ID to find
+     * @return the found Product entity
+     * @throws ResourceNotFoundException if product not found
+     */
     private Product findProductById(Long id) {
-        return productRepository.findById(id)
+        return productRepository.findById(Objects.requireNonNull(id, "Product ID must not be null"))
                 .orElseThrow(() -> new ResourceNotFoundException(PRODUCT_RESOURCE, "id", id));
     }
 
+    /**
+     * Updates product fields from the update request.
+     * Only non-null fields in the request are applied.
+     *
+     * @param product the product entity to update
+     * @param request the update request containing new values
+     */
     private void updateProductFields(Product product, UpdateProductRequest request) {
         if (request.name() != null) {
             product.setName(request.name());

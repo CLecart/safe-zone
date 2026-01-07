@@ -7,6 +7,21 @@ import jakarta.validation.constraints.Size;
 
 import java.util.List;
 
+/**
+ * Request DTO for creating a new order.
+ * <p>
+ * Contains the user ID, list of order items, and optional
+ * shipping/billing addresses.
+ * </p>
+ *
+ * @param userId the ID of the user placing the order (required)
+ * @param items the list of items to order (at least one required)
+ * @param shippingAddress the shipping address (max 500 characters)
+ * @param billingAddress the billing address (max 500 characters)
+ * @author SafeZone Team
+ * @version 1.0.0
+ * @since 2024-01-06
+ */
 public record CreateOrderRequest(
         @NotNull(message = "User ID is required")
         Long userId,

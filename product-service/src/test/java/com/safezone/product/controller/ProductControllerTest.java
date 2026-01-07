@@ -1,248 +1,264 @@
 package com.safezone.product.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.safezone.common.dto.ApiResponse;
-import com.safezone.product.dto.CreateProductRequest;
-import com.safezone.product.dto.ProductResponse;
-import com.safezone.product.dto.UpdateProductRequest;
-import com.safezone.product.entity.ProductCategory;
-import com.safezone.product.service.ProductService;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.safezone.product.dto.CreateProductRequest;
+import com.safezone.product.dto.ProductResponse;
+import com.safezone.product.dto.UpdateProductRequest;
+import com.safezone.product.entity.ProductCategory;
+import com.safezone.product.service.ProductService;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
+/**
+ * Integration tests for {@link ProductController}.
+ * Tests REST endpoints with MockMvc and mocked service layer.
+ *
+ * @author SafeZone Team
+ * @version 1.0.0
+ * @since 2026-01-06
+ */
 @SpringBootTest
 @AutoConfigureMockMvc
 class ProductControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+        /** MockMvc for HTTP request simulation. */
+        @Autowired
+        private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+        /** JSON serialization mapper. */
+        @Autowired
+        private ObjectMapper objectMapper;
 
-    @MockBean
-    private ProductService productService;
+        /** Mock product service. */
+        @MockitoBean
+        private ProductService productService;
 
-    private ProductResponse testProductResponse;
-    private CreateProductRequest createRequest;
+        /** Test product response DTO. */
+        private ProductResponse testProductResponse;
 
-    @BeforeEach
-    void setUp() {
-        testProductResponse = new ProductResponse(
-                1L,
-                "Test Product",
-                "Test Description",
-                BigDecimal.valueOf(99.99),
-                100,
-                "TEST-001",
-                ProductCategory.ELECTRONICS,
-                true,
-                LocalDateTime.now(),
-                LocalDateTime.now()
-        );
+        /** Test product creation request. */
+        private CreateProductRequest createRequest;
 
-        createRequest = new CreateProductRequest(
-                "Test Product",
-                "Test Description",
-                BigDecimal.valueOf(99.99),
-                100,
-                "TEST-001",
-                ProductCategory.ELECTRONICS
-        );
-    }
+        @BeforeEach
+        void setUp() {
+                testProductResponse = new ProductResponse(
+                                1L,
+                                "Test Product",
+                                "Test Description",
+                                BigDecimal.valueOf(99.99),
+                                100,
+                                "TEST-001",
+                                ProductCategory.ELECTRONICS,
+                                true,
+                                LocalDateTime.now(),
+                                LocalDateTime.now());
 
-    @Test
-    @DisplayName("Should get product by ID")
-    void shouldGetProductById() throws Exception {
-        given(productService.getProductById(1L)).willReturn(testProductResponse);
+                createRequest = new CreateProductRequest(
+                                "Test Product",
+                                "Test Description",
+                                BigDecimal.valueOf(99.99),
+                                100,
+                                "TEST-001",
+                                ProductCategory.ELECTRONICS);
+        }
 
-        mockMvc.perform(get("/api/v1/products/1"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.data.id").value(1))
-                .andExpect(jsonPath("$.data.name").value("Test Product"));
-    }
+        @Test
+        @DisplayName("Should get product by ID")
+        void shouldGetProductById() throws Exception {
+                given(productService.getProductById(1L)).willReturn(testProductResponse);
 
-    @Test
-    @DisplayName("Should get products with pagination")
-    void shouldGetProductsWithPagination() throws Exception {
-        Page<ProductResponse> productPage = new PageImpl<>(
-                List.of(testProductResponse),
-                PageRequest.of(0, 20),
-                1
-        );
-        given(productService.getAllProducts(any())).willReturn(productPage);
+                mockMvc.perform(get("/api/v1/products/1"))
+                                .andDo(print())
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.success").value(true))
+                                .andExpect(jsonPath("$.data.id").value(1))
+                                .andExpect(jsonPath("$.data.name").value("Test Product"));
+        }
 
-        mockMvc.perform(get("/api/v1/products")
-                        .param("page", "0")
-                        .param("size", "20"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.data.content").isArray())
-                .andExpect(jsonPath("$.data.totalElements").value(1));
-    }
+        @Test
+        @DisplayName("Should get products with pagination")
+        void shouldGetProductsWithPagination() throws Exception {
+                List<ProductResponse> responseList = Collections.singletonList(testProductResponse);
+                Page<ProductResponse> productPage = new PageImpl<>(
+                                Objects.requireNonNull(responseList),
+                                PageRequest.of(0, 20),
+                                1);
+                given(productService.getAllProducts(any())).willReturn(productPage);
 
-    @Test
-    @WithMockUser(roles = "ADMIN")
-    @DisplayName("Should create product with admin role")
-    void shouldCreateProductWithAdminRole() throws Exception {
-        given(productService.createProduct(any(CreateProductRequest.class)))
-                .willReturn(testProductResponse);
+                mockMvc.perform(get("/api/v1/products")
+                                .param("page", "0")
+                                .param("size", "20"))
+                                .andDo(print())
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.success").value(true))
+                                .andExpect(jsonPath("$.data.content").isArray())
+                                .andExpect(jsonPath("$.data.totalElements").value(1));
+        }
 
-        mockMvc.perform(post("/api/v1/products")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(createRequest)))
-                .andDo(print())
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.data.name").value("Test Product"));
-    }
+        @Test
+        @WithMockUser(roles = "ADMIN")
+        @DisplayName("Should create product with admin role")
+        void shouldCreateProductWithAdminRole() throws Exception {
+                given(productService.createProduct(any(CreateProductRequest.class)))
+                                .willReturn(testProductResponse);
 
-    @Test
-    @DisplayName("Should reject create product without authentication")
-    void shouldRejectCreateProductWithoutAuth() throws Exception {
-        mockMvc.perform(post("/api/v1/products")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(createRequest)))
-                .andDo(print())
-                .andExpect(status().isForbidden());
-    }
+                mockMvc.perform(post("/api/v1/products")
+                                .contentType(Objects.requireNonNull(MediaType.APPLICATION_JSON))
+                                .content(Objects.requireNonNull(objectMapper.writeValueAsString(createRequest))))
+                                .andDo(print())
+                                .andExpect(status().isCreated())
+                                .andExpect(jsonPath("$.success").value(true))
+                                .andExpect(jsonPath("$.data.name").value("Test Product"));
+        }
 
-    @Test
-    @WithMockUser(roles = "USER")
-    @DisplayName("Should reject create product with user role")
-    void shouldRejectCreateProductWithUserRole() throws Exception {
-        mockMvc.perform(post("/api/v1/products")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(createRequest)))
-                .andDo(print())
-                .andExpect(result -> {
-                    int status = result.getResponse().getStatus();
-                    org.assertj.core.api.Assertions.assertThat(status)
-                            .as("Should not allow user role to create product")
-                            .isIn(403, 500);
-                });
-    }
+        @Test
+        @DisplayName("Should reject create product without authentication")
+        void shouldRejectCreateProductWithoutAuth() throws Exception {
+                mockMvc.perform(post("/api/v1/products")
+                                .contentType(Objects.requireNonNull(MediaType.APPLICATION_JSON))
+                                .content(Objects.requireNonNull(objectMapper.writeValueAsString(createRequest))))
+                                .andDo(print())
+                                .andExpect(status().isForbidden());
+        }
 
-    @Test
-    @WithMockUser(roles = "ADMIN")
-    @DisplayName("Should update product")
-    void shouldUpdateProduct() throws Exception {
-        UpdateProductRequest updateRequest = new UpdateProductRequest(
-                "Updated Product",
-                null,
-                BigDecimal.valueOf(149.99),
-                null,
-                null,
-                null
-        );
+        @Test
+        @WithMockUser(roles = "USER")
+        @DisplayName("Should reject create product with user role")
+        void shouldRejectCreateProductWithUserRole() throws Exception {
+                mockMvc.perform(post("/api/v1/products")
+                                .contentType(Objects.requireNonNull(MediaType.APPLICATION_JSON))
+                                .content(Objects.requireNonNull(objectMapper.writeValueAsString(createRequest))))
+                                .andDo(print())
+                                .andExpect(result -> {
+                                        int status = result.getResponse().getStatus();
+                                        org.assertj.core.api.Assertions.assertThat(status)
+                                                        .as("Should not allow user role to create product")
+                                                        .isIn(403, 500);
+                                });
+        }
 
-        given(productService.updateProduct(eq(1L), any(UpdateProductRequest.class)))
-                .willReturn(testProductResponse);
+        @Test
+        @WithMockUser(roles = "ADMIN")
+        @DisplayName("Should update product")
+        void shouldUpdateProduct() throws Exception {
+                UpdateProductRequest updateRequest = new UpdateProductRequest(
+                                "Updated Product",
+                                null,
+                                BigDecimal.valueOf(149.99),
+                                null,
+                                null,
+                                null);
 
-        mockMvc.perform(put("/api/v1/products/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateRequest)))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true));
-    }
+                given(productService.updateProduct(eq(1L), any(UpdateProductRequest.class)))
+                                .willReturn(testProductResponse);
 
-    @Test
-    @WithMockUser(roles = "ADMIN")
-    @DisplayName("Should delete product")
-    void shouldDeleteProduct() throws Exception {
-        mockMvc.perform(delete("/api/v1/products/1"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true));
-    }
+                mockMvc.perform(put("/api/v1/products/1")
+                                .contentType(Objects.requireNonNull(MediaType.APPLICATION_JSON))
+                                .content(Objects.requireNonNull(objectMapper.writeValueAsString(updateRequest))))
+                                .andDo(print())
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.success").value(true));
+        }
 
-    @Test
-    @DisplayName("Should search products")
-    void shouldSearchProducts() throws Exception {
-        Page<ProductResponse> productPage = new PageImpl<>(
-                List.of(testProductResponse),
-                PageRequest.of(0, 20),
-                1
-        );
-        given(productService.searchProducts(eq("test"), any())).willReturn(productPage);
+        @Test
+        @WithMockUser(roles = "ADMIN")
+        @DisplayName("Should delete product")
+        void shouldDeleteProduct() throws Exception {
+                mockMvc.perform(delete("/api/v1/products/1"))
+                                .andDo(print())
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.success").value(true));
+        }
 
-        mockMvc.perform(get("/api/v1/products/search")
-                        .param("q", "test"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true));
-    }
+        @Test
+        @DisplayName("Should search products")
+        void shouldSearchProducts() throws Exception {
+                List<ProductResponse> responseList = Collections.singletonList(testProductResponse);
+                Page<ProductResponse> productPage = new PageImpl<>(
+                                Objects.requireNonNull(responseList),
+                                PageRequest.of(0, 20),
+                                1);
+                given(productService.searchProducts(eq("test"), any())).willReturn(productPage);
 
-    @Test
-    @WithMockUser(roles = "INVENTORY")
-    @DisplayName("Should update stock with inventory role")
-    void shouldUpdateStockWithInventoryRole() throws Exception {
-        given(productService.updateStock(1L, 50)).willReturn(testProductResponse);
+                mockMvc.perform(get("/api/v1/products/search")
+                                .param("q", "test"))
+                                .andDo(print())
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.success").value(true));
+        }
 
-        mockMvc.perform(patch("/api/v1/products/1/stock")
-                        .param("quantity", "50"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true));
-    }
+        @Test
+        @WithMockUser(roles = "INVENTORY")
+        @DisplayName("Should update stock with inventory role")
+        void shouldUpdateStockWithInventoryRole() throws Exception {
+                given(productService.updateStock(1L, 50)).willReturn(testProductResponse);
 
-    @Test
-    @DisplayName("Should check product availability")
-    void shouldCheckProductAvailability() throws Exception {
-        given(productService.isProductAvailable(1L, 10)).willReturn(true);
+                mockMvc.perform(patch("/api/v1/products/1/stock")
+                                .param("quantity", "50"))
+                                .andDo(print())
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.success").value(true));
+        }
 
-        mockMvc.perform(get("/api/v1/products/1/availability")
-                        .param("quantity", "10"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.data").value(true));
-    }
+        @Test
+        @DisplayName("Should check product availability")
+        void shouldCheckProductAvailability() throws Exception {
+                given(productService.isProductAvailable(1L, 10)).willReturn(true);
 
-    @Test
-    @DisplayName("Should validate create product request")
-    @WithMockUser(roles = "ADMIN")
-    void shouldValidateCreateProductRequest() throws Exception {
-        CreateProductRequest invalidRequest = new CreateProductRequest(
-                "",
-                null,
-                BigDecimal.valueOf(-1),
-                -10,
-                "",
-                null
-        );
+                mockMvc.perform(get("/api/v1/products/1/availability")
+                                .param("quantity", "10"))
+                                .andDo(print())
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.success").value(true))
+                                .andExpect(jsonPath("$.data").value(true));
+        }
 
-        mockMvc.perform(post("/api/v1/products")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(invalidRequest)))
-                .andDo(print())
-                .andExpect(status().isBadRequest());
-    }
+        @Test
+        @DisplayName("Should validate create product request")
+        @WithMockUser(roles = "ADMIN")
+        void shouldValidateCreateProductRequest() throws Exception {
+                CreateProductRequest invalidRequest = new CreateProductRequest(
+                                "",
+                                null,
+                                BigDecimal.valueOf(-1),
+                                -10,
+                                "",
+                                null);
+
+                mockMvc.perform(post("/api/v1/products")
+                                .contentType(Objects.requireNonNull(MediaType.APPLICATION_JSON))
+                                .content(Objects.requireNonNull(objectMapper.writeValueAsString(invalidRequest))))
+                                .andDo(print())
+                                .andExpect(status().isBadRequest());
+        }
 }
