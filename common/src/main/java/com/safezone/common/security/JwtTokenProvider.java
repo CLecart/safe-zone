@@ -1,5 +1,17 @@
 package com.safezone.common.security;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
+import javax.crypto.SecretKey;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -7,23 +19,15 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
-import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * JWT token provider for authentication and authorization.
  * Handles token generation, validation, and claim extraction.
  *
- * <p>This component uses HMAC-SHA algorithm for signing tokens
- * and supports configurable expiration times.</p>
+ * <p>
+ * This component uses HMAC-SHA algorithm for signing tokens
+ * and supports configurable expiration times.
+ * </p>
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -86,10 +90,18 @@ public class JwtTokenProvider {
      * @param token the JWT token to parse
      * @return the list of roles, or an empty list if token is invalid
      */
-    @SuppressWarnings("unchecked")
     public List<String> extractRoles(String token) {
         return extractClaims(token)
-                .map(claims -> claims.get("roles", List.class))
+                .map(claims -> {
+                    Object rolesObj = claims.get("roles");
+                    if (rolesObj instanceof List<?> rawList) {
+                        return rawList.stream()
+                                .filter(String.class::isInstance)
+                                .map(String.class::cast)
+                                .toList();
+                    }
+                    return List.<String>of();
+                })
                 .orElse(List.of());
     }
 
