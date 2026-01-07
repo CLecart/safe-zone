@@ -22,8 +22,9 @@ application:
   jwt:
     secret: dGVzdC1zZWNyZXQta2V5LWZvci1zYWZlem9uZS1hcHBsaWNhdGlvbi10ZXN0aW5nLW9ubHk=
 
-product-service:
-  url: http://localhost:8081
+services:
+  product:
+    url: http://localhost:8081
 
 logging:
   level:

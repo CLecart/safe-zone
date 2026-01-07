@@ -151,11 +151,13 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
      * @param claims the JWT claims
      * @return the list of role names, empty list if none
      */
-    @SuppressWarnings("unchecked")
     private List<String> getRoles(Claims claims) {
         Object roles = claims.get("roles");
-        if (roles instanceof List) {
-            return (List<String>) roles;
+        if (roles instanceof List<?> rawList) {
+            return rawList.stream()
+                    .filter(String.class::isInstance)
+                    .map(String.class::cast)
+                    .toList();
         }
         return List.of();
     }

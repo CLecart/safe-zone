@@ -11,9 +11,9 @@
       "description": "JWT token expiration time in milliseconds"
     },
     {
-      "name": "product-service.url",
+      "name": "services.product.url",
       "type": "java.lang.String",
-      "description": "URL of the Product Service for testing"
+      "description": "URL of the Product Service"
     }
   ]
 }
