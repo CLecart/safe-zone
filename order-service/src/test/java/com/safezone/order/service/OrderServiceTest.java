@@ -2,6 +2,7 @@ package com.safezone.order.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
@@ -85,13 +86,21 @@ class OrderServiceTest {
                 100,
                 true);
 
+        // Create order item for testing
+        OrderItem testItem = OrderItem.builder()
+                .productId(1L)
+                .quantity(2)
+                .unitPrice(BigDecimal.valueOf(99.99))
+                .build();
+
         testOrder = Order.builder()
                 .id(1L)
                 .orderNumber("ORD-20260106-ABC12345")
                 .userId(1L)
                 .status(OrderStatus.PENDING)
-                .totalAmount(BigDecimal.valueOf(99.99))
+                .totalAmount(BigDecimal.valueOf(199.98))
                 .shippingAddress("123 Test St")
+                .items(List.of(testItem))
                 .build();
 
         testOrderResponse = new OrderResponse(
@@ -99,7 +108,7 @@ class OrderServiceTest {
                 "ORD-20260106-ABC12345",
                 1L,
                 OrderStatus.PENDING,
-                BigDecimal.valueOf(99.99),
+                BigDecimal.valueOf(199.98),
                 "123 Test St",
                 null,
                 List.of(),
@@ -123,8 +132,8 @@ class OrderServiceTest {
             given(productServiceClient.getProductById(1L)).willReturn(Optional.of(testProduct));
             given(productServiceClient.checkProductAvailability(1L, 2)).willReturn(true);
             given(productServiceClient.updateStock(anyLong(), anyInt())).willReturn(Mono.empty());
-            given(orderRepository.save(Objects.requireNonNull(testOrder))).willReturn(testOrder);
-            given(orderMapper.toResponse(testOrder)).willReturn(testOrderResponse);
+            given(orderRepository.save(any())).willReturn(Objects.requireNonNull(testOrder));
+            given(orderMapper.toResponse(Objects.requireNonNull(testOrder))).willReturn(testOrderResponse);
 
             OrderResponse result = orderService.createOrder(request);
 
