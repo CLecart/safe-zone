@@ -2,6 +2,11 @@
   "files.exclude": {
     "**/target": true
   },
+  "files.watcherExclude": {
+    "**/target": true,
+    "**/.settings": true
+  },
+  "java.import.exclusions": ["**/target/**"],
   "sonarlint.connectedMode.connections.sonarqube": [
     {
       "connectionId": "safezone-sonarqube",
