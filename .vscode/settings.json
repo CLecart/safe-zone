@@ -1,4 +1,7 @@
 {
+  "files.exclude": {
+    "**/target": true
+  },
   "sonarlint.connectedMode.connections.sonarqube": [
     {
       "connectionId": "safezone-sonarqube",
@@ -30,6 +33,10 @@
       "docker-compose*.yaml",
       "**/docker/*.yml",
       "**/docker/*.yaml"
+    ],
+    "https://json.schemastore.org/github-workflow.json": [
+      ".github/workflows/*.yml",
+      ".github/workflows/*.yaml"
     ]
   }
 }
