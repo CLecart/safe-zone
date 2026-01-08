@@ -15,6 +15,7 @@ target/
 .project
 .settings/
 bin/
+!/order-service/.settings/org.eclipse.jdt.core.prefs
 
 # VS Code
 !.vscode/settings.json
