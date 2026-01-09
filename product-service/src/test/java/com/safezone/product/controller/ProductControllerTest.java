@@ -309,7 +309,9 @@ class ProductControllerTest {
         @Test
         @DisplayName("Should get low stock products")
         void shouldGetLowStockProducts() throws Exception {
-                given(productService.getLowStockProducts(10)).willReturn(List.of(testProductResponse));
+                java.util.List<ProductResponse> lowStock = new java.util.ArrayList<>();
+                lowStock.add(testProductResponse);
+                given(productService.getLowStockProducts(10)).willReturn(lowStock);
                 mockMvc.perform(get("/api/v1/products/low-stock")
                                 .param("threshold", "10"))
                                 .andDo(print())
