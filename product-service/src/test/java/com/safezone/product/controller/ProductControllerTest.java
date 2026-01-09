@@ -261,4 +261,60 @@ class ProductControllerTest {
                                 .andDo(print())
                                 .andExpect(status().isBadRequest());
         }
+
+        @Test
+        @DisplayName("Should get product by SKU")
+        void shouldGetProductBySku() throws Exception {
+                given(productService.getProductBySku("SKU-1")).willReturn(testProductResponse);
+                mockMvc.perform(get("/api/v1/products/sku/SKU-1"))
+                                .andDo(print())
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.success").value(true))
+                                .andExpect(jsonPath("$.data.sku").value("SKU-1"));
+        }
+
+        @Test
+        @DisplayName("Should get active products")
+        void shouldGetActiveProducts() throws Exception {
+                List<ProductResponse> content = new java.util.ArrayList<>();
+                content.add(testProductResponse);
+                Page<ProductResponse> productPage = new PageImpl<>(content, PageRequest.of(0, 20), 1);
+                given(productService.getActiveProducts(any())).willReturn(productPage);
+                mockMvc.perform(get("/api/v1/products/active")
+                                .param("page", "0")
+                                .param("size", "20"))
+                                .andDo(print())
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.success").value(true))
+                                .andExpect(jsonPath("$.data.totalElements").value(1));
+        }
+
+        @Test
+        @DisplayName("Should get products by category")
+        void shouldGetProductsByCategory() throws Exception {
+                List<ProductResponse> content = new java.util.ArrayList<>();
+                content.add(testProductResponse);
+                Page<ProductResponse> productPage = new PageImpl<>(content, PageRequest.of(0, 20), 1);
+                given(productService.getProductsByCategory(eq(ProductCategory.ELECTRONICS), any()))
+                                .willReturn(productPage);
+                mockMvc.perform(get("/api/v1/products/category/ELECTRONICS")
+                                .param("page", "0")
+                                .param("size", "20"))
+                                .andDo(print())
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.success").value(true))
+                                .andExpect(jsonPath("$.data.totalElements").value(1));
+        }
+
+        @Test
+        @DisplayName("Should get low stock products")
+        void shouldGetLowStockProducts() throws Exception {
+                given(productService.getLowStockProducts(10)).willReturn(List.of(testProductResponse));
+                mockMvc.perform(get("/api/v1/products/low-stock")
+                                .param("threshold", "10"))
+                                .andDo(print())
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.success").value(true))
+                                .andExpect(jsonPath("$.data").isArray());
+        }
 }
