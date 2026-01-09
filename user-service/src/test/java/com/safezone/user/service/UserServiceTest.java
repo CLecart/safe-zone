@@ -8,7 +8,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -20,8 +19,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
@@ -69,9 +66,6 @@ class UserServiceTest {
 
     @Mock
     private JwtTokenProvider jwtTokenProvider;
-
-    @Captor
-    private ArgumentCaptor<User> userCaptor;
 
     private UserServiceImpl userService;
 
@@ -145,6 +139,7 @@ class UserServiceTest {
 
             assertThat(result).isNotNull();
             assertThat(result.token()).isEqualTo("jwt-token");
+            assertThat(result.expiresIn()).isEqualTo(86400L);
             verify(userRepository).save(Objects.requireNonNull(testUser));
             assertThat(testUser).isNotNull();
         }
@@ -206,6 +201,7 @@ class UserServiceTest {
 
             assertThat(result).isNotNull();
             assertThat(result.token()).isEqualTo("jwt-token");
+            assertThat(result.expiresIn()).isEqualTo(86400L);
         }
 
         @Test
@@ -277,11 +273,31 @@ class UserServiceTest {
         }
 
         @Test
+        @DisplayName("Should get user by username")
+        void shouldGetUserByUsername() {
+            given(userRepository.findByUsername("testuser")).willReturn(Optional.of(testUser));
+            given(userMapper.toResponse(testUser)).willReturn(testUserResponse);
+
+            UserResponse result = userService.getUserByUsername("testuser");
+
+            assertThat(result).isNotNull();
+            assertThat(result.username()).isEqualTo("testuser");
+        }
+
+        @Test
+        @DisplayName("Should throw exception when username not found")
+        void shouldThrowExceptionWhenUsernameNotFound() {
+            given(userRepository.findByUsername("missing")).willReturn(Optional.empty());
+
+            assertThatThrownBy(() -> userService.getUserByUsername("missing"))
+                    .isInstanceOf(ResourceNotFoundException.class);
+        }
+
+        @Test
         @DisplayName("Should get all users with pagination")
         void shouldGetAllUsersWithPagination() {
             Pageable pageable = PageRequest.of(0, 10);
-            List<User> userList = new ArrayList<>();
-            userList.add(testUser);
+            List<User> userList = new java.util.ArrayList<>(List.of(testUser));
             Page<User> userPage = new PageImpl<>(userList, pageable, 1);
 
             given(userRepository.findAll(pageable)).willReturn(userPage);
@@ -290,6 +306,34 @@ class UserServiceTest {
             Page<UserResponse> result = userService.getAllUsers(pageable);
 
             assertThat(result.getContent()).hasSize(1);
+        }
+
+        @Test
+        @DisplayName("Should throw NPE when pageable is null")
+        void shouldThrowNpeWhenPageableNull() {
+            assertThatThrownBy(() -> userService.getAllUsers(null))
+                    .isInstanceOf(NullPointerException.class)
+                    .hasMessageContaining("Pageable must not be null");
+        }
+    }
+
+    @Nested
+    @DisplayName("Search Users Tests")
+    class SearchUsersTests {
+        @Test
+        @DisplayName("Should search users and map to responses")
+        void shouldSearchUsersAndMap() {
+            Pageable pageable = PageRequest.of(0, 5);
+            List<User> userList = new java.util.ArrayList<>(List.of(testUser));
+            Page<User> userPage = new PageImpl<>(userList, pageable, 1);
+
+            given(userRepository.searchUsers("te", pageable)).willReturn(userPage);
+            given(userMapper.toResponse(testUser)).willReturn(testUserResponse);
+
+            Page<UserResponse> result = userService.searchUsers("te", pageable);
+
+            assertThat(result.getContent()).hasSize(1);
+            assertThat(result.getContent().get(0).username()).isEqualTo("testuser");
         }
     }
 
@@ -362,6 +406,59 @@ class UserServiceTest {
             assertThatThrownBy(() -> userService.removeRole(1L, UserRole.USER))
                     .isInstanceOf(BusinessException.class)
                     .hasMessageContaining("Cannot remove the last role");
+        }
+
+        @Test
+        @DisplayName("Should remove role when multiple roles exist")
+        void shouldRemoveRoleWhenMultipleRolesExist() {
+            testUser.setRoles(new HashSet<>(Set.of(UserRole.USER, UserRole.ADMIN)));
+            given(userRepository.findById(1L)).willReturn(Optional.of(testUser));
+            given(userRepository.save(Objects.requireNonNull(testUser))).willReturn(testUser);
+            given(userMapper.toResponse(testUser)).willReturn(testUserResponse);
+
+            UserResponse result = userService.removeRole(1L, UserRole.ADMIN);
+
+            assertThat(result).isNotNull();
+            assertThat(testUser.getRoles()).containsExactly(UserRole.USER);
+        }
+    }
+
+    @Nested
+    @DisplayName("Status Management Tests")
+    class StatusManagementTests {
+        @Test
+        @DisplayName("Should soft delete user by disabling")
+        void shouldSoftDeleteUser() {
+            given(userRepository.findById(1L)).willReturn(Optional.of(testUser));
+
+            userService.deleteUser(1L);
+
+            verify(userRepository).save(Objects.requireNonNull(testUser));
+            assertThat(testUser.getEnabled()).isFalse();
+        }
+
+        @Test
+        @DisplayName("Should enable user")
+        void shouldEnableUser() {
+            testUser.setEnabled(false);
+            given(userRepository.findById(1L)).willReturn(Optional.of(testUser));
+
+            userService.enableUser(1L);
+
+            verify(userRepository).save(Objects.requireNonNull(testUser));
+            assertThat(testUser.getEnabled()).isTrue();
+        }
+
+        @Test
+        @DisplayName("Should disable user")
+        void shouldDisableUser() {
+            testUser.setEnabled(true);
+            given(userRepository.findById(1L)).willReturn(Optional.of(testUser));
+
+            userService.disableUser(1L);
+
+            verify(userRepository).save(Objects.requireNonNull(testUser));
+            assertThat(testUser.getEnabled()).isFalse();
         }
     }
 }
