@@ -66,7 +66,7 @@ class ProductMapperTest {
         assertThat(dto.id()).isEqualTo(2L);
         assertThat(dto.sku()).isEqualTo("SKU-2");
 
-        List<ProductResponse> list = mapper.toResponseList(List.of(p));
+        List<ProductResponse> list = mapper.toResponseList(new java.util.ArrayList<>(java.util.List.of(p)));
         assertThat(list).hasSize(1);
         assertThat(list.get(0).category()).isEqualTo(ProductCategory.BOOKS);
     }

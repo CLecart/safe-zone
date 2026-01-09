@@ -291,9 +291,13 @@ class ProductServiceTest {
                     .active(true)
                     .build();
 
+            java.util.List<Product> lowStockList = new java.util.ArrayList<>();
+            lowStockList.add(lowStockProduct);
             given(productRepository.findLowStockActiveProducts(10))
-                    .willReturn(List.of(lowStockProduct));
-            given(productMapper.toResponseList(any())).willReturn(List.of(testProductResponse));
+                    .willReturn(lowStockList);
+            java.util.List<ProductResponse> mappedLowStock = new java.util.ArrayList<>();
+            mappedLowStock.add(testProductResponse);
+            given(productMapper.toResponseList(any())).willReturn(mappedLowStock);
 
             List<ProductResponse> result = productService.getLowStockProducts(10);
 
