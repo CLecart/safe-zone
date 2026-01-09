@@ -265,12 +265,12 @@ class ProductControllerTest {
         @Test
         @DisplayName("Should get product by SKU")
         void shouldGetProductBySku() throws Exception {
-                given(productService.getProductBySku("SKU-1")).willReturn(testProductResponse);
-                mockMvc.perform(get("/api/v1/products/sku/SKU-1"))
+                given(productService.getProductBySku("TEST-001")).willReturn(testProductResponse);
+                mockMvc.perform(get("/api/v1/products/sku/TEST-001"))
                                 .andDo(print())
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.success").value(true))
-                                .andExpect(jsonPath("$.data.sku").value("SKU-1"));
+                                .andExpect(jsonPath("$.data.sku").value("TEST-001"));
         }
 
         @Test
@@ -307,6 +307,7 @@ class ProductControllerTest {
         }
 
         @Test
+        @WithMockUser(roles = "ADMIN")
         @DisplayName("Should get low stock products")
         void shouldGetLowStockProducts() throws Exception {
                 java.util.List<ProductResponse> lowStock = new java.util.ArrayList<>();
