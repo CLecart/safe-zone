@@ -2,6 +2,7 @@ package com.safezone.order.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
@@ -131,8 +132,8 @@ class OrderServiceTest {
             given(productServiceClient.getProductById(1L)).willReturn(Optional.of(testProduct));
             given(productServiceClient.checkProductAvailability(1L, 2)).willReturn(true);
             given(productServiceClient.updateStock(anyLong(), anyInt())).willReturn(Mono.empty());
-            given(orderRepository.save(testOrder)).willReturn(testOrder);
-            given(orderMapper.toResponse(testOrder)).willReturn(testOrderResponse);
+            given(orderRepository.save(any(Order.class))).willReturn(testOrder);
+            given(orderMapper.toResponse(any(Order.class))).willReturn(testOrderResponse);
 
             OrderResponse result = orderService.createOrder(request);
 
