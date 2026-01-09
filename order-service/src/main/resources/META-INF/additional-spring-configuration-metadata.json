@@ -19,6 +19,11 @@
       "name": "services.user.url",
       "type": "java.lang.String",
       "description": "URL of the User Service"
+    },
+    {
+      "name": "application.jwt.secret",
+      "type": "java.lang.String",
+      "description": "Override JWT secret for application scope"
     }
   ]
 }

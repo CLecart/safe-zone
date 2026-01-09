@@ -2,6 +2,11 @@ package com.safezone.order;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
+
+import com.safezone.order.config.ApplicationProperties;
+import com.safezone.order.config.JwtProperties;
+import com.safezone.order.config.ServiceProperties;
 
 /**
  * Main application class for the Order microservice.
@@ -18,7 +23,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @version 1.0.0
  * @since 2024-01-06
  */
-@SpringBootApplication(scanBasePackages = {"com.safezone.order", "com.safezone.common"})
+@SpringBootApplication(scanBasePackages = { "com.safezone.order", "com.safezone.common" })
+@ConfigurationPropertiesScan(basePackageClasses = { ServiceProperties.class, JwtProperties.class,
+        ApplicationProperties.class })
 public class OrderServiceApplication {
 
     /**
