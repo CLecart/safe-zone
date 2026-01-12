@@ -267,6 +267,46 @@ class OrderBuilderTest {
         }
 
         /**
+         * Tests @PrePersist lifecycle callback with pre-existing status.
+         * 
+         * <p>
+         * <strong>Scenario:</strong> JPA callback respects explicitly set status.
+         * 
+         * <p>
+         * <strong>Given:</strong> Order built with status=CONFIRMED.
+         * 
+         * <p>
+         * <strong>When:</strong> onCreate() is called (simulates JPA).
+         * 
+         * <p>
+         * <strong>Then:</strong> Default status is NOT applied, existing status
+         * preserved.
+         * 
+         * <p>
+         * <strong>Coverage:</strong> Tests onCreate() when status is not null (else
+         * branch).
+         */
+        @Test
+        @DisplayName("Should preserve explicitly set status on @PrePersist")
+        void shouldPreserveExplicitStatusOnPrePersist() {
+            // Arrange: Build Order with explicit status
+            Order order = Order.builder()
+                    .orderNumber("ORD-EXPLICIT")
+                    .userId(1L)
+                    .totalAmount(BigDecimal.TEN)
+                    .status(OrderStatus.CONFIRMED)
+                    .build();
+
+            // Act: Simulate @PrePersist
+            order.onCreate();
+
+            // Assert: Verify explicit status preserved
+            assertThat(order.getStatus()).isEqualTo(OrderStatus.CONFIRMED);
+            assertThat(order.getCreatedAt()).isNotNull();
+            assertThat(order.getUpdatedAt()).isNotNull();
+        }
+
+        /**
          * Tests @PreUpdate lifecycle callback.
          * 
          * <p>
@@ -286,7 +326,7 @@ class OrderBuilderTest {
          */
         @Test
         @DisplayName("Should refresh timestamp on @PreUpdate")
-        void shouldRefreshTimestampOnPreUpdate() throws InterruptedException {
+        void shouldRefreshTimestampOnPreUpdate() {
             // Arrange: Build Order with old timestamp
             LocalDateTime old = LocalDateTime.of(2026, 1, 1, 10, 0);
             Order order = Order.builder()
