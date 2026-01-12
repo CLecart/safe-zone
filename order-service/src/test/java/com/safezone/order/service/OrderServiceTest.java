@@ -227,6 +227,48 @@ class OrderServiceTest {
 
             assertThat(result.getContent()).hasSize(1);
         }
+
+        @Test
+        @DisplayName("Should get all orders with pagination")
+        void shouldGetAllOrders() {
+            Pageable pageable = PageRequest.of(0, 10);
+            List<Order> orderList = Collections.singletonList(testOrder);
+            Page<Order> orderPage = new PageImpl<>(Objects.requireNonNull(orderList), pageable, 1);
+
+            given(orderRepository.findAll(pageable)).willReturn(orderPage);
+            given(orderMapper.toResponse(testOrder)).willReturn(testOrderResponse);
+
+            Page<OrderResponse> result = orderService.getAllOrders(pageable);
+
+            assertThat(result.getContent()).hasSize(1);
+        }
+
+        @Test
+        @DisplayName("Should get orders by status")
+        void shouldGetOrdersByStatus() {
+            Pageable pageable = PageRequest.of(0, 10);
+            testOrder.setStatus(OrderStatus.PENDING);
+            List<Order> orderList = Collections.singletonList(testOrder);
+            Page<Order> orderPage = new PageImpl<>(Objects.requireNonNull(orderList), pageable, 1);
+
+            given(orderRepository.findByStatus(OrderStatus.PENDING, pageable)).willReturn(orderPage);
+            given(orderMapper.toResponse(testOrder)).willReturn(testOrderResponse);
+
+            Page<OrderResponse> result = orderService.getOrdersByStatus(OrderStatus.PENDING, pageable);
+
+            assertThat(result.getContent()).hasSize(1);
+        }
+
+        @Test
+        @DisplayName("Should throw exception when order number not found")
+        void shouldThrowExceptionWhenOrderNumberNotFound() {
+            given(orderRepository.findByOrderNumber("INVALID-NUMBER"))
+                    .willReturn(Optional.empty());
+
+            assertThatThrownBy(() -> orderService.getOrderByNumber("INVALID-NUMBER"))
+                    .isInstanceOf(ResourceNotFoundException.class)
+                    .hasMessageContaining("Order not found");
+        }
     }
 
     @Nested
@@ -254,6 +296,41 @@ class OrderServiceTest {
             assertThatThrownBy(() -> orderService.updateOrderStatus(1L, OrderStatus.PROCESSING))
                     .isInstanceOf(BusinessException.class)
                     .hasMessageContaining("Cannot change status");
+        }
+
+        @Test
+        @DisplayName("Should throw exception for invalid status transition from refunded")
+        void shouldThrowExceptionForInvalidTransitionFromRefunded() {
+            testOrder.setStatus(OrderStatus.REFUNDED);
+            given(orderRepository.findById(1L)).willReturn(Optional.of(testOrder));
+
+            assertThatThrownBy(() -> orderService.updateOrderStatus(1L, OrderStatus.PROCESSING))
+                    .isInstanceOf(BusinessException.class)
+                    .hasMessageContaining("Cannot change status");
+        }
+
+        @Test
+        @DisplayName("Should throw exception when delivered order status changed to non-refunded")
+        void shouldThrowExceptionWhenDeliveredChangedToNonRefunded() {
+            testOrder.setStatus(OrderStatus.DELIVERED);
+            given(orderRepository.findById(1L)).willReturn(Optional.of(testOrder));
+
+            assertThatThrownBy(() -> orderService.updateOrderStatus(1L, OrderStatus.PROCESSING))
+                    .isInstanceOf(BusinessException.class)
+                    .hasMessageContaining("Delivered order can only be refunded");
+        }
+
+        @Test
+        @DisplayName("Should allow delivered order to be refunded")
+        void shouldAllowDeliveredOrderToBeRefunded() {
+            testOrder.setStatus(OrderStatus.DELIVERED);
+            given(orderRepository.findById(1L)).willReturn(Optional.of(testOrder));
+            given(orderRepository.save(Objects.requireNonNull(testOrder))).willReturn(testOrder);
+            given(orderMapper.toResponse(testOrder)).willReturn(testOrderResponse);
+
+            OrderResponse result = orderService.updateOrderStatus(1L, OrderStatus.REFUNDED);
+
+            assertThat(result).isNotNull();
         }
     }
 
@@ -284,6 +361,55 @@ class OrderServiceTest {
         @DisplayName("Should throw exception when cancelling shipped order")
         void shouldThrowExceptionWhenCancellingShippedOrder() {
             testOrder.setStatus(OrderStatus.SHIPPED);
+            given(orderRepository.findById(1L)).willReturn(Optional.of(testOrder));
+
+            assertThatThrownBy(() -> orderService.cancelOrder(1L))
+                    .isInstanceOf(BusinessException.class)
+                    .hasMessageContaining("cannot be cancelled");
+        }
+
+        @Test
+        @DisplayName("Should successfully cancel confirmed order")
+        void shouldCancelConfirmedOrder() {
+            testOrder.setStatus(OrderStatus.CONFIRMED);
+            testOrder.setItems(List.of(OrderItem.builder()
+                    .productId(1L)
+                    .quantity(2)
+                    .build()));
+
+            given(orderRepository.findById(1L)).willReturn(Optional.of(testOrder));
+            given(orderRepository.save(Objects.requireNonNull(testOrder))).willReturn(testOrder);
+            given(orderMapper.toResponse(testOrder)).willReturn(testOrderResponse);
+            given(productServiceClient.updateStock(anyLong(), anyInt())).willReturn(Mono.empty());
+
+            OrderResponse result = orderService.cancelOrder(1L);
+
+            assertThat(result).isNotNull();
+        }
+
+        @Test
+        @DisplayName("Should successfully cancel processing order")
+        void shouldCancelProcessingOrder() {
+            testOrder.setStatus(OrderStatus.PROCESSING);
+            testOrder.setItems(List.of(OrderItem.builder()
+                    .productId(1L)
+                    .quantity(2)
+                    .build()));
+
+            given(orderRepository.findById(1L)).willReturn(Optional.of(testOrder));
+            given(orderRepository.save(Objects.requireNonNull(testOrder))).willReturn(testOrder);
+            given(orderMapper.toResponse(testOrder)).willReturn(testOrderResponse);
+            given(productServiceClient.updateStock(anyLong(), anyInt())).willReturn(Mono.empty());
+
+            OrderResponse result = orderService.cancelOrder(1L);
+
+            assertThat(result).isNotNull();
+        }
+
+        @Test
+        @DisplayName("Should throw exception when cancelling delivered order")
+        void shouldThrowExceptionWhenCancellingDeliveredOrder() {
+            testOrder.setStatus(OrderStatus.DELIVERED);
             given(orderRepository.findById(1L)).willReturn(Optional.of(testOrder));
 
             assertThatThrownBy(() -> orderService.cancelOrder(1L))
