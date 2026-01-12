@@ -183,4 +183,41 @@ class ProductServiceCoverageTest {
 
         assertThat(result).isTrue();
     }
+
+    @Test
+    @DisplayName("getActiveProducts returns active products only")
+    void getActiveProductsReturnsActiveProductsOnly() {
+        Pageable pageable = PageRequest.of(0, 10);
+        List<Product> products = new ArrayList<>();
+        products.add(testProduct);
+        Page<Product> page = new PageImpl<>(products, pageable, 1);
+
+        given(productRepository.findByActiveTrue(pageable)).willReturn(page);
+        given(productMapper.toResponse(testProduct)).willReturn(testProductResponse);
+
+        Page<ProductResponse> result = productService.getActiveProducts(pageable);
+
+        assertThat(result.getContent()).hasSize(1);
+        verify(productRepository).findByActiveTrue(pageable);
+    }
+
+    @Test
+    @DisplayName("updateProduct with description set to null")
+    void updateProductWithDescriptionNull() {
+        UpdateProductRequest request = new UpdateProductRequest(
+                null,
+                "Description",
+                null,
+                null,
+                null,
+                null);
+
+        given(productRepository.findById(1L)).willReturn(Optional.of(testProduct));
+        given(productRepository.save(any(Product.class))).willReturn(testProduct);
+        given(productMapper.toResponse(testProduct)).willReturn(testProductResponse);
+
+        ProductResponse result = productService.updateProduct(1L, request);
+
+        assertThat(result).isNotNull();
+    }
 }

@@ -218,6 +218,18 @@ class UserServiceTest {
         }
 
         @Test
+        @DisplayName("Should throw exception when user not found")
+        void shouldThrowExceptionWhenUserNotFoundDuringLogin() {
+            LoginRequest request = new LoginRequest("nonexistent", "password");
+
+            given(userRepository.findByUsername("nonexistent")).willReturn(Optional.empty());
+
+            assertThatThrownBy(() -> userService.login(request))
+                    .isInstanceOf(BusinessException.class)
+                    .hasMessageContaining("Invalid username or password");
+        }
+
+        @Test
         @DisplayName("Should throw exception for disabled account")
         void shouldThrowExceptionForDisabledAccount() {
             testUser.setEnabled(false);
@@ -377,6 +389,66 @@ class UserServiceTest {
                     .isInstanceOf(BusinessException.class)
                     .hasMessageContaining("Email is already in use");
         }
+
+        @Test
+        @DisplayName("Should update email when not in use")
+        void shouldUpdateEmailWhenNotInUse() {
+            UpdateUserRequest request = new UpdateUserRequest(
+                    null,
+                    null,
+                    "newemail@example.com",
+                    null);
+
+            given(userRepository.findById(1L)).willReturn(Optional.of(testUser));
+            given(userRepository.existsByEmail("newemail@example.com")).willReturn(false);
+            given(userRepository.save(Objects.requireNonNull(testUser))).willReturn(testUser);
+            given(userMapper.toResponse(testUser)).willReturn(testUserResponse);
+
+            UserResponse result = userService.updateUser(1L, request);
+
+            assertThat(result).isNotNull();
+            verify(userRepository).existsByEmail("newemail@example.com");
+        }
+
+        @Test
+        @DisplayName("Should update phone when provided")
+        void shouldUpdatePhoneWhenProvided() {
+            UpdateUserRequest request = new UpdateUserRequest(
+                    null,
+                    null,
+                    null,
+                    "+33612345678");
+
+            given(userRepository.findById(1L)).willReturn(Optional.of(testUser));
+            given(userRepository.save(Objects.requireNonNull(testUser))).willReturn(testUser);
+            given(userMapper.toResponse(testUser)).willReturn(testUserResponse);
+
+            UserResponse result = userService.updateUser(1L, request);
+
+            assertThat(result).isNotNull();
+            verify(userRepository).save(Objects.requireNonNull(testUser));
+        }
+
+        @Test
+        @DisplayName("Should update all fields when provided")
+        void shouldUpdateAllFieldsWhenProvided() {
+            UpdateUserRequest request = new UpdateUserRequest(
+                    "NewFirst",
+                    "NewLast",
+                    "newemail@example.com",
+                    "+33612345678");
+
+            given(userRepository.findById(1L)).willReturn(Optional.of(testUser));
+            given(userRepository.existsByEmail("newemail@example.com")).willReturn(false);
+            given(userRepository.save(Objects.requireNonNull(testUser))).willReturn(testUser);
+            given(userMapper.toResponse(testUser)).willReturn(testUserResponse);
+
+            UserResponse result = userService.updateUser(1L, request);
+
+            assertThat(result).isNotNull();
+            assertThat(testUser.getFirstName()).isEqualTo("NewFirst");
+            assertThat(testUser.getLastName()).isEqualTo("NewLast");
+        }
     }
 
     @Nested
@@ -420,6 +492,20 @@ class UserServiceTest {
 
             assertThat(result).isNotNull();
             assertThat(testUser.getRoles()).containsExactly(UserRole.USER);
+        }
+
+        @Test
+        @DisplayName("Should remove non-USER role when multiple roles exist")
+        void shouldRemoveNonUserRoleWhenMultipleRolesExist() {
+            testUser.setRoles(new HashSet<>(Set.of(UserRole.USER, UserRole.ADMIN, UserRole.SUPPORT)));
+            given(userRepository.findById(1L)).willReturn(Optional.of(testUser));
+            given(userRepository.save(Objects.requireNonNull(testUser))).willReturn(testUser);
+            given(userMapper.toResponse(testUser)).willReturn(testUserResponse);
+
+            UserResponse result = userService.removeRole(1L, UserRole.SUPPORT);
+
+            assertThat(result).isNotNull();
+            assertThat(testUser.getRoles()).contains(UserRole.USER, UserRole.ADMIN);
         }
     }
 
