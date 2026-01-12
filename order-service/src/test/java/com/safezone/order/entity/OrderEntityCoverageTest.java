@@ -123,18 +123,14 @@ class OrderEntityCoverageTest {
     void preUpdateUpdatesTimestamp() {
         Order order = new Order();
         order.onCreate();
-        LocalDateTime originalUpdatedAt = order.getUpdatedAt();
 
-        // Simulate time passing
-        try {
-            Thread.sleep(10);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        // Set updatedAt to a past time to simulate time passing
+        LocalDateTime pastTime = LocalDateTime.now().minusSeconds(1);
+        order.setUpdatedAt(pastTime);
 
         order.onUpdate();
 
-        assertThat(order.getUpdatedAt()).isAfter(originalUpdatedAt);
+        assertThat(order.getUpdatedAt()).isAfter(pastTime);
     }
 
     @Test

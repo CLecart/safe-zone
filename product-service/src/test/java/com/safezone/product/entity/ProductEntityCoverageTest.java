@@ -130,17 +130,13 @@ class ProductEntityCoverageTest {
     void preUpdateUpdatesTimestamp() {
         Product product = new Product();
         product.onCreate();
-        LocalDateTime originalUpdatedAt = product.getUpdatedAt();
 
-        // Simulate time passing
-        try {
-            Thread.sleep(10);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        // Set updatedAt to a past time to simulate time passing
+        LocalDateTime pastTime = LocalDateTime.now().minusSeconds(1);
+        product.setUpdatedAt(pastTime);
 
         product.onUpdate();
 
-        assertThat(product.getUpdatedAt()).isAfter(originalUpdatedAt);
+        assertThat(product.getUpdatedAt()).isAfter(pastTime);
     }
 }
