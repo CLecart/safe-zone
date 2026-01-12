@@ -176,17 +176,14 @@ class UserEntityCoverageTest {
     void preUpdateUpdatesTimestamp() {
         User user = User.builder().build();
         user.onCreate();
-        LocalDateTime originalUpdatedAt = user.getUpdatedAt();
 
-        try {
-            Thread.sleep(10);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        // Set updatedAt to a past time to simulate time passing
+        LocalDateTime pastTime = LocalDateTime.now().minusSeconds(1);
+        user.setUpdatedAt(pastTime);
 
         user.onUpdate();
 
-        assertThat(user.getUpdatedAt()).isAfter(originalUpdatedAt);
+        assertThat(user.getUpdatedAt()).isAfter(pastTime);
     }
 
     @Test
