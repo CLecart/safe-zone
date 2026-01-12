@@ -78,65 +78,81 @@ class ProductEntityCoverageTest {
     }
 
     @Test
-    @DisplayName("Product AllArgsConstructor creates valid instance")
-    void productAllArgsConstructorCreatesValidInstance() {
+    @DisplayName("Product all-args constructor initializes correctly")
+    void productAllArgsConstructorInitializesCorrectly() {
         LocalDateTime now = LocalDateTime.now();
 
         Product product = new Product(
                 3L,
-                "Constructor Product",
-                "Constructed",
-                BigDecimal.valueOf(199.99),
-                75,
-                "CONS-001",
-                ProductCategory.CLOTHING,
+                "All Args",
+                "Test Description",
+                BigDecimal.valueOf(50),
+                200,
+                "ALLARGS-001",
+                ProductCategory.ELECTRONICS,
                 true,
                 now,
                 now);
 
         assertThat(product.getId()).isEqualTo(3L);
-        assertThat(product.getName()).isEqualTo("Constructor Product");
-        assertThat(product.getDescription()).isEqualTo("Constructed");
-        assertThat(product.getPrice()).isEqualByComparingTo(BigDecimal.valueOf(199.99));
-        assertThat(product.getStockQuantity()).isEqualTo(75);
-        assertThat(product.getSku()).isEqualTo("CONS-001");
-        assertThat(product.getCategory()).isEqualTo(ProductCategory.CLOTHING);
+        assertThat(product.getName()).isEqualTo("All Args");
+        assertThat(product.getDescription()).isEqualTo("Test Description");
+        assertThat(product.getPrice()).isEqualByComparingTo(BigDecimal.valueOf(50));
+        assertThat(product.getStockQuantity()).isEqualTo(200);
+        assertThat(product.getSku()).isEqualTo("ALLARGS-001");
+        assertThat(product.getCategory()).isEqualTo(ProductCategory.ELECTRONICS);
         assertThat(product.getActive()).isTrue();
+        assertThat(product.getCreatedAt()).isEqualTo(now);
+        assertThat(product.getUpdatedAt()).isEqualTo(now);
     }
 
     @Test
-    @DisplayName("Product NoArgsConstructor creates empty instance")
+    @DisplayName("Product no-args constructor creates empty instance")
     void productNoArgsConstructorCreatesEmptyInstance() {
         Product product = new Product();
 
-        assertThat(product).isNotNull();
         assertThat(product.getId()).isNull();
         assertThat(product.getName()).isNull();
+        assertThat(product.getDescription()).isNull();
+        assertThat(product.getPrice()).isNull();
+        assertThat(product.getStockQuantity()).isNull();
+        assertThat(product.getSku()).isNull();
+        assertThat(product.getCategory()).isNull();
+        assertThat(product.getActive()).isNull();
+        assertThat(product.getCreatedAt()).isNull();
+        assertThat(product.getUpdatedAt()).isNull();
     }
 
     @Test
-    @DisplayName("PrePersist sets createdAt and updatedAt")
-    void prePersistSetsTimestamps() {
+    @DisplayName("Product onCreate() sets timestamps and active flag")
+    void productOnCreateSetsTimestamps() {
         Product product = new Product();
+        LocalDateTime beforeCreate = LocalDateTime.now();
+
         product.onCreate();
 
+        LocalDateTime afterCreate = LocalDateTime.now();
         assertThat(product.getCreatedAt()).isNotNull();
         assertThat(product.getUpdatedAt()).isNotNull();
+        assertThat(product.getCreatedAt()).isBetween(beforeCreate, afterCreate);
+        assertThat(product.getUpdatedAt()).isBetween(beforeCreate, afterCreate);
         assertThat(product.getActive()).isTrue();
     }
 
     @Test
-    @DisplayName("PreUpdate updates updatedAt timestamp")
-    void preUpdateUpdatesTimestamp() {
+    @DisplayName("Product onUpdate() refreshes timestamp")
+    void productOnUpdateRefreshesTimestamp() {
         Product product = new Product();
-        product.onCreate();
+        LocalDateTime createdTime = LocalDateTime.now().minusSeconds(5);
+        product.setCreatedAt(createdTime);
+        product.setUpdatedAt(createdTime);
 
-        // Set updatedAt to a past time to simulate time passing
-        LocalDateTime pastTime = LocalDateTime.now().minusSeconds(1);
-        product.setUpdatedAt(pastTime);
-
+        LocalDateTime beforeUpdate = LocalDateTime.now();
         product.onUpdate();
+        LocalDateTime afterUpdate = LocalDateTime.now();
 
-        assertThat(product.getUpdatedAt()).isAfter(pastTime);
+        assertThat(product.getCreatedAt()).isEqualTo(createdTime);
+        assertThat(product.getUpdatedAt()).isNotNull().isAfter(createdTime);
+        assertThat(product.getUpdatedAt()).isBetween(beforeUpdate, afterUpdate);
     }
 }

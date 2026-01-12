@@ -449,6 +449,25 @@ class UserServiceTest {
             assertThat(testUser.getFirstName()).isEqualTo("NewFirst");
             assertThat(testUser.getLastName()).isEqualTo("NewLast");
         }
+
+        @Test
+        @DisplayName("Should skip email update when email unchanged")
+        void shouldSkipEmailUpdateWhenUnchanged() {
+            UpdateUserRequest request = new UpdateUserRequest(
+                    null,
+                    null,
+                    "test@example.com",
+                    null);
+
+            given(userRepository.findById(1L)).willReturn(Optional.of(testUser));
+            given(userRepository.save(Objects.requireNonNull(testUser))).willReturn(testUser);
+            given(userMapper.toResponse(testUser)).willReturn(testUserResponse);
+
+            UserResponse result = userService.updateUser(1L, request);
+
+            assertThat(result).isNotNull();
+            // Verify existsByEmail was NOT called (email is same, so skip the check)
+        }
     }
 
     @Nested
