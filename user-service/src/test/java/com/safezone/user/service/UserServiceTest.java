@@ -1449,6 +1449,50 @@ class UserServiceDocumentedTest {
         }
 
         /**
+         * Tests successful removal of USER role when user has multiple roles.
+         * 
+         * <p>
+         * <strong>Scenario:</strong> Remove USER role from user with multiple roles
+         * (USER, ADMIN). This covers the branch where role==USER but size>1.
+         * 
+         * <p>
+         * <strong>Given:</strong>
+         * <ul>
+         * <li>User with ID=1 has roles USER and ADMIN</li>
+         * </ul>
+         * 
+         * <p>
+         * <strong>When:</strong> removeRole(1L, USER) is called.
+         * 
+         * <p>
+         * <strong>Then:</strong> Method returns UserResponse with USER removed,
+         * ADMIN remaining. The validation allows this because size > 1.
+         * 
+         * <p>
+         * <strong>Coverage:</strong>
+         * Tests the else branch where role==USER but user has multiple roles.
+         * This is the critical missing branch coverage case.
+         * 
+         * @see UserServiceImpl#removeRole(Long, UserRole)
+         */
+        @Test
+        @DisplayName("Should remove USER role when multiple roles exist")
+        void shouldRemoveUserRoleWhenMultipleRolesExist() {
+            // Arrange: Set user to have USER and ADMIN roles
+            testUser.setRoles(new HashSet<>(Set.of(UserRole.USER, UserRole.ADMIN)));
+            given(userRepository.findById(1L)).willReturn(Optional.of(testUser));
+            given(userRepository.save(Objects.requireNonNull(testUser))).willReturn(testUser);
+            given(userMapper.toResponse(testUser)).willReturn(testUserResponse);
+
+            // Act: Remove USER role (size > 1, so it's allowed)
+            UserResponse result = userService.removeRole(1L, UserRole.USER);
+
+            // Assert: Verify USER removed and ADMIN remains
+            assertThat(result).isNotNull();
+            assertThat(testUser.getRoles()).containsExactly(UserRole.ADMIN);
+        }
+
+        /**
          * Tests successful removal of non-USER role when user has multiple roles.
          * 
          * <p>
