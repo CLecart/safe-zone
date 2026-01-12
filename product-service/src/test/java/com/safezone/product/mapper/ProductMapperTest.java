@@ -70,4 +70,32 @@ class ProductMapperTest {
         assertThat(list).hasSize(1);
         assertThat(list.get(0).category()).isEqualTo(ProductCategory.BOOKS);
     }
+
+    @Test
+    @DisplayName("toEntity handles null request")
+    void toEntityHandlesNullRequest() {
+        Product p = mapper.toEntity(null);
+        assertThat(p).isNull();
+    }
+
+    @Test
+    @DisplayName("toResponse handles null product")
+    void toResponseHandlesNullProduct() {
+        ProductResponse dto = mapper.toResponse(null);
+        assertThat(dto).isNull();
+    }
+
+    @Test
+    @DisplayName("toResponseList handles null list")
+    void toResponseListHandlesNullList() {
+        List<ProductResponse> list = mapper.toResponseList(null);
+        assertThat(list).isNull();
+    }
+
+    @Test
+    @DisplayName("toResponseList handles empty list")
+    void toResponseListHandlesEmptyList() {
+        List<ProductResponse> list = mapper.toResponseList(new java.util.ArrayList<>());
+        assertThat(list).isEmpty();
+    }
 }
