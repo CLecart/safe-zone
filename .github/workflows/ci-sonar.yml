@@ -66,3 +66,29 @@ jobs:
           fi
           echo "Using SONAR_HOST_URL=$SONAR_HOST_URL"
           mvn -B -Psonar verify -DskipTests=false -Dsonar.host.url="$SONAR_HOST_URL" -Dsonar.login="$SONAR_TOKEN"
+
+      - name: Send Email Notification (Failure)
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.office365.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "SonarQube Analysis Failed: ${{ github.repository }}"
+          to: ${{ secrets.EMAIL_TO }}
+          from: ${{ secrets.EMAIL_USERNAME }}
+          body: "Quality gate failed for commit ${{ github.sha }}."
+
+      - name: Send Email Notification (Success)
+        if: success()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.office365.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "SonarQube Analysis Passed: ${{ github.repository }}"
+          to: ${{ secrets.EMAIL_TO }}
+          from: ${{ secrets.EMAIL_USERNAME }}
+          body: "Quality gate passed for commit ${{ github.sha }}."
