@@ -67,22 +67,35 @@ jobs:
           echo "Using SONAR_HOST_URL=$SONAR_HOST_URL"
           mvn -B -Psonar verify -DskipTests=false -Dsonar.host.url="$SONAR_HOST_URL" -Dsonar.login="$SONAR_TOKEN"
 
-      - name: Publish Sonar expected status (Octokit)
-        if: always()
+      - name: Publish sonarExpected (success)
+        if: success()
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const state = (process.env.GITHUB_JOB_STATUS || 'success') === 'success' ? 'success' : 'failure'
-            // job status isn't available directly in env; derive from conclusion if present
-            const context = 'sonarExpected'
             await github.rest.repos.createCommitStatus({
-              owner: contextPayload.repository.owner.login || contextPayload.repository.owner.name,
-              repo: contextPayload.repository.name,
-              sha: contextPayload.sha || process.env.GITHUB_SHA,
-              state: state,
-              context: context,
-              description: 'SonarQube status',
+              owner: github.context.repo.owner,
+              repo: github.context.repo.repo,
+              sha: github.context.sha,
+              state: 'success',
+              context: 'sonarExpected',
+              description: 'SonarQube analysis passed',
+              target_url: `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
+            })
+
+      - name: Publish sonarExpected (failure)
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.repos.createCommitStatus({
+              owner: github.context.repo.owner,
+              repo: github.context.repo.repo,
+              sha: github.context.sha,
+              state: 'failure',
+              context: 'sonarExpected',
+              description: 'SonarQube analysis failed',
               target_url: `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
             })
 
@@ -96,7 +109,7 @@ jobs:
           password: ${{ secrets.EMAIL_PASSWORD }}
           subject: "SonarQube Analysis Failed: ${{ github.repository }}"
           to: ${{ secrets.EMAIL_TO }}
-          from: ${{ secrets.EMAIL_USERNAME }}
+          from: ${{ secrets.EMAIL_FROM || secrets.EMAIL_USERNAME }}
           body: "Quality gate failed for commit ${{ github.sha }}."
 
       - name: Send Email Notification (Success)
@@ -109,5 +122,5 @@ jobs:
           password: ${{ secrets.EMAIL_PASSWORD }}
           subject: "SonarQube Analysis Passed: ${{ github.repository }}"
           to: ${{ secrets.EMAIL_TO }}
-          from: ${{ secrets.EMAIL_USERNAME }}
+          from: ${{ secrets.EMAIL_FROM || secrets.EMAIL_USERNAME }}
           body: "Quality gate passed for commit ${{ github.sha }}."
