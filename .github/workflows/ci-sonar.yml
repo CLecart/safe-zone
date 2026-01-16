@@ -73,10 +73,12 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
+            const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/')
+            const sha = process.env.GITHUB_SHA
             await github.rest.repos.createCommitStatus({
-              owner: github.context.repo.owner,
-              repo: github.context.repo.repo,
-              sha: github.context.sha,
+              owner,
+              repo,
+              sha,
               state: 'success',
               context: 'sonarExpected',
               description: 'SonarQube analysis passed',
@@ -89,10 +91,12 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
+            const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/')
+            const sha = process.env.GITHUB_SHA
             await github.rest.repos.createCommitStatus({
-              owner: github.context.repo.owner,
-              repo: github.context.repo.repo,
-              sha: github.context.sha,
+              owner,
+              repo,
+              sha,
               state: 'failure',
               context: 'sonarExpected',
               description: 'SonarQube analysis failed',
