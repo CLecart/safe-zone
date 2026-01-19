@@ -72,7 +72,7 @@ jobs:
           mvn -B -Psonar verify -DskipTests=false -Dsonar.host.url="$SONAR_HOST_URL" -Dsonar.login="$SONAR_TOKEN"
 
       - name: Publish sonarExpected (success)
-        if: "success() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false || secrets.PUBLISH_STATUS_TOKEN != '')"
+        if: "success()"
         uses: actions/github-script@v6
         with:
           # prefer a repo PAT stored in secrets (PUBLISH_STATUS_TOKEN) for PRs from forks
@@ -91,7 +91,7 @@ jobs:
             })
 
       - name: Publish sonarExpected (failure)
-        if: "failure() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false || secrets.PUBLISH_STATUS_TOKEN != '')"
+        if: "failure()"
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.PUBLISH_STATUS_TOKEN || secrets.GITHUB_TOKEN }}
@@ -101,40 +101,46 @@ jobs:
             await github.rest.repos.createCommitStatus({
               owner,
               repo,
-              sha,
+              sha, 
               state: 'failure',
               context: 'sonarExpected',
               description: 'SonarQube analysis failed',
               target_url: `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
             })
 
-      - name: Send Email Notification (Failure)
+      - name: Send Email Notification (Failure via SendGrid)
         if: failure()
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.office365.com
-          server_port: 587
-          username: ${{ secrets.MAIL_USERNAME }}
-          password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: "SonarQube Analysis Failed: ${{ github.repository }}"
-          to: ${{ secrets.EMAIL_TO }}
-          from: ${{ secrets.EMAIL_FROM || secrets.MAIL_USERNAME }}
-          body: "Quality gate failed for commit ${{ github.sha }}."
-
-      - name: Warn: skipping sonarExpected status (forked PR without token)
-        if: "github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == true && secrets.PUBLISH_STATUS_TOKEN == ''"
+        env:
+          SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM || secrets.MAIL_USERNAME }}
         run: |
-          echo "Skipping posting 'sonarExpected' status because this is a forked PR and PUBLISH_STATUS_TOKEN is not configured. Add the secret to allow status posting from forks."
+          if [ -z "${SENDGRID_API_KEY:-}" ]; then
+            echo "SENDGRID_API_KEY not set; skipping email."
+            exit 0
+          fi
+          payload=$(jq -n --arg to "$EMAIL_TO" --arg from "$EMAIL_FROM" --arg sub "SonarQube Analysis Failed: ${{ github.repository }}" --arg body "Quality gate failed for commit ${{ github.sha }}." '{personalizations:[{to:[{email:$to}]}],from:{email:$from},subject:$sub,content:[{type:"text/plain",value:$body}]}')
+          curl -s -X POST "https://api.sendgrid.com/v3/mail/send" \
+            -H "Authorization: Bearer ${SENDGRID_API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d "$payload"
 
-      - name: Send Email Notification (Success)
+      # Note: posting commit statuses from forked PRs may be blocked by GITHUB_TOKEN permissions.
+      # If you need status posting from forks, set the PUBLISH_STATUS_TOKEN secret (PAT with repo:status).
+
+      - name: Send Email Notification (Success via SendGrid)
         if: success()
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.office365.com
-          server_port: 587
-          username: ${{ secrets.MAIL_USERNAME }}
-          password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: "SonarQube Analysis Passed: ${{ github.repository }}"
-          to: ${{ secrets.EMAIL_TO }}
-          from: ${{ secrets.EMAIL_FROM || secrets.MAIL_USERNAME }}
-          body: "Quality gate passed for commit ${{ github.sha }}."
+        env:
+          SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM || secrets.MAIL_USERNAME }}
+        run: |
+          if [ -z "${SENDGRID_API_KEY:-}" ]; then
+            echo "SENDGRID_API_KEY not set; skipping email."
+            exit 0
+          fi
+          payload=$(jq -n --arg to "$EMAIL_TO" --arg from "$EMAIL_FROM" --arg sub "SonarQube Analysis Passed: ${{ github.repository }}" --arg body "Quality gate passed for commit ${{ github.sha }}." '{personalizations:[{to:[{email:$to}]}],from:{email:$from},subject:$sub,content:[{type:"text/plain",value:$body}]}')
+          curl -s -X POST "https://api.sendgrid.com/v3/mail/send" \
+            -H "Authorization: Bearer ${SENDGRID_API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d "$payload"
