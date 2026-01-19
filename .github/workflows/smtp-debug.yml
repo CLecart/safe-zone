@@ -1,0 +1,68 @@
+name: SMTP Debug
+
+on:
+  workflow_dispatch:
+
+jobs:
+  smtp-test:
+    runs-on: ubuntu-latest
+    env:
+      MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+      EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+    steps:
+      - name: Mail send test (SendGrid if available, else SMTP)
+        env:
+          SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+          MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM || secrets.MAIL_USERNAME }}
+        run: |
+          if [ -n "${SENDGRID_API_KEY:-}" ]; then
+            echo "Testing SendGrid send..."
+            if ! command -v jq >/dev/null 2>&1; then
+              sudo apt-get update && sudo apt-get install -y jq
+            fi
+            payload=$(jq -n --arg to "$EMAIL_TO" --arg from "$EMAIL_FROM" --arg sub "SMTP Debug: SendGrid" --arg body "Test message from GitHub Actions" '{personalizations:[{to:[{email:$to}]}],from:{email:$from},subject:$sub,content:[{type:"text/plain",value:$body}]}')
+            code=$(curl -s -o /tmp/sendgrid.out -w "%{http_code}" -X POST "https://api.sendgrid.com/v3/mail/send" \
+              -H "Authorization: Bearer ${SENDGRID_API_KEY}" \
+              -H "Content-Type: application/json" \
+              -d "$payload")
+            echo "SendGrid HTTP code: $code"
+            if [ "$code" != "202" ]; then
+              echo "SendGrid response:"; cat /tmp/sendgrid.out; exit 1
+            fi
+            echo "SendGrid send OK"
+          else
+            echo "SENDGRID_API_KEY not set — falling back to SMTP test"
+            printf '%s\n' \
+              "import smtplib, os, sys" \
+              "user=os.getenv('MAIL_USERNAME')" \
+              "pw=os.getenv('EMAIL_PASSWORD')" \
+              "to=os.getenv('EMAIL_TO')" \
+              "from_addr=os.getenv('EMAIL_FROM') or user" \
+              "if not user or not pw:" \
+              "    print('MISSING_SECRETS')" \
+              "    sys.exit(2)" \
+              "try:" \
+              "    s=smtplib.SMTP('smtp.office365.com',587,timeout=30)" \
+              "    s.ehlo()" \
+              "    s.starttls()" \
+              "    try:" \
+              "        res = s.login(user,pw)" \
+              "        print('LOGIN_SUCCESS', res)" \
+              "        s.sendmail(from_addr,[to],'Subject: SMTP debug\\n\\nOK')" \
+              "        print('SMTP SEND OK')" \
+              "    except Exception as e:" \
+              "        print('LOGIN_FAILED', repr(e))" \
+              "        raise" \
+              "    finally:" \
+              "        try: s.quit()" \
+              "        except: pass" \
+              "except Exception as e:" \
+              "    print('SMTP_CONNECTION_ERROR', repr(e))" \
+              "    sys.exit(1)" \
+              "print('SMTP_TEST_DONE')" \
+            > /tmp/smtp_test.py
+            python3 /tmp/smtp_test.py
+          fi
