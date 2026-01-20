@@ -2,6 +2,8 @@
 
 A comprehensive e-commerce microservices project with integrated code quality analysis using SonarQube.
 
+<!-- ci: 2026-01-19 - small non-functional entry to record today's contribution -->
+
 ## Architecture Overview
 
 ```
@@ -91,7 +93,6 @@ safe-zone/
    ```
 
 2. Access SonarQube at http://localhost:9000
-
    - Default credentials: admin/admin
    - Change password on first login
 
