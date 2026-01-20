@@ -42,8 +42,8 @@ jobs:
               "to=os.getenv('EMAIL_TO')" \
               "from_addr=os.getenv('EMAIL_FROM') or user" \
               "if not user or not pw:" \
-              "    print('MISSING_SECRETS')" \
-              "    sys.exit(2)" \
+              "    print('MISSING_SECRETS - skipping SMTP test')" \
+              "    sys.exit(0)" \
               "try:" \
               "    s=smtplib.SMTP('smtp.office365.com',587,timeout=30)" \
               "    s.ehlo()" \
