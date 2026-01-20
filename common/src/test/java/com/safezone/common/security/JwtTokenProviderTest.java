@@ -28,7 +28,7 @@ class JwtTokenProviderTest {
     private JwtTokenProvider jwtTokenProvider;
 
     /** Test secret key for JWT signing (Base64 encoded, 256+ bits). */
-    private static final String SECRET = "dGVzdC1zZWNyZXQta2V5LWZvci1zYWZlem9uZS1hcHBsaWNhdGlvbi10ZXN0aW5nLW9ubHktdGhpcy1pcy1sb25nLWVub3VnaA==";
+    private static final String SECRET = "REMOVED_JWT_SECRET";
 
     /** Test token expiration time in milliseconds (1 hour). */
     private static final long EXPIRATION = 3600000L;
