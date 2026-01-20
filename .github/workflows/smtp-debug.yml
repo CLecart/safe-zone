@@ -35,34 +35,6 @@ jobs:
             echo "SendGrid send OK"
           else
             echo "SENDGRID_API_KEY not set — falling back to SMTP test"
-            printf '%s\n' \
-              "import smtplib, os, sys" \
-              "user=os.getenv('MAIL_USERNAME')" \
-              "pw=os.getenv('EMAIL_PASSWORD')" \
-              "to=os.getenv('EMAIL_TO')" \
-              "from_addr=os.getenv('EMAIL_FROM') or user" \
-              "if not user or not pw:" \
-              "    print('MISSING_SECRETS - skipping SMTP test')" \
-              "    sys.exit(0)" \
-              "try:" \
-              "    s=smtplib.SMTP('smtp.office365.com',587,timeout=30)" \
-              "    s.ehlo()" \
-              "    s.starttls()" \
-              "    try:" \
-              "        res = s.login(user,pw)" \
-              "        print('LOGIN_SUCCESS', res)" \
-              "        s.sendmail(from_addr,[to],'Subject: SMTP debug\\n\\nOK')" \
-              "        print('SMTP SEND OK')" \
-              "    except Exception as e:" \
-              "        print('LOGIN_FAILED', repr(e))" \
-              "        raise" \
-              "    finally:" \
-              "        try: s.quit()" \
-              "        except: pass" \
-              "except Exception as e:" \
-              "    print('SMTP_CONNECTION_ERROR', repr(e))" \
-              "    sys.exit(1)" \
-              "print('SMTP_TEST_DONE')" \
-            > /tmp/smtp_test.py
-            python3 /tmp/smtp_test.py
+            # Use the repository script to avoid embedding Python in YAML
+            python3 .github/scripts/smtp_test.py
           fi
