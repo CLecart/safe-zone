@@ -108,6 +108,24 @@ jobs:
               target_url: `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
             })
 
+      - name: Publish sonar (failure)
+        if: "failure()"
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.PUBLISH_STATUS_TOKEN || secrets.GITHUB_TOKEN }}
+          script: |
+            const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/')
+            const sha = process.env.GITHUB_SHA
+            await github.rest.repos.createCommitStatus({
+              owner,
+              repo,
+              sha,
+              state: 'failure',
+              context: 'sonar',
+              description: 'SonarQube analysis failed',
+              target_url: `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
+            })
+
       - name: Send Email Notification (Failure via SendGrid)
         if: failure()
         env:
@@ -144,3 +162,21 @@ jobs:
             -H "Authorization: Bearer ${SENDGRID_API_KEY}" \
             -H "Content-Type: application/json" \
             -d "$payload"
+
+      - name: Publish sonar (success)
+        if: success()
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.PUBLISH_STATUS_TOKEN || secrets.GITHUB_TOKEN }}
+          script: |
+            const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/')
+            const sha = process.env.GITHUB_SHA
+            await github.rest.repos.createCommitStatus({
+              owner,
+              repo,
+              sha,
+              state: 'success',
+              context: 'sonar',
+              description: 'SonarQube analysis passed',
+              target_url: `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
+            })
