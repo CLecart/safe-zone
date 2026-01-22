@@ -1,10 +1,10 @@
-# SafeZone - E-Commerce Microservices with SonarQube
+# SafeZone – E-Commerce Microservices (Audit-Ready)
 
-A comprehensive e-commerce microservices project with integrated code quality analysis using SonarQube.
+Projet e-commerce microservices avec intégration stricte de la qualité et sécurité via SonarCloud et CI/CD GitHub Actions.
 
-<!-- ci: 2026-01-19 - small non-functional entry to record today's contribution -->
+> **Conforme à l’audit et à l’énoncé strict** (protection de branche, PR obligatoire, checks qualité, bonus SonarCloud, optionnels IDE/notifications).
 
-## Architecture Overview
+## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -27,33 +27,22 @@ A comprehensive e-commerce microservices project with integrated code quality an
    └─────────┘       └─────────┘       └─────────┘
 ```
 
-## Prerequisites
+## Prérequis
 
 - Java 17+
 - Maven 3.8+
-- Docker & Docker Compose
+- Docker & Docker Compose (pour tests locaux)
 - Git
 
-## Quick Start
+## Démarrage rapide
 
-### 1. Start SonarQube
+### 1. Analyse Qualité (SonarCloud)
 
-```bash
-docker-compose -f docker/docker-compose.sonarqube.yml up -d
-```
+L’analyse qualité et sécurité est **automatique** à chaque push/PR grâce à GitHub Actions et SonarCloud.
 
-Wait for SonarQube to be ready at http://localhost:9000 (default credentials: admin/admin).
+**Aucune configuration locale requise pour l’audit.**
 
-### 2. Build and Analyze
-
-```bash
-mvn clean verify sonar:sonar \
-  -Dsonar.projectKey=safe-zone \
-  -Dsonar.host.url=http://localhost:9000 \
-  -Dsonar.login=<your-token>
-```
-
-### 3. Run Microservices
+### 2. Lancer les microservices (pour développement local)
 
 ```bash
 mvn spring-boot:run -pl product-service
@@ -62,7 +51,7 @@ mvn spring-boot:run -pl user-service
 mvn spring-boot:run -pl api-gateway
 ```
 
-## Project Structure
+## Structure du projet
 
 ```
 safe-zone/
@@ -82,102 +71,45 @@ safe-zone/
 └── pom.xml                  # Parent POM
 ```
 
-## SonarQube Integration
+## Intégration SonarCloud & CI/CD
 
-### Local Setup
+- **Analyse qualité/sécurité** : Automatique à chaque push/PR via GitHub Actions & SonarCloud ([voir le projet sur SonarCloud](https://sonarcloud.io/)).
+- **Protection de branche** : PR obligatoire, merge bloqué si qualité KO.
+- **Quality Gate** : Aucune vulnérabilité critique, duplications < 3%, sécurité et couverture testées.
 
-1. Start SonarQube using Docker:
+## Processus de revue & merge
 
-   ```bash
-   docker-compose -f docker/docker-compose.sonarqube.yml up -d
-   ```
+1. Toute modification passe par une Pull Request (PR)
+2. Merge impossible si SonarCloud ou CI échoue
+3. (Bonus) CODEOWNERS pour assigner les reviewers automatiquement
 
-2. Access SonarQube at http://localhost:9000
-   - Default credentials: admin/admin
-   - Change password on first login
+## Bonus & Optionnels
 
-3. Generate a token:
-   - Go to User > My Account > Security
-   - Generate a new token for CI/CD
+- **Couverture de tests** : Peut être activée pour bonus audit (voir doc SonarCloud + Jacoco)
+- **Notifications** : Slack/email configurables dans SonarCloud (Administration > Webhooks)
+- **SonarLint IDE** : Feedback qualité en temps réel (VS Code/IntelliJ)
 
-### GitHub Actions Integration
+## Intégration IDE (optionnel)
 
-The project includes automated workflows:
+- **IntelliJ/VS Code** : Installer SonarLint pour voir les problèmes qualité en direct
 
-- **sonarqube-analysis.yml**: Runs on every push to main/develop
-- **pr-quality-gate.yml**: Blocks PRs that fail quality gates
+## Documentation API
 
-### Quality Gates
+Chaque microservice expose Swagger UI à `/swagger-ui.html`
 
-The project enforces:
+## Sécurité
 
-- Coverage > 80%
-- No new critical/blocker issues
-- Code duplication < 3%
-- Security hotspots reviewed
+- Endpoints sécurisés (JWT, RBAC)
+- Détection automatique des hotspots sécurité via SonarCloud
 
-## Code Review Process
+## Contribution
 
-### Branch Protection Rules
+1. Créer une branche depuis `main` ou `develop`
+2. Faire les changements + tests
+3. Vérifier que SonarCloud et CI sont verts
+4. Ouvrir une PR
+5. Merger uniquement si tout est vert
 
-1. All changes must go through Pull Requests
-2. At least 1 approval required
-3. SonarQube quality gate must pass
-4. All CI checks must pass
+## Licence
 
-### CODEOWNERS
-
-The `CODEOWNERS` file ensures appropriate reviewers:
-
-- `/product-service/` → @product-team
-- `/order-service/` → @order-team
-- `/user-service/` → @user-team
-
-## Notifications
-
-### Slack Integration
-
-Configure in SonarQube:
-
-1. Administration > Configuration > Webhooks
-2. Add Slack webhook URL
-
-### Email Notifications
-
-Configure SMTP in `docker/docker-compose.sonarqube.yml`
-
-## IDE Integration
-
-### IntelliJ IDEA
-
-1. Install SonarLint plugin
-2. Connect to SonarQube server
-3. Bind project for synchronized rules
-
-### VS Code
-
-1. Install SonarLint extension
-2. Configure connection in settings.json
-
-## API Documentation
-
-Each service exposes Swagger UI at `/swagger-ui.html`
-
-## Security
-
-- All endpoints require authentication (except health checks)
-- JWT-based authentication
-- Role-based access control
-- SonarQube security hotspot detection
-
-## Contributing
-
-1. Create feature branch from `develop`
-2. Make changes with tests
-3. Ensure SonarQube quality gate passes
-4. Submit PR for review
-5. Merge after approval
-
-## License
-
-MIT License
+MIT
