@@ -31,6 +31,13 @@ import jakarta.servlet.http.HttpServletResponse;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+    /**
+     * Provides a BCrypt password encoder bean for secure password hashing.
+     */
+    @Bean
+    public org.springframework.security.crypto.password.PasswordEncoder passwordEncoder() {
+        return new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
+    }
 
     /** JWT token provider for authentication processing. */
     private final JwtTokenProvider jwtTokenProvider;
@@ -89,6 +96,7 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/users/{id}").permitAll()
                         .anyRequest().authenticated());
         http.exceptionHandling(ex -> ex
                 .authenticationEntryPoint((request, response, authException) -> response

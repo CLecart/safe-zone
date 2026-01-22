@@ -18,11 +18,6 @@
     "connectionId": "safezone-sonarqube",
     "projectKey": "safe-zone"
   },
-  "sonarlint.rules": {
-    "java:S1135": {
-      "level": "off"
-    }
-  },
   "java.configuration.updateBuildConfiguration": "automatic",
   "java.compile.nullAnalysis.mode": "automatic",
   "editor.formatOnSave": true,

@@ -15,6 +15,30 @@ import org.springframework.test.web.servlet.MockMvc;
 @SpringBootTest
 @AutoConfigureMockMvc
 class UserControllerSecurityIntegrationTest {
+    @Autowired
+    private com.safezone.user.repository.UserRepository userRepository;
+
+    private Long testUserId;
+
+    @SuppressWarnings("null")
+    @org.junit.jupiter.api.BeforeEach
+    void setupTestUser() {
+        // Remove any existing test user with the same email to avoid unique constraint
+        // violation
+        userRepository.findByEmail("testuser@example.com").ifPresent(userRepository::delete);
+        com.safezone.user.entity.User user = com.safezone.user.entity.User.builder()
+                .username("testuser")
+                .email("testuser@example.com")
+                .password("$2a$10$testhash") // dummy bcrypt hash
+                .firstName("Test")
+                .lastName("User")
+                .enabled(true)
+                .locked(false)
+                .createdAt(java.time.LocalDateTime.now())
+                .updatedAt(java.time.LocalDateTime.now())
+                .build();
+        testUserId = userRepository.save(user).getId();
+    }
 
     @Autowired
     private MockMvc mockMvc;
@@ -22,7 +46,7 @@ class UserControllerSecurityIntegrationTest {
     @Test
     @DisplayName("GET /api/v1/users/{id} should be public")
     void getUserById_publicAccess() throws Exception {
-        mockMvc.perform(get("/api/v1/users/1"))
+        mockMvc.perform(get("/api/v1/users/" + testUserId))
                 .andExpect(status().isOk());
     }
 

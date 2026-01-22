@@ -1,15 +1,5 @@
 package com.safezone.user.controller;
 
-import com.safezone.common.dto.ApiResponse;
-import com.safezone.common.dto.PageResponse;
-import com.safezone.user.dto.UpdateUserRequest;
-import com.safezone.user.dto.UserResponse;
-import com.safezone.user.entity.UserRole;
-import com.safezone.user.service.UserService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,12 +17,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.safezone.common.dto.ApiResponse;
+import com.safezone.common.dto.PageResponse;
+import com.safezone.user.dto.UpdateUserRequest;
+import com.safezone.user.dto.UserResponse;
+import com.safezone.user.entity.UserRole;
+import com.safezone.user.service.UserService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+
 /**
  * REST controller for user management operations.
  * Provides endpoints for user CRUD operations and role management.
  *
- * <p>Most endpoints require authentication. Admin role required for
- * user deletion and role management operations.</p>
+ * <p>
+ * Most endpoints require authentication. Admin role required for
+ * user deletion and role management operations.
+ * </p>
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -56,11 +60,9 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Get user by ID")
     public ResponseEntity<ApiResponse<UserResponse>> getUserById(
             @Parameter(description = "User ID") @PathVariable Long id) {
-
         UserResponse user = userService.getUserById(id);
         return ResponseEntity.ok(ApiResponse.success(user));
     }
@@ -177,7 +179,6 @@ public class UserController {
                 page.getContent(),
                 page.getNumber(),
                 page.getSize(),
-                page.getTotalElements()
-        );
+                page.getTotalElements());
     }
 }
