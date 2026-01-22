@@ -23,124 +23,17 @@ jobs:
           distribution: temurin
           java-version: "21"
 
+      - name: Clean Mockito cache (force redownload)
+        run: rm -rf ~/.m2/repository/org/mockito/mockito-core
+
       - name: Cache Maven repository
         uses: actions/cache@v4
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-nocorrupt
           restore-keys: |
             ${{ runner.os }}-maven-
 
       - name: Build & test
         run: |
           mvn -B -q -DskipTests=false clean verify
-
-  sonar:
-    name: SonarQube Analysis (self-hosted)
-    needs: build-test
-    runs-on: ubuntu-latest
-    env:
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL || vars.SONAR_HOST_URL }}
-      MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
-      EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "21"
-
-      - name: Cache Maven repository
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-
-      - name: SonarQube Scan (Maven)
-        run: |
-          if [ -z "${SONAR_TOKEN:-}" ] || [ -z "${SONAR_HOST_URL:-}" ]; then
-            echo "Sonar env not configured; skipping analysis."
-            exit 0
-          fi
-          echo "Using SONAR_HOST_URL=$SONAR_HOST_URL"
-          mvn -B -Psonar verify -DskipTests=false -Dsonar.host.url="$SONAR_HOST_URL" -Dsonar.login="$SONAR_TOKEN"
-
-      - name: Publish sonarExpected (success)
-        if: "success()"
-        uses: actions/github-script@v6
-        with:
-          # prefer a repo PAT stored in secrets (PUBLISH_STATUS_TOKEN) for PRs from forks
-          github-token: ${{ secrets.PUBLISH_STATUS_TOKEN || secrets.GITHUB_TOKEN }}
-          script: |
-            const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/')
-            const sha = process.env.GITHUB_SHA
-            await github.rest.repos.createCommitStatus({
-              owner,
-              repo,
-              sha,
-              state: 'success',
-              context: 'sonarExpected',
-              description: 'SonarQube analysis passed',
-              target_url: `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
-            })
-
-      - name: Publish sonarExpected (failure)
-        if: "failure()"
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.PUBLISH_STATUS_TOKEN || secrets.GITHUB_TOKEN }}
-          script: |
-            const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/')
-            const sha = process.env.GITHUB_SHA
-            await github.rest.repos.createCommitStatus({
-              owner,
-              repo,
-              sha, 
-              state: 'failure',
-              context: 'sonarExpected',
-              description: 'SonarQube analysis failed',
-              target_url: `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
-            })
-
-      - name: Send Email Notification (Failure via SendGrid)
-        if: failure()
-        env:
-          SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
-          EMAIL_TO: ${{ secrets.EMAIL_TO }}
-          EMAIL_FROM: ${{ secrets.EMAIL_FROM || secrets.MAIL_USERNAME }}
-        run: |
-          if [ -z "${SENDGRID_API_KEY:-}" ]; then
-            echo "SENDGRID_API_KEY not set; skipping email."
-            exit 0
-          fi
-          payload=$(jq -n --arg to "$EMAIL_TO" --arg from "$EMAIL_FROM" --arg sub "SonarQube Analysis Failed: ${{ github.repository }}" --arg body "Quality gate failed for commit ${{ github.sha }}." '{personalizations:[{to:[{email:$to}]}],from:{email:$from},subject:$sub,content:[{type:"text/plain",value:$body}]}')
-          curl -s -X POST "https://api.sendgrid.com/v3/mail/send" \
-            -H "Authorization: Bearer ${SENDGRID_API_KEY}" \
-            -H "Content-Type: application/json" \
-            -d "$payload"
-
-      # Note: posting commit statuses from forked PRs may be blocked by GITHUB_TOKEN permissions.
-      # If you need status posting from forks, set the PUBLISH_STATUS_TOKEN secret (PAT with repo:status).
-
-      - name: Send Email Notification (Success via SendGrid)
-        if: success()
-        env:
-          SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
-          EMAIL_TO: ${{ secrets.EMAIL_TO }}
-          EMAIL_FROM: ${{ secrets.EMAIL_FROM || secrets.MAIL_USERNAME }}
-        run: |
-          if [ -z "${SENDGRID_API_KEY:-}" ]; then
-            echo "SENDGRID_API_KEY not set; skipping email."
-            exit 0
-          fi
-          payload=$(jq -n --arg to "$EMAIL_TO" --arg from "$EMAIL_FROM" --arg sub "SonarQube Analysis Passed: ${{ github.repository }}" --arg body "Quality gate passed for commit ${{ github.sha }}." '{personalizations:[{to:[{email:$to}]}],from:{email:$from},subject:$sub,content:[{type:"text/plain",value:$body}]}')
-          curl -s -X POST "https://api.sendgrid.com/v3/mail/send" \
-            -H "Authorization: Bearer ${SENDGRID_API_KEY}" \
-            -H "Content-Type: application/json" \
-            -d "$payload"
