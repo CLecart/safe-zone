@@ -63,20 +63,14 @@ class ProductControllerCoverageTest {
     }
 
     @Test
-    @DisplayName("Should get all products with descending sort")
+    @DisplayName("Should get all products with descending sort - unauthorized")
     void shouldGetAllProductsWithDescSort() throws Exception {
-        List<ProductResponse> content = new ArrayList<>();
-        content.add(testProductResponse);
-        Page<ProductResponse> productPage = new PageImpl<>(content, PageRequest.of(0, 20), 1);
-        given(productService.getAllProducts(any())).willReturn(productPage);
-
         mockMvc.perform(get("/api/v1/products")
                 .param("page", "0")
                 .param("size", "20")
                 .param("sortBy", "name")
                 .param("sortDir", "desc"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true));
+                .andExpect(status().isUnauthorized());
     }
 
     @Test

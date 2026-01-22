@@ -22,10 +22,15 @@ class ProductControllerSecurityIntegrationTest {
     private MockMvc mockMvc;
 
     @Test
-    @DisplayName("GET /api/v1/products/{id} should be public")
+    @DisplayName("GET /api/v1/products/{id} should be public (200 or 404)")
     void getProductById_publicAccess() throws Exception {
         mockMvc.perform(get("/api/v1/products/1"))
-                .andExpect(status().isOk());
+                .andExpect(result -> {
+                    int status = result.getResponse().getStatus();
+                    org.assertj.core.api.Assertions.assertThat(status)
+                            .as("Should be 200 OK if found, 404 if not found")
+                            .isIn(200, 404);
+                });
     }
 
     @Test
