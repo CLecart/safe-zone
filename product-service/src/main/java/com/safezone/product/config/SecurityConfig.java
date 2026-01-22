@@ -66,10 +66,7 @@ public class SecurityConfig {
                                 .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers("/actuator/**").permitAll()
                                                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                                                .requestMatchers(HttpMethod.GET, "/api/v1/products/{id}",
-                                                                "/api/v1/products/sku/{sku}",
-                                                                "/api/v1/products/category/{category}")
-                                                .permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/v1/products/**").permitAll()
                                                 .anyRequest().authenticated())
                                 .exceptionHandling(ex -> ex
                                                 .authenticationEntryPoint((request, response, authException) -> response
