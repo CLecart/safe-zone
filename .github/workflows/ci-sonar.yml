@@ -60,6 +60,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
+      - name: Install docker-compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
       - name: Start SonarQube (Docker)
         run: |
           docker-compose -f docker/docker-compose.sonarqube.yml up -d
