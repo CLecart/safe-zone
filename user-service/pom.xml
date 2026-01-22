@@ -76,7 +76,7 @@
                    <version>3.2.3</version>
                    <configuration>
                        <argLine>${jacoco.agent.argLine}</argLine>
-                       <argLine>-javaagent:${settings.localRepository}/org/mockito/mockito-core/5.2.0/mockito-core-5.2.0.jar</argLine>
+                       <argLine>-javaagent:${settings.localRepository}/org/mockito/mockito-core/5.2.1/mockito-core-5.2.1.jar</argLine>
                    </configuration>
                </plugin>
             <plugin>
