@@ -35,20 +35,7 @@
 
         <sonar.organization>safezone</sonar.organization>
         <sonar.host.url>http://localhost:9000</sonar.host.url>
-        <sonar.projectKey>safe-zone</sonar.projectKey>
-        <sonar.projectName>SafeZone E-Commerce</sonar.projectName>
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
-        <sonar.coverage.jacoco.xmlReportPaths>
-            ${project.basedir}/../target/site/jacoco-aggregate/jacoco.xml,
-            ${project.basedir}/target/site/jacoco/jacoco.xml
-        </sonar.coverage.jacoco.xmlReportPaths>
-        <sonar.exclusions>
-            **/config/**,
-            **/dto/**,
-            **/entity/**,
-            **/exception/**,
-            **/*Application.java
-        </sonar.exclusions>
         <sonar.qualitygate.wait>true</sonar.qualitygate.wait>
 
         <jacoco.version>0.8.11</jacoco.version>

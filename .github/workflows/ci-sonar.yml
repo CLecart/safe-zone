@@ -1,7 +1,5 @@
 # yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
 name: CI & SonarQube
-permissions:
-  statuses: write
 
 on:
   push:
@@ -38,6 +36,8 @@ jobs:
   sonar:
     name: SonarQube Analysis (self-hosted)
     needs: build-test
+    permissions:
+      statuses: write
     runs-on: ubuntu-latest
     env:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

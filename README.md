@@ -181,3 +181,22 @@ Each service exposes Swagger UI at `/swagger-ui.html`
 ## License
 
 MIT License
+
+## Local SonarQube Analysis with .env
+
+Pour éviter de stocker des secrets dans le code, place ton token SonarQube dans un fichier `.env` (déjà ignoré par Git) :
+
+```
+SONAR_TOKEN=ton_token_ici
+SONAR_HOST_URL=http://localhost:9000
+```
+
+Utilise le script fourni pour charger automatiquement les variables et lancer l’analyse :
+
+```bash
+source ./run-sonar-local.sh
+```
+
+Le script charge les variables de `.env` et lance Maven avec le bon token. Ne jamais commettre `.env` : il est déjà dans `.gitignore`.
+
+Pour un exemple de structure, vois `.env.example`.
