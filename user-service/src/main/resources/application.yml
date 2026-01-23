@@ -23,7 +23,7 @@ server:
   port: 8083
 
 jwt:
-  secret: ${JWT_SECRET:SafeZoneSecretKeyForJWTAuthenticationMustBeAtLeast256BitsLong}
+  secret: ${JWT_SECRET}
   expiration: ${JWT_EXPIRATION:86400000}
 
 springdoc:
