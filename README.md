@@ -46,13 +46,16 @@ Wait for SonarQube to be ready at http://localhost:9000 (default credentials: ad
 
 ### 2. Build and Analyze
 
+> Note: SonarCloud supports _Automatic Analysis_ via the SonarCloud GitHub App. If Automatic Analysis is enabled for the project `CLecart_safe-zone`, do **not** run `sonar:sonar` from CI or in automated pipelines because that causes a conflict (SonarCloud will report an error). Instead rely on the SonarCloud app to analyse PRs automatically.
+
+For a local, manual analysis against a Sonar server (or to force a SonarCloud scan locally), use the helper script (requires `SONAR_TOKEN` in `.env`):
+
 ```bash
-mvn clean verify sonar:sonar \
-  -Dsonar.organization=clecart \
-  -Dsonar.projectKey=CLecart_safe-zone \
-  -Dsonar.host.url=https://sonarcloud.io \
-  -Dsonar.login=<your-token>
+# run a local analysis (will refuse against SonarCloud unless forced)
+FORCE_LOCAL_SONAR=1 source ./run-sonar-local.sh
 ```
+
+If you maintain CI scans instead of using Automatic Analysis, set the repository secret `FORCE_SONAR_CI_SCAN=true` and re-run the workflow to enable the CI-invoked Sonar scan.
 
 ### 3. Run Microservices
 
