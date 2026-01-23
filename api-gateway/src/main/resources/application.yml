@@ -53,9 +53,6 @@ spring:
 server:
   port: 8080
 
-jwt:
-  secret: ${JWT_SECRET:SafeZoneSecretKeyForJWTAuthenticationMustBeAtLeast256BitsLong}
-
 management:
   endpoints:
     web:

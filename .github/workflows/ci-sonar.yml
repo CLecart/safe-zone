@@ -1,7 +1,5 @@
 # yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
 name: CI & SonarQube
-permissions:
-  statuses: write
 
 on:
   push:
@@ -33,11 +31,13 @@ jobs:
 
       - name: Build & test
         run: |
-          mvn -B -q -DskipTests=false clean verify
+          mvn -B -q -DskipTests=false -Dmaven.project.sourceRoots.warningsDisabled=true clean verify
 
   sonar:
     name: SonarQube Analysis (self-hosted)
     needs: build-test
+    permissions:
+      statuses: write
     runs-on: ubuntu-latest
     env:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -62,14 +62,27 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - name: SonarQube Scan (Maven)
+      - name: SonarQube Scan (guarded - avoid double analysis)
         run: |
           if [ -z "${SONAR_TOKEN:-}" ] || [ -z "${SONAR_HOST_URL:-}" ]; then
             echo "Sonar env not configured; skipping analysis."
             exit 0
           fi
+          # By default we avoid running CI-invoked Sonar scans because SonarCloud's
+          # Automatic Analysis (GitHub App) may already perform the analysis and
+          # running both will cause a conflict (see SonarCloud error about Automatic Analysis).
+          # To force a CI scan set the repository secret FORCE_SONAR_CI_SCAN=true.
+          if [ "${FORCE_SONAR_CI_SCAN:-}" != "true" ]; then
+            echo "Automatic Analysis may be enabled in SonarCloud. CI-invoked analysis is disabled by default to avoid conflict."
+            echo "If you intentionally want a CI scan, set repository secret FORCE_SONAR_CI_SCAN=true and re-run the workflow."
+            exit 0
+          fi
           echo "Using SONAR_HOST_URL=$SONAR_HOST_URL"
-          mvn -B -Psonar verify -DskipTests=false -Dsonar.host.url="$SONAR_HOST_URL" -Dsonar.login="$SONAR_TOKEN"
+          mvn -B -Psonar verify -DskipTests=false -Dmaven.project.sourceRoots.warningsDisabled=true \
+            -Dsonar.host.url="$SONAR_HOST_URL" \
+            -Dsonar.organization=clecart \
+            -Dsonar.projectKey=CLecart_safe-zone \
+            -Dsonar.login="$SONAR_TOKEN"
 
       - name: Publish sonarExpected (success)
         if: "success()"

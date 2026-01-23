@@ -13,20 +13,7 @@ spring:
       hibernate:
         "[format_sql]": false
     database-platform: org.hibernate.dialect.H2Dialect
-
-  h2:
-    console:
-      enabled: false
-
-application:
-  jwt:
-    secret: dGVzdC1zZWNyZXQta2V5LWZvci1zYWZlem9uZS1hcHBsaWNhdGlvbi10ZXN0aW5nLW9ubHk=
-
-services:
-  product:
-    url: http://localhost:8081
-
 logging:
   level:
-    root: WARN
+    root: INFO
     "[com.safezone]": INFO

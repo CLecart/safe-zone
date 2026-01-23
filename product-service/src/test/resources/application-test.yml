@@ -15,10 +15,10 @@ server:
   port: 0
 
 jwt:
-  secret: TestSecretKeyForJWTAuthenticationMustBeAtLeast256BitsLong12345
+  secret: test-jwt-secret
   expiration: 86400000
 
 logging:
   level:
-    "[com.safezone]": WARN
-    "[org.springframework]": WARN
+    "[com.safezone]": INFO
+    "[org.springframework]": INFO

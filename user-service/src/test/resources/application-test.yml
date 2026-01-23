@@ -20,11 +20,11 @@ spring:
 
 application:
   jwt:
-    secret: dGVzdC1zZWNyZXQta2V5LWZvci1zYWZlem9uZS1hcHBsaWNhdGlvbi10ZXN0aW5nLW9ubHk=
+    secret: test-jwt-secret
     expiration: 3600000
 
 logging:
   level:
-    root: WARN
+    root: INFO
     "[com.safezone]": INFO
-    "[org.hibernate.SQL]": WARN
+    "[org.hibernate.SQL]": INFO

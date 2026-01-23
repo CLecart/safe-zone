@@ -63,8 +63,13 @@ public class SecurityConfig {
          */
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+                // CSRF is disabled because this service is a stateless REST API that uses
+                // JWT Bearer tokens (Authorization: Bearer <token>). There is no cookie- or
+                // session-based authentication and no login form, so CSRF is not applicable.
+                // See SonarQube rule S4502 for justification.
                 http
-                                .csrf(AbstractHttpConfigurer::disable)
+                                .csrf(AbstractHttpConfigurer::disable) // NOSONAR: S4502 justified - stateless REST API
+                                                                       // using JWT Bearer tokens
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .authorizeHttpRequests(auth -> auth

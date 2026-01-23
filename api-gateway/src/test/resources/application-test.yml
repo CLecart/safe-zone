@@ -16,9 +16,9 @@ spring:
             - Path=/api/users/**,/api/auth/**
 
 jwt:
-  secret: dGVzdC1zZWNyZXQta2V5LWZvci1zYWZlem9uZS1hcHBsaWNhdGlvbi10ZXN0aW5nLW9ubHk=
+  secret: test-jwt-secret
 
 logging:
   level:
-    root: WARN
+    root: INFO
     "[com.safezone]": INFO
