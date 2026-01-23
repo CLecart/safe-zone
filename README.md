@@ -48,8 +48,9 @@ Wait for SonarQube to be ready at http://localhost:9000 (default credentials: ad
 
 ```bash
 mvn clean verify sonar:sonar \
-  -Dsonar.projectKey=com.safezone:safe-zone-parent \
-  -Dsonar.host.url=http://localhost:9000 \
+  -Dsonar.organization=clecart \
+  -Dsonar.projectKey=CLecart_safe-zone \
+  -Dsonar.host.url=https://sonarcloud.io \
   -Dsonar.login=<your-token>
 ```
 

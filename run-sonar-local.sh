@@ -12,5 +12,7 @@ if [ -z "$SONAR_TOKEN" ]; then
 fi
 
 # Run Maven with Sonar token
-echo "Running Maven with SonarQube token..."
-mvn clean verify -Psonar -Dsonar.token=$SONAR_TOKEN "$@"
+echo "Running Maven with Sonar token..."
+SONAR_HOST_URL=${SONAR_HOST_URL:-https://sonarcloud.io}
+echo "Using SONAR_HOST_URL=$SONAR_HOST_URL"
+mvn clean verify -Psonar -Dsonar.host.url="$SONAR_HOST_URL" -Dsonar.login="$SONAR_TOKEN" "$@"
