@@ -69,7 +69,11 @@ jobs:
             exit 0
           fi
           echo "Using SONAR_HOST_URL=$SONAR_HOST_URL"
-          mvn -B -Psonar verify -DskipTests=false -Dsonar.host.url="$SONAR_HOST_URL" -Dsonar.login="$SONAR_TOKEN"
+          mvn -B -Psonar verify -DskipTests=false \
+            -Dsonar.host.url="$SONAR_HOST_URL" \
+            -Dsonar.organization=clecart \
+            -Dsonar.projectKey=CLecart_safe-zone \
+            -Dsonar.login="$SONAR_TOKEN"
 
       - name: Publish sonarExpected (success)
         if: "success()"
