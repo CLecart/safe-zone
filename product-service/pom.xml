@@ -104,17 +104,10 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.3</version>
                 <configuration>
-<<<<<<< HEAD
-                    <argLine>-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/0.8.11/org.jacoco.agent-0.8.11-runtime.jar=destfile=${project.build.directory}/jacoco.exec -javaagent:${settings.localRepository}/org/mockito/mockito-core/5.17.0/mockito-core-5.17.0.jar</argLine>
-=======
                     <argLine>-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/0.8.11/org.jacoco.agent-0.8.11-runtime.jar=destfile=${project.build.directory}/jacoco.exec</argLine>
-                                <systemPropertyVariables>
-                                    <maven.project.sourceRoots.warningsDisabled>true</maven.project.sourceRoots.warningsDisabled>
-                                </systemPropertyVariables>
                     <systemPropertyVariables>
                         <maven.project.sourceRoots.warningsDisabled>true</maven.project.sourceRoots.warningsDisabled>
                     </systemPropertyVariables>
->>>>>>> 0836b0d (ci: guard Sonar CI scan to avoid Automatic Analysis conflict (#11))
                 </configuration>
             </plugin>
         </plugins>

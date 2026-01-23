@@ -5,15 +5,9 @@ spring:
     url: jdbc:h2:mem:orderdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     username: sa
     password:
-<<<<<<< HEAD
+
 jwt:
   secret: ${JWT_SECRET:SafeZoneSecretKeyForJWTAuthenticationMustBeAtLeast256BitsLong}
-=======
-logging:
-  level:
-    root: INFO
-
->>>>>>> 0836b0d (ci: guard Sonar CI scan to avoid Automatic Analysis conflict (#11))
 
 logging:
   level:
