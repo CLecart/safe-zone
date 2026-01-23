@@ -78,6 +78,13 @@
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
         </dependency>
+            <!-- Add mockito-inline for agent-based mocking -->
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-inline</artifactId>
+                <version>5.2.0</version>
+                <scope>test</scope>
+            </dependency>
     </dependencies>
 
     <build>
@@ -92,7 +99,6 @@
                    <version>3.2.3</version>
                    <configuration>
                        <argLine>${jacoco.agent.argLine}</argLine>
-                       <argLine>-javaagent:${settings.localRepository}/org/mockito/mockito-core/5.2.0/mockito-core-5.2.0.jar</argLine>
                    </configuration>
                </plugin>
         </plugins>

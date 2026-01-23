@@ -20,5 +20,5 @@ jwt:
 
 logging:
   level:
-    root: WARN
+    root: INFO
     "[com.safezone]": INFO

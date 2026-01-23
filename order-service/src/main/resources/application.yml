@@ -25,7 +25,8 @@ jwt:
 
 logging:
   level:
-    "[com.safezone]": DEBUG
+    root: INFO
+    "[com.safezone]": INFO
 
 management:
   endpoints:

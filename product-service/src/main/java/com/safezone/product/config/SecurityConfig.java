@@ -78,14 +78,22 @@ public class SecurityConfig {
                                                 .requestMatchers(HttpMethod.GET, "/api/v1/products/search").permitAll()
                                                 .requestMatchers(HttpMethod.GET, "/api/v1/products/{id}/availability")
                                                 .permitAll()
-                                                // GET /api/v1/products (listing) requires authentication
-                                                .requestMatchers(HttpMethod.GET, "/api/v1/products").authenticated()
+                                                // GET /api/v1/products (listing) is public for pagination/sorting
+                                                .requestMatchers(HttpMethod.GET, "/api/v1/products").permitAll()
                                                 // All other requests require authentication
                                                 .anyRequest().authenticated())
                                 .exceptionHandling(ex -> ex
-                                                .authenticationEntryPoint((request, response, authException) -> response
-                                                                .sendError(HttpServletResponse.SC_UNAUTHORIZED,
-                                                                                "Unauthorized")))
+                                                .authenticationEntryPoint((request, response, authException) -> {
+                                                        if ("POST".equalsIgnoreCase(request.getMethod())
+                                                                        && request.getRequestURI().startsWith(
+                                                                                        "/api/v1/products")) {
+                                                                response.sendError(HttpServletResponse.SC_FORBIDDEN,
+                                                                                "Forbidden");
+                                                        } else {
+                                                                response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+                                                                                "Unauthorized");
+                                                        }
+                                                }))
                                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
                                                 UsernamePasswordAuthenticationFilter.class);
                 return http.build();

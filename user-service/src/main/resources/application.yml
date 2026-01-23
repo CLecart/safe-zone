@@ -26,21 +26,10 @@ jwt:
   secret: ${JWT_SECRET:SafeZoneSecretKeyForJWTAuthenticationMustBeAtLeast256BitsLong}
   expiration: ${JWT_EXPIRATION:86400000}
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,metrics,prometheus
-  endpoint:
-    health:
-      show-details: always
-
 springdoc:
   api-docs:
     path: /v3/api-docs
-  swagger-ui:
-    path: /swagger-ui.html
-
 logging:
   level:
-    "[com.safezone]": DEBUG
+    root: INFO
+    "[com.safezone]": INFO

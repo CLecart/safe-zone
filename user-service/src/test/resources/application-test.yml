@@ -25,6 +25,6 @@ application:
 
 logging:
   level:
-    root: WARN
+    root: INFO
     "[com.safezone]": INFO
-    "[org.hibernate.SQL]": WARN
+    "[org.hibernate.SQL]": INFO
