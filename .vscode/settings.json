@@ -39,9 +39,5 @@
       ".github/workflows/*.yaml"
     ]
   },
-  "yaml.validate": true,
-  "files.associations": {
-    "chat-editing-snapshot-*.yml": "plaintext",
-    "chat-editing-snapshot-*.yaml": "plaintext"
-  }
+  "yaml.validate": true
 }
