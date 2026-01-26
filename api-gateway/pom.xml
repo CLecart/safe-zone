@@ -73,6 +73,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.3</version>
                 <configuration>
+                    <argLine>${argLine} -XX:+EnableDynamicAgentLoading -Djdk.instrument.traceUsage=false</argLine>
                     <systemPropertyVariables>
                         <maven.project.sourceRoots.warningsDisabled>true</maven.project.sourceRoots.warningsDisabled>
                     </systemPropertyVariables>
