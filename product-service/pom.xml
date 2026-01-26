@@ -19,14 +19,6 @@
             <groupId>com.safezone</groupId>
             <artifactId>common</artifactId>
         </dependency>
-
-                    <argLine>-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/0.8.11/org.jacoco.agent-0.8.11-runtime.jar=destfile=${project.build.directory}/jacoco.exec</argLine>
-                                <systemPropertyVariables>
-                                    <maven.project.sourceRoots.warningsDisabled>true</maven.project.sourceRoots.warningsDisabled>
-                                </systemPropertyVariables>
-                    <systemPropertyVariables>
-                        <maven.project.sourceRoots.warningsDisabled>true</maven.project.sourceRoots.warningsDisabled>
-                    </systemPropertyVariables>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
