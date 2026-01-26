@@ -1,6 +1,7 @@
 package com.safezone.gateway.filter;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,7 +59,15 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
     public JwtAuthenticationFilter(
             @Value("${jwt.secret:SafeZoneSecretKeyForJWTAuthenticationMustBeAtLeast256BitsLong}") String secret) {
         super(Config.class);
-        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+        byte[] keyBytes;
+        try {
+            // Accept Base64-encoded secrets for flexibility in CI/secrets management
+            keyBytes = Base64.getDecoder().decode(secret);
+        } catch (IllegalArgumentException ex) {
+            // Fallback: treat secret as raw bytes
+            keyBytes = secret.getBytes(StandardCharsets.UTF_8);
+        }
+        this.secretKey = Keys.hmacShaKeyFor(keyBytes);
     }
 
     /**
