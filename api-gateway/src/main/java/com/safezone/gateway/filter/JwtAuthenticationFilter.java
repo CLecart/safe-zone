@@ -57,8 +57,12 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
      * @param secret the secret key for JWT signature verification
      */
     public JwtAuthenticationFilter(
-            @Value("${jwt.secret:SafeZoneSecretKeyForJWTAuthenticationMustBeAtLeast256BitsLong}") String secret) {
+            @Value("${jwt.secret}") String secret) {
         super(Config.class);
+        if (secret == null || secret.isBlank()) {
+            throw new IllegalStateException(
+                    "Required configuration property 'jwt.secret' is missing or empty. Set it in the environment or application properties.");
+        }
         byte[] keyBytes;
         try {
             // Accept Base64-encoded secrets for flexibility in CI/secrets management

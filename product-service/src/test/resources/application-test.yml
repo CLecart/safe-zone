@@ -15,7 +15,7 @@ server:
   port: 0
 
 jwt:
-  secret: test-jwt-secret
+  secret: dGVzdC1qd3Qtc2VjcmV0LXRlc3QtMTIzNDU2Nzg5MDEyMzQ1Ng==
   expiration: 86400000
 
 logging:

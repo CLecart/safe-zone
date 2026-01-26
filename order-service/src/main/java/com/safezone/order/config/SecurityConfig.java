@@ -6,7 +6,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -68,8 +67,10 @@ public class SecurityConfig {
                 // session-based authentication and no login form, so CSRF is not applicable.
                 // See SonarQube rule S4502 for justification.
                 http
-                                .csrf(AbstractHttpConfigurer::disable) // NOSONAR: S4502 justified - stateless REST API
-                                                                       // using JWT Bearer tokens
+                                .csrf(csrf -> csrf
+                                                // CSRF remains enabled but is explicitly ignored for the stateless
+                                                // REST API endpoints using JWT (no cookies/sessions). See Sonar S4502.
+                                                .ignoringRequestMatchers("/api/**"))
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .authorizeHttpRequests(auth -> auth
