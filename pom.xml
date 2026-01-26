@@ -114,6 +114,14 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId>
+            <version>4.11.0</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -206,7 +214,8 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.3</version>
                 <configuration>
-                    <argLine>${argLine}</argLine>
+                    <!-- Preserve jacoco's ${argLine}, ensure ByteBuddy agent is loaded at JVM startup and append JVM flags to avoid dynamic agent warnings -->
+                    <argLine>${argLine} -javaagent:${settings.localRepository}/net/bytebuddy/byte-buddy-agent/1.17.8/byte-buddy-agent-1.17.8.jar -XX:+EnableDynamicAgentLoading -Djdk.instrument.traceUsage=false</argLine>
                 </configuration>
             </plugin>
         </plugins>
