@@ -1,12 +1,12 @@
 package com.safezone.gateway.config;
 
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsWebFilter;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
-
-import java.util.List;
 
 /**
  * CORS configuration for the API Gateway.
@@ -27,11 +27,11 @@ public class CorsConfig {
      * <p>
      * Configuration allows:
      * <ul>
-     *   <li>All origin patterns</li>
-     *   <li>Common HTTP methods (GET, POST, PUT, PATCH, DELETE, OPTIONS)</li>
-     *   <li>All headers</li>
-     *   <li>Credentials (cookies, authorization headers)</li>
-     *   <li>1 hour preflight cache</li>
+     * <li>All origin patterns</li>
+     * <li>Common HTTP methods (GET, POST, PUT, PATCH, DELETE, OPTIONS)</li>
+     * <li>All headers</li>
+     * <li>Credentials (cookies, authorization headers)</li>
+     * <li>1 hour preflight cache</li>
      * </ul>
      * </p>
      *
@@ -44,7 +44,12 @@ public class CorsConfig {
         corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         corsConfig.setAllowedHeaders(List.of("*"));
         corsConfig.setExposedHeaders(List.of("Authorization", "Content-Type"));
-        corsConfig.setAllowCredentials(true);
+        // Do NOT allow credentials (cookies) for the gateway: this service uses
+        // stateless
+        // JWT bearer authentication (Authorization header). Allowing credentials makes
+        // CSRF protections necessary and would contradict the S4502 rationale below.
+        // Keep CORS permissive for origins/headers/methods, but do not permit cookies.
+        corsConfig.setAllowCredentials(false);
         corsConfig.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
