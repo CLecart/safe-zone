@@ -29,6 +29,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
+      - name: Ensure test JWT secret
+        run: |
+          if [ -z "${JWT_TEST_SECRET:-}" ]; then
+            JWT_TEST_SECRET=$(head -c 48 /dev/urandom | base64)
+            echo "JWT_TEST_SECRET=$JWT_TEST_SECRET" >> $GITHUB_ENV
+          fi
+
       - name: Build & test
         run: |
           mvn -B -q -DskipTests=false -Dmaven.project.sourceRoots.warningsDisabled=true clean verify
@@ -61,6 +68,13 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
+
+      - name: Ensure test JWT secret
+        run: |
+          if [ -z "${JWT_TEST_SECRET:-}" ]; then
+            JWT_TEST_SECRET=$(head -c 48 /dev/urandom | base64)
+            echo "JWT_TEST_SECRET=$JWT_TEST_SECRET" >> $GITHUB_ENV
+          fi
 
       - name: SonarQube Scan (guarded - avoid double analysis)
         run: |

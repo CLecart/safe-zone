@@ -58,15 +58,20 @@ public class SecurityConfig {
          */
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-                // CSRF is disabled because this service is a stateless REST API that uses
-                // JWT Bearer tokens (Authorization: Bearer <token>). There is no cookie- or
-                // session-based authentication and no login form, so CSRF is not applicable.
-                // See SonarQube rule S4502 for justification.
+                // CSRF handling justification (Sonar S4502):
+                // This service is a stateless REST API that exclusively uses JWT Bearer tokens
+                // (Authorization: Bearer <token>) for authentication. There is no cookie-based
+                // or session-based authentication and no login form, therefore CSRF attacks
+                // are not applicable for typical API clients. To maintain server-side CSRF
+                // protection for any non-API endpoints, CSRF remains enabled by default and
+                // we explicitly ignore only API endpoints that accept JWTs. If future changes
+                // introduce cookies/sessions, this configuration must be revisited and CSRF
+                // protection re-enabled for affected endpoints.
                 http
                                 .csrf(csrf -> csrf
                                                 // CSRF remains enabled but is explicitly ignored for stateless
                                                 // REST API endpoints that use JWT authentication (no cookies/sessions).
-                                                // See Sonar S4502.
+                                                // See Sonar S4502 and the justification above.
                                                 .ignoringRequestMatchers("/api/**"))
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

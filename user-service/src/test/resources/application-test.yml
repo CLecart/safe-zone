@@ -20,7 +20,7 @@ spring:
 
 application:
   jwt:
-    secret: dGVzdC1qd3Qtc2VjcmV0LXRlc3QtMTIzNDU2Nzg5MDEyMzQ1Ng==
+    secret: ${JWT_TEST_SECRET:placeholder-test-secret}
     expiration: 3600000
 
 logging:

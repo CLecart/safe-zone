@@ -59,26 +59,20 @@ public class SecurityConfig {
      * @Bean
      *       public SecurityFilterChain securityFilterChain(HttpSecurity http)
      *       throws Exception {
-     *       http
-     *       .csrf(AbstractHttpConfigurer::disable)
-     *       .sessionManagement(session ->
-     *       session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-     *       .authorizeHttpRequests(auth -> auth
-     *       .requestMatchers("/actuator/**").permitAll()
-     *       .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-     *       .requestMatchers("/api/v1/auth/**").permitAll()
-     *       .anyRequest().authenticated()
-     *       );
-     *       http.exceptionHandling(ex -> ex
-     *       .authenticationEntryPoint((request, response, authException) -> {
-     *       response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-     *       "Unauthorized");
-     *       })
-     *       );
-     *       http.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
-     *       UsernamePasswordAuthenticationFilter.class);
-     *       return http.build();
-     *       }
+     *       // Example (do not disable CSRF globally):
+     *       // http
+     *       // .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
+     *       // .sessionManagement(session ->
+     *       // session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+     *       // .authorizeHttpRequests(auth -> auth
+     *       // .requestMatchers("/actuator/**").permitAll()
+     *       // .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+     *       // .requestMatchers("/api/v1/auth/**").permitAll()
+     *       // .anyRequest().authenticated());
+     *       // http.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
+     *       // UsernamePasswordAuthenticationFilter.class);
+     *       // return http.build();
+     *       // }
      *       </ul>
      *       </p>
      *
