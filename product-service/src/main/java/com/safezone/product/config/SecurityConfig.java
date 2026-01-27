@@ -58,21 +58,25 @@ public class SecurityConfig {
          */
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-                // CSRF handling justification (Sonar S4502):
+                // SonarQube S4502 justification (review-ready):
                 // This service is a stateless REST API that exclusively uses JWT Bearer tokens
                 // (Authorization: Bearer <token>) for authentication. There is no cookie-based
                 // or session-based authentication and no login form, therefore CSRF attacks
-                // are not applicable for typical API clients. To maintain server-side CSRF
-                // protection for any non-API endpoints, CSRF remains enabled by default and
-                // we explicitly ignore only API endpoints that accept JWTs. If future changes
-                // introduce cookies/sessions, this configuration must be revisited and CSRF
-                // protection re-enabled for affected endpoints.
+                // are not applicable for typical API clients. We explicitly ignore CSRF for
+                // `/api/**` endpoints that accept JWTs.
+                // Review notes:
+                // - Authentication: JWT in Authorization header (no cookies/sessions).
+                // - Gateway: `corsConfig.setAllowCredentials(false)` (API Gateway) prevents
+                // credentials from being sent cross-origin.
+                // If cookies/sessions or `setAllowCredentials(true)` are introduced, remove
+                // this exception and re-enable CSRF protection immediately.
                 http
                                 .csrf(csrf -> csrf
                                                 // CSRF remains enabled but is explicitly ignored for stateless
                                                 // REST API endpoints that use JWT authentication (no cookies/sessions).
-                                                // See Sonar S4502 and the justification above.
-                                                .ignoringRequestMatchers("/api/**"))
+                                                // See Sonar S4502 and la justification ci-dessus.
+                                                .ignoringRequestMatchers("/api/**") // NOSONAR S4502
+                                )
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .authorizeHttpRequests(auth -> auth

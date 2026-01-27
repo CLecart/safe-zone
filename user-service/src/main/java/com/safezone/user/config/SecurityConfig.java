@@ -59,20 +59,6 @@ public class SecurityConfig {
      * @Bean
      *       public SecurityFilterChain securityFilterChain(HttpSecurity http)
      *       throws Exception {
-     *       // Example (do not disable CSRF globally):
-     *       // http
-     *       // .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
-     *       // .sessionManagement(session ->
-     *       // session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-     *       // .authorizeHttpRequests(auth -> auth
-     *       // .requestMatchers("/actuator/**").permitAll()
-     *       // .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-     *       // .requestMatchers("/api/v1/auth/**").permitAll()
-     *       // .anyRequest().authenticated());
-     *       // http.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
-     *       // UsernamePasswordAuthenticationFilter.class);
-     *       // return http.build();
-     *       // }
      *       </ul>
      *       </p>
      *
@@ -82,21 +68,19 @@ public class SecurityConfig {
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        // SonarQube S4502 justification:
-        // This service is a stateless REST API that uses JWT Bearer tokens
-        // (Authorization: Bearer <token>) and SessionCreationPolicy.STATELESS.
-        // There is no cookie- or session-based authentication and no login form,
-        // therefore CSRF attacks (which rely on a browser sending authenticated
-        // cookies) do not apply to API endpoints. We explicitly ignore CSRF for
-        // `/api/**` endpoints to make this intent visible to Sonar and reviewers.
-        // Important: Ensure CORS does NOT allow credentials (cookies). If cookies or
-        // server-side sessions are introduced in the future, this exception must be
-        // removed and CSRF protection re-enabled.
         http
                 .csrf(csrf -> csrf
-                        // CSRF remains enabled but is explicitly ignored for stateless REST API
-                        // endpoints
-                        // that use JWT authentication (no cookies/sessions). See Sonar S4502.
+                        /*
+                         * SonarQube S4502 justification:
+                         * CSRF protection is ignored for /api/** endpoints because:
+                         * - All authentication is via JWT Bearer tokens in the Authorization header (no
+                         * cookies/sessions).
+                         * - SessionCreationPolicy.STATELESS is enforced.
+                         * - No login forms or browser-based authentication are used.
+                         * - This is a stateless REST API, not vulnerable to CSRF attacks.
+                         * If cookie/session-based authentication is ever introduced, remove this
+                         * exception and re-enable CSRF protection immediately.
+                         */
                         .ignoringRequestMatchers("/api/**"))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
