@@ -132,8 +132,10 @@ class SecurityPolicyTest {
             for (Path f : files) {
                 String c = Files.readString(f);
                 if ((c.contains("setAllowedOriginPatterns(\"*\")") || c.contains("setAllowedOrigins(\"*\")")
-                        || c.contains("setAllowedOriginPatterns(List.of(\"*\"))") || c.contains("setAllowedOrigins(List.of(\"*\"))"))
-                        && !(c.contains("S5122") || c.toLowerCase().contains("sonarqube s5122") || c.contains("Sonar S5122"))) {
+                        || c.contains("setAllowedOriginPatterns(List.of(\"*\"))")
+                        || c.contains("setAllowedOrigins(List.of(\"*\"))"))
+                        && !(c.contains("S5122") || c.toLowerCase().contains("sonarqube s5122")
+                                || c.contains("Sonar S5122"))) {
                     anyMissing = true;
                     missing.append(f.toString()).append("\n");
                 }
@@ -143,3 +145,7 @@ class SecurityPolicyTest {
                     .isFalse();
         }
     }
+
+    // Fin du test SecurityPolicyTest — commentaire inoffensif pour forcer une merge
+    // propre
+}
