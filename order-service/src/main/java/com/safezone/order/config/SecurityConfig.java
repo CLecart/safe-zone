@@ -62,24 +62,17 @@ public class SecurityConfig {
          */
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-                // SonarQube S4502 justification (review-ready):
-                // This service is a stateless REST API that uses JWT Bearer tokens
-                // (Authorization: Bearer <token>) and SessionCreationPolicy.STATELESS.
-                // There is no cookie- or session-based authentication and no login form;
-                // therefore CSRF attacks (which rely on a browser sending authenticated
-                // cookies) do not apply to API endpoints. We explicitly ignore CSRF for
-                // `/api/**` endpoints to make this intent visible to Sonar and reviewers.
-                // Review notes:
-                // - Authentication: JWT in Authorization header (no cookies/sessions).
-                // - Gateway: `corsConfig.setAllowCredentials(false)` ensures credentials
-                // (cookies) are not sent cross-origin.
-                // If cookies/sessions or `setAllowCredentials(true)` are introduced, remove
-                // this exception and re-enable CSRF protection immediately.
+                // SonarQube S4502 justification:
+                // CSRF is ignored for /api/** endpoints because:
+                // - Stateless JWT auth (Authorization header, no cookies/sessions)
+                // - SessionCreationPolicy.STATELESS
+                // - No login forms or browser-based auth
+                // - API Gateway disables credentials (no cross-origin cookies)
+                // If cookies/sessions or setAllowCredentials(true) are introduced, remove this
+                // exception and re-enable CSRF protection.
                 http
                                 .csrf(csrf -> csrf
-                                                // CSRF remains enabled but is explicitly ignored for stateless
-                                                // REST API endpoints that use JWT authentication (no cookies/sessions).
-                                                // See Sonar S4502 for documented justification.
+                                                /* See Sonar S4502 justification above. */
                                                 .ignoringRequestMatchers("/api/**"))
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
