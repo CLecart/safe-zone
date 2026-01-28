@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 import com.safezone.common.security.JwtAuthenticationFilter;
 import com.safezone.common.security.JwtTokenProvider;
@@ -61,7 +62,8 @@ public class SecurityConfig {
          * @throws Exception if security configuration fails
          */
         @Bean
-        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                        CorsConfigurationSource corsConfigurationSource) throws Exception {
                 // SonarQube S4502 justification:
                 // CSRF is ignored for /api/** endpoints because:
                 // - Stateless JWT auth (Authorization header, no cookies/sessions)
@@ -71,6 +73,7 @@ public class SecurityConfig {
                 // If cookies/sessions or setAllowCredentials(true) are introduced, remove this
                 // exception and re-enable CSRF protection.
                 http
+                                .cors(cors -> cors.configurationSource(corsConfigurationSource))
                                 .csrf(csrf -> csrf
                                                 /* See Sonar S4502 justification above. */
                                                 .ignoringRequestMatchers("/api/**"))

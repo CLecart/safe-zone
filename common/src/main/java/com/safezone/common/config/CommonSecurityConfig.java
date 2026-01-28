@@ -13,7 +13,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
  * Common utility for security configuration (CORS, CSRF, etc.)
  * to be used in all microservices to avoid duplication.
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class CommonSecurityConfig {
     // Prevent instantiation
     private CommonSecurityConfig() {

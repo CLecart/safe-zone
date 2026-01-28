@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 import com.safezone.common.security.JwtAuthenticationFilter;
 import com.safezone.common.security.JwtTokenProvider;
@@ -57,7 +58,8 @@ public class SecurityConfig {
          * @throws Exception if configuration fails
          */
         @Bean
-        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                        CorsConfigurationSource corsConfigurationSource) throws Exception {
                 // SonarQube S4502 justification (review-ready):
                 // This service is a stateless REST API that exclusively uses JWT Bearer tokens
                 // (Authorization: Bearer <token>) for authentication. There is no cookie-based
@@ -71,6 +73,7 @@ public class SecurityConfig {
                 // If cookies/sessions or `setAllowCredentials(true)` are introduced, remove
                 // this exception and re-enable CSRF protection immediately.
                 http
+                                .cors(cors -> cors.configurationSource(corsConfigurationSource))
                                 .csrf(csrf -> csrf
                                                 // CSRF remains enabled but is explicitly ignored for stateless
                                                 // REST API endpoints that use JWT authentication (no cookies/sessions).

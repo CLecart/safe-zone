@@ -102,7 +102,11 @@ class SecurityPolicyTest {
                     .filter(p -> {
                         try {
                             String c = Files.readString(Paths.get(p));
-                            return c.contains("setAllowCredentials(true)");
+                            // Remove block comments (/* ... */) and line comments (// ...)
+                            String withoutBlockComments = c.replaceAll("(?s)/\\*.*?\\*/", "");
+                            String withoutComments = withoutBlockComments.replaceAll("(?m)//.*$", "");
+                            // Only consider code outside comments when searching for disallowed usage
+                            return withoutComments.contains("setAllowCredentials(true)");
                         } catch (IOException e) {
                             return false;
                         }
