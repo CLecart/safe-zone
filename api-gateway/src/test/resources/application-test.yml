@@ -16,7 +16,7 @@ spring:
             - Path=/api/users/**,/api/auth/**
 
 jwt:
-  secret: test-jwt-secret
+  secret: ${JWT_TEST_SECRET:placeholder-test-secret}
 
 logging:
   level:

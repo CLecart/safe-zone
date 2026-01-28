@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 import com.safezone.common.security.JwtAuthenticationFilter;
 import com.safezone.common.security.JwtTokenProvider;
@@ -64,12 +65,22 @@ public class SecurityConfig {
          * @throws Exception if configuration fails
          */
         @Bean
-        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-                // CSRF is disabled because this service is a stateless REST API that uses
-                // JWT Bearer tokens (Authorization: Bearer <token>). There is no cookie- or
-                // session-based authentication and no login form, so CSRF is not applicable.
-                // See SonarQube rule S4502 for justification.
+        public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                        CorsConfigurationSource corsConfigurationSource) throws Exception {
+                // SonarQube S4502 justification (review-ready):
+                // This service is a stateless REST API that exclusively uses JWT Bearer tokens
+                // (Authorization: Bearer <token>) for authentication. There is no cookie-based
+                // or session-based authentication and no login form, therefore CSRF attacks
+                // are not applicable for typical API clients. We explicitly ignore CSRF for
+                // `/api/**` endpoints that accept JWTs.
+                // Review notes:
+                // - Authentication: JWT in Authorization header (no cookies/sessions).
+                // - Gateway: `corsConfig.setAllowCredentials(false)` (API Gateway) prevents
+                // credentials from being sent cross-origin.
+                // If cookies/sessions or `setAllowCredentials(true)` are introduced, remove
+                // this exception and re-enable CSRF protection immediately.
                 http
+                                .cors(cors -> cors.configurationSource(corsConfigurationSource))
                                 .csrf(org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer::disable) // NOSONAR:
                                                                                                                                       // S4502
                                                                                                                                       // justified

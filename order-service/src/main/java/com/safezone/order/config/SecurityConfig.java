@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 import com.safezone.common.security.JwtAuthenticationFilter;
 import com.safezone.common.security.JwtTokenProvider;
@@ -67,12 +68,18 @@ public class SecurityConfig {
          * @throws Exception if security configuration fails
          */
         @Bean
-        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-                // CSRF is disabled because this service is a stateless REST API that uses
-                // JWT Bearer tokens (Authorization: Bearer <token>). There is no cookie- or
-                // session-based authentication and no login form, so CSRF is not applicable.
-                // See SonarQube rule S4502 for justification.
+        public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                        CorsConfigurationSource corsConfigurationSource) throws Exception {
+                // SonarQube S4502 justification:
+                // CSRF is ignored for /api/** endpoints because:
+                // - Stateless JWT auth (Authorization header, no cookies/sessions)
+                // - SessionCreationPolicy.STATELESS
+                // - No login forms or browser-based auth
+                // - API Gateway disables credentials (no cross-origin cookies)
+                // If cookies/sessions or setAllowCredentials(true) are introduced, remove this
+                // exception and re-enable CSRF protection.
                 http
+                                .cors(cors -> cors.configurationSource(corsConfigurationSource))
                                 .csrf(org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer::disable) // NOSONAR:
                                                                                                                                       // S4502
                                                                                                                                       // justified

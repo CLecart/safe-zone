@@ -3,6 +3,9 @@ package com.safezone.gateway.config;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -54,7 +57,9 @@ public class CorsConfig {
         corsConfig.setAllowedMethods(ALLOWED_METHODS);
         corsConfig.setAllowedHeaders(ALLOWED_HEADERS);
         corsConfig.setExposedHeaders(EXPOSED_HEADERS);
-        corsConfig.setAllowCredentials(true);
+        // For security, the gateway must not allow credentials (cookies) by default.
+        // Tests and the security policy expect credentials to be disabled.
+        corsConfig.setAllowCredentials(false);
         corsConfig.setMaxAge(3600L);
 
         return corsConfig;
@@ -63,27 +68,25 @@ public class CorsConfig {
     /**
      * Creates a CORS filter with configurable settings.
      * <p>
-     * For security, allowed origins should be explicitly configured in production
-     * using the `cors.allowed-origins` property (comma-separated). In development
-     * the default is `http://localhost` and `http://127.0.0.1` to support local
-     * web clients.
-     * </p>
-     * <p>
-     * Note: the wildcard origin `*` is only permitted when the operator sets
-     * `cors.allow-wildcard=true` (opt-in). Without this opt-in l'application
-     * will refuse to start to prevent insecure deployments. See
-     * `.github/SONAR_S5122_JUSTIFICATION.md` for justification and reviewer
-     * guidance.
+     * The bean reads `cors.allowed-origins` and `cors.allow-wildcard` to determine
+     * the effective configuration. When `cors.allowed-origins` is empty, the
+     * bean defaults to localhost origins for development convenience.
      * </p>
      *
      * @return the configured CORS web filter
      */
+    private static final Logger logger = LoggerFactory.getLogger(CorsConfig.class);
+
     @Bean
-    @SuppressWarnings("null")
-    public CorsWebFilter corsWebFilter(
-            @org.springframework.beans.factory.annotation.Value("${cors.allowed-origins:http://localhost,http://127.0.0.1}") String allowedOriginsProp,
-            @org.springframework.beans.factory.annotation.Value("${cors.allow-wildcard:false}") boolean allowWildcard) {
+    public CorsWebFilter corsWebFilter(@Value("${cors.allowed-origins:}") String allowedOriginsProp,
+            @Value("${cors.allow-wildcard:false}") boolean allowWildcard) {
+        if (allowedOriginsProp == null || allowedOriginsProp.isBlank()) {
+            allowedOriginsProp = "http://localhost,http://127.0.0.1";
+            logger.warn(
+                    "'cors.allowed-origins' not set; defaulting to localhost origins for development. Set a strict list in production.");
+        }
         CorsConfiguration corsConfig = buildCorsConfiguration(allowedOriginsProp, allowWildcard);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfig);
         return new CorsWebFilter(source);

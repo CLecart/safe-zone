@@ -30,6 +30,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+
     /**
      * Provides a BCrypt password encoder bean for secure password hashing.
      */
@@ -57,8 +58,7 @@ public class SecurityConfig {
      * CSRF protection is disabled intentionally because this service exposes a
      * stateless JSON API secured by JWT bearer tokens. State-changing operations
      * require a valid JWT and are therefore not vulnerable to browser-based CSRF
-     * attacks in this architecture. Public endpoints are limited to read-only
-     * GET requests as shown below. For the complete Sonar S4502 justification
+     * attacks in this architecture. For the complete Sonar S4502 justification
      * and reviewer guidance, see `.github/SONAR_S4502_JUSTIFICATION.md`.
      * </p>
      *
@@ -68,10 +68,6 @@ public class SecurityConfig {
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        // CSRF is disabled because this service is a stateless REST API that uses
-        // JWT Bearer tokens (Authorization: Bearer <token>). There is no cookie- or
-        // session-based authentication and no login form, so CSRF is not applicable.
-        // See SonarQube rule S4502 for justification.
         http
                 .csrf(org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer::disable) // NOSONAR:
                                                                                                                       // S4502

@@ -20,7 +20,7 @@ spring:
 
 application:
   jwt:
-    secret: test-jwt-secret
+    secret: ${JWT_TEST_SECRET:placeholder-test-secret}
     expiration: 3600000
 
 logging:
