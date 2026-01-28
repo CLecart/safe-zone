@@ -40,7 +40,6 @@ jobs:
         run: |
           echo 'Running Spotless format check...'
           mvn -B -q spotless:check || { echo 'Spotless: formatting issues found. Run "mvn spotless:apply" and commit the result.'; exit 1; }
-
       - name: Build & test
         run: |
           mvn -B -q -DskipTests=false -Dmaven.project.sourceRoots.warningsDisabled=true clean verify

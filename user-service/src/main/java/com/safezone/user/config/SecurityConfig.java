@@ -54,8 +54,7 @@ public class SecurityConfig {
      * CSRF protection is disabled intentionally because this service exposes a
      * stateless JSON API secured by JWT bearer tokens. State-changing operations
      * require a valid JWT and are therefore not vulnerable to browser-based CSRF
-     * attacks in this architecture. Public endpoints are limited to read-only
-     * GET requests as shown below. For the complete Sonar S4502 justification
+     * attacks in this architecture. For the complete Sonar S4502 justification
      * and reviewer guidance, see `.github/SONAR_S4502_JUSTIFICATION.md`.
      * </p>
      *
