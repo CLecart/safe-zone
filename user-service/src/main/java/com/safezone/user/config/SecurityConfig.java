@@ -73,8 +73,8 @@ public class SecurityConfig {
         // See CommonSecurityConfigurer for CSRF/CORS policy and S4502 justification
         CommonSecurityConfigurer.applyDefaultSecurity(http, jwtTokenProvider, corsConfigurationSource)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/**").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        // Common public endpoints (actuator & swagger) are configured in
+                        // CommonSecurityConfigurer
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/users/{id}").permitAll()
                         .anyRequest().authenticated());

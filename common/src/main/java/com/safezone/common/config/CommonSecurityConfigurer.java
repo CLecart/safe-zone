@@ -34,6 +34,12 @@ public final class CommonSecurityConfigurer {
                 .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
+        // Common public endpoints (actuator & swagger) — extracted to reduce
+        // duplication
+        http.authorizeHttpRequests(auth -> auth
+                .requestMatchers("/actuator/**").permitAll()
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll());
+
         http.exceptionHandling(ex -> ex
                 .authenticationEntryPoint((request, response, authException) -> response
                         .sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")));

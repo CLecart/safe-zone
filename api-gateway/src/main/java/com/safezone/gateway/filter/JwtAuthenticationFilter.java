@@ -1,15 +1,9 @@
 package com.safezone.gateway.filter;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.List;
-import java.util.Optional;
-
-import javax.crypto.SecretKey;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpHeaders;
@@ -18,21 +12,17 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
-import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException;
+import com.safezone.common.security.JwtTokenProvider;
+
 import reactor.core.publisher.Mono;
 
 /**
  * Gateway filter for JWT token authentication.
  * <p>
- * Validates JWT tokens in incoming requests and extracts user information.
- * Public endpoints are allowed without authentication. Authenticated requests
- * have user ID and roles added as headers for downstream services.
+ * Delegates token validation and claim extraction to `JwtTokenProvider` to
+ * avoid duplication with other modules. Public endpoints are allowed without
+ * authentication. Authenticated requests have user ID and roles added as
+ * headers for downstream services.
  * </p>
  *
  * @author SafeZone Team
@@ -48,68 +38,24 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
     /** Bearer token prefix. */
     private static final String BEARER_PREFIX = "Bearer ";
 
-    /** Secret key for JWT signature verification. */
-    private final SecretKey secretKey;
+    /** JWT helper that centralizes token parsing and validation. */
+    private final JwtTokenProvider jwtTokenProvider;
 
     /**
-     * Constructs the filter with the JWT secret key.
+     * Constructs the filter with the shared `JwtTokenProvider` from `common`.
      *
-     * @param secret the secret key for JWT signature verification
+     * @param jwtTokenProvider the shared JWT helper
      */
-    public JwtAuthenticationFilter(
-            @Value("${jwt.secret}") String secret) {
+    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider) {
         super(Config.class);
-        SecretKey tmpSecretKey = null;
-
-        if (secret == null || secret.isBlank()) {
-            // No jwt.secret provided; generate a secure random key to allow tests and local
-            // runs to proceed without embedding a secret in the repo. In CI/production a
-            // real secret should be provided via environment or configuration.
-            logger.warn("'jwt.secret' not provided; generating a secure random key for runtime. "
-                    + "Provide a proper 'jwt.secret' in production environments.");
-            byte[] generated = new byte[32];
-            new java.security.SecureRandom().nextBytes(generated);
-            tmpSecretKey = Keys.hmacShaKeyFor(generated);
-        } else {
-            byte[] keyBytes;
-            try {
-                // Accept Base64-encoded secrets for flexibility in CI/secrets management
-                keyBytes = Base64.getDecoder().decode(secret);
-            } catch (IllegalArgumentException ex) {
-                // Fallback: treat secret as raw bytes
-                keyBytes = secret.getBytes(StandardCharsets.UTF_8);
-            }
-
-            // Ensure key length is secure enough for HMAC-SHA algorithms (>= 256 bits).
-            try {
-                tmpSecretKey = Keys.hmacShaKeyFor(keyBytes);
-            } catch (io.jsonwebtoken.security.WeakKeyException ex) {
-                // If running tests or using the placeholder secret we generate a secure
-                // random key at runtime. This avoids hard-coded secrets in the repo while
-                // still allowing tests to run locally.
-                if (secret.contains("placeholder") || isTestProfileActive()) {
-                    logger.warn(
-                            "Provided JWT secret is too short for HMAC-SHA algorithms; generating a secure random key for runtime use in test/profile.");
-                    byte[] generated = new byte[32]; // 256 bits
-                    new java.security.SecureRandom().nextBytes(generated);
-                    tmpSecretKey = Keys.hmacShaKeyFor(generated);
-                } else {
-                    throw new IllegalStateException(
-                            "Provided 'jwt.secret' is not secure enough. Use a 256-bit (or larger) secret. "
-                                    + ex.getMessage(),
-                            ex);
-                }
-            }
-        }
-
-        this.secretKey = tmpSecretKey;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     /**
      * Creates the gateway filter that performs JWT authentication.
      * <p>
-     * The filter validates the JWT token and adds user headers to the request.
-     * Public endpoints bypass authentication.
+     * The filter validates the JWT token via `JwtTokenProvider` and adds user
+     * headers to the request. Public endpoints bypass authentication.
      * </p>
      *
      * @param config the filter configuration
@@ -130,16 +76,17 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
             }
 
             String token = authHeader.substring(BEARER_PREFIX.length());
-            Optional<Claims> claimsOpt = validateToken(token);
 
-            if (claimsOpt.isEmpty()) {
+            if (!jwtTokenProvider.validateToken(token)) {
                 return onError(exchange, "Invalid JWT token", HttpStatus.UNAUTHORIZED);
             }
 
-            Claims claims = claimsOpt.get();
+            String username = jwtTokenProvider.extractUsername(token).orElse("");
+            List<String> roles = jwtTokenProvider.extractRoles(token);
+
             ServerHttpRequest modifiedRequest = request.mutate()
-                    .header("X-User-Id", claims.getSubject())
-                    .header("X-User-Roles", String.join(",", getRoles(claims)))
+                    .header("X-User-Id", username)
+                    .header("X-User-Roles", String.join(",", roles))
                     .build();
 
             return chain.filter(exchange.mutate().request(modifiedRequest).build());
@@ -154,68 +101,9 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
      * @return true if the endpoint is public
      */
     private boolean isPublicEndpoint(String path) {
-        return path.contains("/api/v1/auth/") ||
-                path.contains("/actuator/") ||
-                path.contains("/swagger-ui") ||
-                path.contains("/v3/api-docs") ||
-                (path.contains("/api/v1/products") && !path.contains("/stock") && !path.contains("/low-stock"));
-    }
-
-    /**
-     * Validates a JWT token and extracts its claims.
-     *
-     * @param token the JWT token to validate
-     * @return an Optional containing the claims if valid, empty otherwise
-     */
-    private Optional<Claims> validateToken(String token) {
-        try {
-            Claims claims = Jwts.parser()
-                    .verifyWith(secretKey)
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
-            return Optional.of(claims);
-        } catch (SignatureException ex) {
-            logger.error("Invalid JWT signature");
-        } catch (MalformedJwtException ex) {
-            logger.error("Invalid JWT token");
-        } catch (ExpiredJwtException ex) {
-            logger.error("Expired JWT token");
-        } catch (UnsupportedJwtException ex) {
-            logger.error("Unsupported JWT token");
-        } catch (IllegalArgumentException ex) {
-            logger.error("JWT claims string is empty");
-        }
-        return Optional.empty();
-    }
-
-    /**
-     * Extracts user roles from JWT claims.
-     *
-     * @param claims the JWT claims
-     * @return the list of role names, empty list if none
-     */
-    private List<String> getRoles(Claims claims) {
-        Object roles = claims.get("roles");
-        if (roles instanceof List<?> rawList) {
-            return rawList.stream()
-                    .filter(String.class::isInstance)
-                    .map(String.class::cast)
-                    .toList();
-        }
-        return List.of();
-    }
-
-    /**
-     * Checks whether a 'test' profile is active via system properties or
-     * environment.
-     * Useful to relax certain runtime checks during unit/integration tests while
-     * avoiding hard-coded secrets in the repository.
-     */
-    private static boolean isTestProfileActive() {
-        String prop = System.getProperty("spring.profiles.active");
-        String env = System.getenv("SPRING_PROFILES_ACTIVE");
-        return (prop != null && prop.contains("test")) || (env != null && env.contains("test"));
+        return path.contains("/api/v1/auth/") || path.contains("/actuator/") || path.contains("/swagger-ui")
+                || path.contains("/v3/api-docs")
+                || (path.contains("/api/v1/products") && !path.contains("/stock") && !path.contains("/low-stock"));
     }
 
     /**
