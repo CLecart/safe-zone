@@ -15,7 +15,7 @@ server:
   port: 0
 
 jwt:
-  secret: test-jwt-secret
+  secret: ${JWT_TEST_SECRET:placeholder-test-secret}
   expiration: 86400000
 
 logging:

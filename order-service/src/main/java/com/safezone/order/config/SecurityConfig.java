@@ -6,10 +6,10 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 import com.safezone.common.security.JwtAuthenticationFilter;
 import com.safezone.common.security.JwtTokenProvider;
@@ -62,14 +62,21 @@ public class SecurityConfig {
          * @throws Exception if security configuration fails
          */
         @Bean
-        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-                // CSRF is disabled because this service is a stateless REST API that uses
-                // JWT Bearer tokens (Authorization: Bearer <token>). There is no cookie- or
-                // session-based authentication and no login form, so CSRF is not applicable.
-                // See SonarQube rule S4502 for justification.
+        public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                        CorsConfigurationSource corsConfigurationSource) throws Exception {
+                // SonarQube S4502 justification:
+                // CSRF is ignored for /api/** endpoints because:
+                // - Stateless JWT auth (Authorization header, no cookies/sessions)
+                // - SessionCreationPolicy.STATELESS
+                // - No login forms or browser-based auth
+                // - API Gateway disables credentials (no cross-origin cookies)
+                // If cookies/sessions or setAllowCredentials(true) are introduced, remove this
+                // exception and re-enable CSRF protection.
                 http
-                                .csrf(AbstractHttpConfigurer::disable) // NOSONAR: S4502 justified - stateless REST API
-                                                                       // using JWT Bearer tokens
+                                .cors(cors -> cors.configurationSource(corsConfigurationSource))
+                                .csrf(csrf -> csrf
+                                                /* See Sonar S4502 justification above. */
+                                                .ignoringRequestMatchers("/api/**"))
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .authorizeHttpRequests(auth -> auth

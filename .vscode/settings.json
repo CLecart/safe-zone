@@ -38,5 +38,6 @@
       ".github/workflows/*.yml",
       ".github/workflows/*.yaml"
     ]
-  }
+  },
+  "yaml.validate": true
 }

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.context.ApplicationContext;
+import org.springframework.test.context.ActiveProfiles;
 
 /**
  * Integration tests for the API Gateway Application.
@@ -23,6 +24,7 @@ import org.springframework.context.ApplicationContext;
  * @since 2024-01-06
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
 @DisplayName("API Gateway Application Tests")
 class ApiGatewayApplicationTest {
 
