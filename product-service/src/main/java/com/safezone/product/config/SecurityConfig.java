@@ -36,6 +36,25 @@ import jakarta.servlet.http.HttpServletResponse;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+        /**
+         * CORS configuration bean to ensure credentials are never allowed
+         * (setAllowCredentials(false)).
+         * Cela garantit la conformité avec la politique de sécurité et les tests
+         * automatiques.
+         */
+        @Bean
+        public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
+                org.springframework.web.cors.CorsConfiguration config = new org.springframework.web.cors.CorsConfiguration();
+                config.setAllowedOrigins(java.util.List.of("http://localhost:3000", "http://127.0.0.1:3000"));
+                config.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+                config.setAllowedHeaders(java.util.List.of("*"));
+                config.setExposedHeaders(java.util.List.of("Authorization", "Content-Type"));
+                config.setAllowCredentials(false); // Sécurité: jamais de credentials côté service
+                config.setMaxAge(3600L);
+                org.springframework.web.cors.UrlBasedCorsConfigurationSource source = new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
+                source.registerCorsConfiguration("/**", config);
+                return source;
+        }
 
         /** JWT token provider for authentication filter. */
         private final JwtTokenProvider jwtTokenProvider;
