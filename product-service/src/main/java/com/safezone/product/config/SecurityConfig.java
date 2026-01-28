@@ -6,12 +6,10 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
-import com.safezone.common.security.JwtAuthenticationFilter;
+import com.safezone.common.config.CommonSecurityConfigurer;
 import com.safezone.common.security.JwtTokenProvider;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -60,28 +58,8 @@ public class SecurityConfig {
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http,
                         CorsConfigurationSource corsConfigurationSource) throws Exception {
-                // SonarQube S4502 justification (review-ready):
-                // This service is a stateless REST API that exclusively uses JWT Bearer tokens
-                // (Authorization: Bearer <token>) for authentication. There is no cookie-based
-                // or session-based authentication and no login form, therefore CSRF attacks
-                // are not applicable for typical API clients. We explicitly ignore CSRF for
-                // `/api/**` endpoints that accept JWTs.
-                // Review notes:
-                // - Authentication: JWT in Authorization header (no cookies/sessions).
-                // - Gateway: `corsConfig.setAllowCredentials(false)` (API Gateway) prevents
-                // credentials from being sent cross-origin.
-                // If cookies/sessions or `setAllowCredentials(true)` are introduced, remove
-                // this exception and re-enable CSRF protection immediately.
-                http
-                                .cors(cors -> cors.configurationSource(corsConfigurationSource))
-                                .csrf(csrf -> csrf
-                                                // CSRF remains enabled but is explicitly ignored for stateless
-                                                // REST API endpoints that use JWT authentication (no cookies/sessions).
-                                                // See Sonar S4502 and la justification ci-dessus.
-                                                .ignoringRequestMatchers("/api/**") // NOSONAR S4502
-                                )
-                                .sessionManagement(session -> session
-                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // See CommonSecurityConfigurer for CSRF/CORS policy and S4502 justification.
+                CommonSecurityConfigurer.applyDefaultSecurity(http, jwtTokenProvider, corsConfigurationSource)
                                 .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers("/actuator/**").permitAll()
                                                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
@@ -112,9 +90,7 @@ public class SecurityConfig {
                                                                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
                                                                                 "Unauthorized");
                                                         }
-                                                }))
-                                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
-                                                UsernamePasswordAuthenticationFilter.class);
+                                                }));
                 return http.build();
         }
 }

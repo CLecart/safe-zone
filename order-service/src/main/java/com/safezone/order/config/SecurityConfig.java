@@ -6,15 +6,11 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
-import com.safezone.common.security.JwtAuthenticationFilter;
+import com.safezone.common.config.CommonSecurityConfigurer;
 import com.safezone.common.security.JwtTokenProvider;
-
-import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Security configuration for the Order Service.
@@ -64,21 +60,8 @@ public class SecurityConfig {
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http,
                         CorsConfigurationSource corsConfigurationSource) throws Exception {
-                // SonarQube S4502 justification:
-                // CSRF is ignored for /api/** endpoints because:
-                // - Stateless JWT auth (Authorization header, no cookies/sessions)
-                // - SessionCreationPolicy.STATELESS
-                // - No login forms or browser-based auth
-                // - API Gateway disables credentials (no cross-origin cookies)
-                // If cookies/sessions or setAllowCredentials(true) are introduced, remove this
-                // exception and re-enable CSRF protection.
-                http
-                                .cors(cors -> cors.configurationSource(corsConfigurationSource))
-                                .csrf(csrf -> csrf
-                                                /* See Sonar S4502 justification above. */
-                                                .ignoringRequestMatchers("/api/**"))
-                                .sessionManagement(session -> session
-                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // See CommonSecurityConfigurer for CSRF/CORS policy and S4502 justification.
+                CommonSecurityConfigurer.applyDefaultSecurity(http, jwtTokenProvider, corsConfigurationSource)
                                 .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers("/actuator/**").permitAll()
                                                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
@@ -86,11 +69,6 @@ public class SecurityConfig {
                                                                 "/api/v1/orders/number/{orderNumber}")
                                                 .permitAll()
                                                 .anyRequest().authenticated());
-                http.exceptionHandling(ex -> ex
-                                .authenticationEntryPoint((request, response, authException) -> response
-                                                .sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")));
-                http.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
-                                UsernamePasswordAuthenticationFilter.class);
                 return http.build();
         }
 }
