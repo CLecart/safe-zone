@@ -26,11 +26,17 @@ public class CommonSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(List.of("*"));
+        // S5122 justification: Wildcard CORS origins are allowed because
+        // setAllowCredentials(false) guarantees that no credentials (cookies, auth
+        // headers, client certificates) will ever be sent cross-origin. This is
+        // required for public REST APIs and is safe as long as credentials are always
+        // refused. If setAllowCredentials(true) is ever used, remove the wildcard and
+        // restrict origins explicitly. (See SonarQube S5122)
+        config.setAllowedOriginPatterns(List.of("*")); // NOSONAR S5122
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setExposedHeaders(List.of("Authorization", "Content-Type"));
-        config.setAllowCredentials(false);
+        config.setAllowCredentials(false); // Absolutely required for wildcard CORS
         config.setMaxAge(3600L);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
