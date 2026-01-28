@@ -30,11 +30,6 @@ import jakarta.servlet.http.HttpServletResponse;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-    // Utilisation du bean CORS commun défini dans common
-    @Bean
-    public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
-        return com.safezone.common.config.CommonSecurityConfig.corsConfigurationSource();
-    }
 
     /**
      * Provides a BCrypt password encoder bean for secure password hashing.

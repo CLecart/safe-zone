@@ -31,11 +31,6 @@ import jakarta.servlet.http.HttpServletResponse;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-        // Utilisation du bean CORS commun défini dans common
-        @Bean
-        public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
-                return com.safezone.common.config.CommonSecurityConfig.corsConfigurationSource();
-        }
 
         /** JWT token provider for authentication processing. */
         private final JwtTokenProvider jwtTokenProvider;
