@@ -1,0 +1,40 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Maven verify (no skipTests)",
+			"type": "shell",
+			"command": "mvn",
+			"args": [
+				"-B",
+				"-q",
+				"-DskipTests=false",
+				"-Dmaven.project.sourceRoots.warningsDisabled=true",
+				"clean",
+				"verify"
+			]
+		},
+		{
+			"label": "Maven verify (no skipTests, after CORS fix)",
+			"type": "shell",
+			"command": "mvn",
+			"args": [
+				"-B",
+				"-Dmaven.project.sourceRoots.warningsDisabled=true",
+				"clean",
+				"verify"
+			]
+		},
+		{
+			"label": "Maven verify (final strict CORS revert)",
+			"type": "shell",
+			"command": "mvn",
+			"args": [
+				"-B",
+				"-Dmaven.project.sourceRoots.warningsDisabled=true",
+				"clean",
+				"verify"
+			]
+		}
+	]
+}

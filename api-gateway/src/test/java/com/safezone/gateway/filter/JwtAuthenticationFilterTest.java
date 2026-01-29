@@ -20,9 +20,6 @@ import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import org.springframework.mock.web.server.MockServerWebExchange;
 import org.springframework.web.server.ServerWebExchange;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import reactor.core.publisher.Mono;
 
 class JwtAuthenticationFilterTest {
@@ -39,7 +36,9 @@ class JwtAuthenticationFilterTest {
     void publicEndpointIsBypassed() {
         byte[] key = new byte[64];
         String secret = generateBase64Secret(key);
-        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(secret);
+        com.safezone.common.security.JwtTokenProvider provider = new com.safezone.common.security.JwtTokenProvider(
+                secret, 86400000L);
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(provider);
 
         MockServerHttpRequest request = MockServerHttpRequest.get("/actuator/health").build();
         MockServerWebExchange exchange = MockServerWebExchange.from(request);
@@ -56,7 +55,9 @@ class JwtAuthenticationFilterTest {
     void missingAuthorizationHeaderReturnsUnauthorized() {
         byte[] key = new byte[64];
         String secret = generateBase64Secret(key);
-        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(secret);
+        com.safezone.common.security.JwtTokenProvider provider = new com.safezone.common.security.JwtTokenProvider(
+                secret, 86400000L);
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(provider);
 
         MockServerHttpRequest request = MockServerHttpRequest.get(ORDERS_PATH).build();
         MockServerWebExchange exchange = MockServerWebExchange.from(request);
@@ -74,7 +75,9 @@ class JwtAuthenticationFilterTest {
     void invalidTokenReturnsUnauthorized() {
         byte[] key = new byte[64];
         String secret = generateBase64Secret(key);
-        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(secret);
+        com.safezone.common.security.JwtTokenProvider provider = new com.safezone.common.security.JwtTokenProvider(
+                secret, 86400000L);
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(provider);
 
         MockServerHttpRequest request = MockServerHttpRequest.get(ORDERS_PATH)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer not-a-valid-token")
@@ -95,13 +98,14 @@ class JwtAuthenticationFilterTest {
     void validTokenAddsUserHeadersAndCallsChain() {
         byte[] key = new byte[64];
         String secret = generateBase64Secret(key);
-        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(secret);
+        com.safezone.common.security.JwtTokenProvider provider = new com.safezone.common.security.JwtTokenProvider(
+                secret, 86400000L);
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(provider);
 
-        String token = Jwts.builder()
-                .claim(Claims.SUBJECT, "42")
-                .claim("roles", List.of("ROLE_USER"))
-                .signWith(Keys.hmacShaKeyFor(key))
-                .compact();
+        // Use the provider to generate a token so signing key and format are consistent
+        String token = provider.generateToken("42", List.of("ROLE_USER"));
+        // Sanity check the provider validates its own token
+        org.assertj.core.api.Assertions.assertThat(provider.validateToken(token)).isTrue();
 
         MockServerHttpRequest request = MockServerHttpRequest.get(ORDERS_PATH)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
