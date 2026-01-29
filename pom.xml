@@ -33,9 +33,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <sonar.organization>safezone</sonar.organization>
-        <sonar.host.url>http://localhost:9000</sonar.host.url>
-        <sonar.projectKey>safe-zone</sonar.projectKey>
+        <sonar.organization>safezone-github</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.projectKey>safezone-github_safe-zone</sonar.projectKey>
         <sonar.projectName>SafeZone E-Commerce</sonar.projectName>
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
         <sonar.coverage.jacoco.xmlReportPaths>
