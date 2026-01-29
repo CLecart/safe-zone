@@ -25,28 +25,69 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public final class CommonSecurityConfigurer {
 
-    private CommonSecurityConfigurer() {
-    }
+        private CommonSecurityConfigurer() {
+        }
 
-    public static HttpSecurity applyDefaultSecurity(HttpSecurity http, JwtTokenProvider jwtTokenProvider,
-            CorsConfigurationSource corsConfigurationSource) throws Exception {
-        http.cors(cors -> cors.configurationSource(corsConfigurationSource))
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        public static HttpSecurity applyDefaultSecurity(HttpSecurity http, JwtTokenProvider jwtTokenProvider,
+                        CorsConfigurationSource corsConfigurationSource) throws Exception {
+                http.cors(cors -> cors.configurationSource(corsConfigurationSource))
+                                // Justification Sonar S4502 :
+                                // Le CSRF est volontairement désactivé pour les endpoints sous `/api/**` car :
+                                // - L'authentification est sans état et utilise des JWT dans l'en-tête
+                                // `Authorization` (pas de cookies / sessions).
+                                // - La stratégie de session est `STATELESS` (pas de session côté serveur).
+                                // - La configuration CORS définit `allowCredentials=false` : l'utilisation de
+                                // cookies cross-site est impossible.
+                                // Si des cookies, une authentification par session ou `allowCredentials=true`
+                                // sont introduits,
+                                // réactivez immédiatement la protection CSRF et réévaluez ce hotspot.
+                                .csrf(csrf -> csrf.requireCsrfProtectionMatcher(req -> {
+                                        String method = req.getMethod();
+                                        boolean mutating = java.util.Set.of("POST", "PUT", "PATCH", "DELETE")
+                                                        .contains(method);
+                                        if (!mutating) {
+                                                return false;
+                                        }
+                                        boolean hasCookies = req.getCookies() != null && req.getCookies().length > 0;
+                                        String auth = req.getHeader("Authorization");
+                                        boolean hasAuthHeader = auth != null && !auth.isBlank();
+                                        // Protect when cookies are present or when Authorization header is missing
+                                        return hasCookies || !hasAuthHeader;
+                                }))
+                                .sessionManagement(session -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        // Common public endpoints (actuator & swagger) — extracted to reduce
-        // duplication
-        http.authorizeHttpRequests(auth -> auth
-                .requestMatchers("/actuator/**").permitAll()
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll());
+                // Common public endpoints (actuator & swagger) — extracted to reduce
+                // duplication
+                http.authorizeHttpRequests(auth -> auth
+                                .requestMatchers("/actuator/**").permitAll()
+                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll());
 
-        http.exceptionHandling(ex -> ex
-                .authenticationEntryPoint((request, response, authException) -> response
-                        .sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")));
+                http.exceptionHandling(ex -> ex
+                                .authenticationEntryPoint((request, response, authException) -> response
+                                                .sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")));
 
-        http.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
-                UsernamePasswordAuthenticationFilter.class);
+                http.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
+                                UsernamePasswordAuthenticationFilter.class);
 
-        return http;
-    }
+                return http;
+        }
+
+        // Visible for tests: determine whether CSRF protection should apply to the
+        // given request.
+        // Rules:
+        // - Only mutating HTTP methods (POST/PUT/PATCH/DELETE) are considered
+        // - If cookies are present, protect
+        // - If Authorization header is absent, protect (defensive)
+        static boolean shouldProtectCsrf(jakarta.servlet.http.HttpServletRequest req) {
+                String method = req.getMethod();
+                boolean mutating = java.util.Set.of("POST", "PUT", "PATCH", "DELETE").contains(method);
+                if (!mutating) {
+                        return false;
+                }
+                boolean hasCookies = req.getCookies() != null && req.getCookies().length > 0;
+                String auth = req.getHeader("Authorization");
+                boolean hasAuthHeader = auth != null && !auth.isBlank();
+                return hasCookies || !hasAuthHeader;
+        }
 }
