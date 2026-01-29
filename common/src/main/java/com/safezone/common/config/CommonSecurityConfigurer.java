@@ -31,16 +31,15 @@ public final class CommonSecurityConfigurer {
         public static HttpSecurity applyDefaultSecurity(HttpSecurity http, JwtTokenProvider jwtTokenProvider,
                         CorsConfigurationSource corsConfigurationSource) throws Exception {
                 http.cors(cors -> cors.configurationSource(corsConfigurationSource))
-                                // Justification Sonar S4502 :
-                                // Le CSRF est volontairement désactivé pour les endpoints sous `/api/**` car :
-                                // - L'authentification est sans état et utilise des JWT dans l'en-tête
-                                // `Authorization` (pas de cookies / sessions).
-                                // - La stratégie de session est `STATELESS` (pas de session côté serveur).
-                                // - La configuration CORS définit `allowCredentials=false` : l'utilisation de
-                                // cookies cross-site est impossible.
-                                // Si des cookies, une authentification par session ou `allowCredentials=true`
-                                // sont introduits,
-                                // réactivez immédiatement la protection CSRF et réévaluez ce hotspot.
+                                // Sonar S4502 justification:
+                                // CSRF protection is applied conditionally:
+                                // - Only mutating HTTP methods (POST/PUT/PATCH/DELETE) are considered.
+                                // - Protect requests that include cookies (possible CSRF) or when the
+                                // Authorization header is missing.
+                                // - Requests with an Authorization header and no cookies (typical stateless JWT
+                                // usage) are allowed without CSRF.
+                                // If cookies, session-based authentication, or allowCredentials=true are
+                                // introduced, re-enable CSRF and reassess.
                                 .csrf(csrf -> csrf.requireCsrfProtectionMatcher(req -> {
                                         String method = req.getMethod();
                                         boolean mutating = java.util.Set.of("POST", "PUT", "PATCH", "DELETE")
