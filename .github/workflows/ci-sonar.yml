@@ -80,7 +80,6 @@ jobs:
             JWT_TEST_SECRET=$(head -c 48 /dev/urandom | base64)
             echo "JWT_TEST_SECRET=$JWT_TEST_SECRET" >> $GITHUB_ENV
           fi
-
       - name: SonarQube Scan (guarded - avoid double analysis)
         run: |
           if [ -z "${SONAR_TOKEN:-}" ] || [ -z "${SONAR_HOST_URL:-}" ]; then
