@@ -5,14 +5,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.safezone.common.security.JwtAuthenticationFilter;
+import com.safezone.common.config.CommonSecurityConfigurer;
 import com.safezone.common.security.JwtTokenProvider;
-
-import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Security configuration for the User Service.
@@ -67,30 +63,16 @@ public class SecurityConfig {
      * @throws Exception if security configuration fails
      */
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer::disable) // NOSONAR:
-                                                                                                                      // S4502
-                                                                                                                      // justified
-                                                                                                                      // -
-                                                                                                                      // stateless
-                                                                                                                      // REST
-                                                                                                                      // API
-                                                                                                                      // using
-                                                                                                                      // JWT
-                                                                                                                      // Bearer
-                                                                                                                      // tokens
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+            org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource) throws Exception {
+        // Centralized default security configuration (CSRF/CORS/S4502 justification)
+        CommonSecurityConfigurer.applyDefaultSecurity(http, jwtTokenProvider, corsConfigurationSource)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/**").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        // Common public endpoints (actuator & swagger) are configured in
+                        // CommonSecurityConfigurer
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/users/{id}").permitAll()
                         .anyRequest().authenticated());
-        http.exceptionHandling(ex -> ex
-                .authenticationEntryPoint((request, response, authException) -> response
-                        .sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")));
-        http.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }

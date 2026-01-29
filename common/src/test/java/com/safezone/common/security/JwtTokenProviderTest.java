@@ -123,6 +123,25 @@ class JwtTokenProviderTest {
             assertThat(isValid).isFalse();
             assertThat(jwtTokenProvider.extractUsername(unsignedToken)).isEmpty();
         }
+
+        @Test
+        @DisplayName("Should tolerate weak secret when test profile active")
+        void shouldTolerateWeakSecretWhenTestProfileActive() {
+            String previous = System.getProperty("spring.profiles.active");
+            try {
+                System.setProperty("spring.profiles.active", "test");
+                JwtTokenProvider weakProvider = new JwtTokenProvider("short", EXPIRATION);
+                String token = weakProvider.generateToken("tst", List.of("ROLE_USER"));
+                // token generated with fallback key should be valid for the provider
+                assertThat(weakProvider.validateToken(token)).isTrue();
+            } finally {
+                if (previous != null) {
+                    System.setProperty("spring.profiles.active", previous);
+                } else {
+                    System.clearProperty("spring.profiles.active");
+                }
+            }
+        }
     }
 
     @Nested

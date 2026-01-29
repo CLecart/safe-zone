@@ -50,6 +50,19 @@
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
         </dependency>
+
+        <!-- Shared common library with JwtTokenProvider and utilities -->
+        <dependency>
+            <groupId>com.safezone</groupId>
+            <artifactId>common</artifactId>
+            <!-- exclude spring-web (MVC) transitively pulled by common to avoid spring-mvc on classpath in gateway -->
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-web</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
     </dependencies>
 
     <build>
