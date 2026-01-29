@@ -26,16 +26,12 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 public class CorsConfig {
 
     /**
-     * Creates a CORS filter with permissive settings.
+     * Creates a CORS filter with configurable settings.
      * <p>
-     * Configuration allows:
-     * <ul>
-     * <li>All origin patterns</li>
-     * <li>Common HTTP methods (GET, POST, PUT, PATCH, DELETE, OPTIONS)</li>
-     * <li>All headers</li>
-     * <li>Credentials (cookies, authorization headers)</li>
-     * <li>1 hour preflight cache</li>
-     * </ul>
+     * For security, allowed origins should be explicitly configured in production
+     * using the `cors.allowed-origins` property (comma-separated). In development
+     * the default is `http://localhost` and `http://127.0.0.1` to support local
+     * web clients. Avoid using wildcard origins (`*`) in production.
      * </p>
      *
      * @return the configured CORS web filter
@@ -76,7 +72,6 @@ public class CorsConfig {
         } else {
             corsConfig.setAllowedOrigins(origins);
         }
-
         corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         corsConfig.setAllowedHeaders(List.of("*"));
         corsConfig.setExposedHeaders(List.of("Authorization", "Content-Type"));

@@ -52,6 +52,12 @@ public class SecurityConfig {
          * <li>JWT authentication filter for protected endpoints</li>
          * </ul>
          * </p>
+         * <p>
+         * Rationale: CSRF is disabled because the API is stateless and protected by
+         * JWT bearer tokens; state-changing endpoints require authentication. See
+         * `.github/SONAR_S4502_JUSTIFICATION.md` for the Sonar S4502 justification
+         * and reviewer checklist.
+         * </p>
          *
          * @param http the HttpSecurity builder to configure
          * @return the configured SecurityFilterChain
