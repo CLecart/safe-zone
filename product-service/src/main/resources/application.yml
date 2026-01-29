@@ -20,13 +20,6 @@ spring:
       path: /h2-console
 
 server:
-  port: 8081
-
-jwt:
-  secret: ${JWT_SECRET:SafeZoneSecretKeyForJWTAuthenticationMustBeAtLeast256BitsLong}
-  expiration: ${JWT_EXPIRATION:86400000}
-
-springdoc:
   api-docs:
     path: /v3/api-docs
 logging:

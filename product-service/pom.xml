@@ -8,8 +8,8 @@
         <groupId>com.safezone</groupId>
         <artifactId>safe-zone-parent</artifactId>
         <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
-
     <artifactId>product-service</artifactId>
     <name>Product Service</name>
     <description>Product management microservice</description>
@@ -20,6 +20,13 @@
             <artifactId>common</artifactId>
         </dependency>
 
+                    <argLine>-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/0.8.11/org.jacoco.agent-0.8.11-runtime.jar=destfile=${project.build.directory}/jacoco.exec</argLine>
+                                <systemPropertyVariables>
+                                    <maven.project.sourceRoots.warningsDisabled>true</maven.project.sourceRoots.warningsDisabled>
+                                </systemPropertyVariables>
+                    <systemPropertyVariables>
+                        <maven.project.sourceRoots.warningsDisabled>true</maven.project.sourceRoots.warningsDisabled>
+                    </systemPropertyVariables>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -68,8 +75,8 @@
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>5.17.0</version>
+            <artifactId>mockito-inline</artifactId>
+            <version>5.2.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -97,7 +104,17 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.3</version>
                 <configuration>
+<<<<<<< HEAD
                     <argLine>-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/0.8.11/org.jacoco.agent-0.8.11-runtime.jar=destfile=${project.build.directory}/jacoco.exec -javaagent:${settings.localRepository}/org/mockito/mockito-core/5.17.0/mockito-core-5.17.0.jar</argLine>
+=======
+                    <argLine>-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/0.8.11/org.jacoco.agent-0.8.11-runtime.jar=destfile=${project.build.directory}/jacoco.exec</argLine>
+                                <systemPropertyVariables>
+                                    <maven.project.sourceRoots.warningsDisabled>true</maven.project.sourceRoots.warningsDisabled>
+                                </systemPropertyVariables>
+                    <systemPropertyVariables>
+                        <maven.project.sourceRoots.warningsDisabled>true</maven.project.sourceRoots.warningsDisabled>
+                    </systemPropertyVariables>
+>>>>>>> 0836b0d (ci: guard Sonar CI scan to avoid Automatic Analysis conflict (#11))
                 </configuration>
             </plugin>
         </plugins>
