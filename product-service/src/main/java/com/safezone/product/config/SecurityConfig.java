@@ -61,8 +61,6 @@ public class SecurityConfig {
                 // See CommonSecurityConfigurer for CSRF/CORS policy and S4502 justification.
                 CommonSecurityConfigurer.applyDefaultSecurity(http, jwtTokenProvider, corsConfigurationSource)
                                 .authorizeHttpRequests(auth -> auth
-                                                // Common public endpoints (actuator & swagger) are configured in
-                                                // CommonSecurityConfigurer
                                                 // Public GET endpoints
                                                 .requestMatchers(HttpMethod.GET, "/api/v1/products/{id}").permitAll()
                                                 .requestMatchers(HttpMethod.GET, "/api/v1/products/category/{category}")

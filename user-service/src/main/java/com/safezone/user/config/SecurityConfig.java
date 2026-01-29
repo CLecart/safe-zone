@@ -6,13 +6,9 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.safezone.common.config.CommonSecurityConfigurer;
-import com.safezone.common.security.JwtAuthenticationFilter;
 import com.safezone.common.security.JwtTokenProvider;
-
-import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Security configuration for the User Service.
@@ -78,10 +74,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/users/{id}").permitAll()
                         .anyRequest().authenticated());
-        http.exceptionHandling(ex -> ex
-                .authenticationEntryPoint((request, response, authException) -> response
-                        .sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")));
-        http.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }
