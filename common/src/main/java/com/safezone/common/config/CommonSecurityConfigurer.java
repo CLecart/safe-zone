@@ -34,10 +34,7 @@ public final class CommonSecurityConfigurer {
                                 // Sonar S4502 justification:
                                 // CSRF protection is applied conditionally:
                                 // - Only mutating HTTP methods (POST/PUT/PATCH/DELETE) are considered.
-                                // - Protect requests that include cookies (possible CSRF) or when the
-                                // Authorization header is missing.
-                                // - Requests with an Authorization header and no cookies (typical stateless JWT
-                                // usage) are allowed without CSRF.
+                                // - Protect requests that include cookies (possible CSRF).
                                 // If cookies, session-based authentication, or allowCredentials=true are
                                 // introduced, re-enable CSRF and reassess.
                                 .csrf(csrf -> csrf.requireCsrfProtectionMatcher(req -> {
@@ -47,11 +44,8 @@ public final class CommonSecurityConfigurer {
                                         if (!mutating) {
                                                 return false;
                                         }
-                                        boolean hasCookies = req.getCookies() != null && req.getCookies().length > 0;
-                                        String auth = req.getHeader("Authorization");
-                                        boolean hasAuthHeader = auth != null && !auth.isBlank();
-                                        // Protect when cookies are present or when Authorization header is missing
-                                        return hasCookies || !hasAuthHeader;
+                                        // Protect only when cookies are present (session-based or cookie auth).
+                                        return req.getCookies() != null && req.getCookies().length > 0;
                                 }))
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -77,16 +71,12 @@ public final class CommonSecurityConfigurer {
         // Rules:
         // - Only mutating HTTP methods (POST/PUT/PATCH/DELETE) are considered
         // - If cookies are present, protect
-        // - If Authorization header is absent, protect (defensive)
         static boolean shouldProtectCsrf(jakarta.servlet.http.HttpServletRequest req) {
                 String method = req.getMethod();
                 boolean mutating = java.util.Set.of("POST", "PUT", "PATCH", "DELETE").contains(method);
                 if (!mutating) {
                         return false;
                 }
-                boolean hasCookies = req.getCookies() != null && req.getCookies().length > 0;
-                String auth = req.getHeader("Authorization");
-                boolean hasAuthHeader = auth != null && !auth.isBlank();
-                return hasCookies || !hasAuthHeader;
+                return req.getCookies() != null && req.getCookies().length > 0;
         }
 }
