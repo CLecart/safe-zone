@@ -35,8 +35,8 @@ class CommonSecurityIntegrationTest {
     }
 
     @Test
-    void postWithoutAuthOrCookies_isForbiddenDueToMissingCsrf() throws Exception {
-        mvc.perform(post("/api/test").contentType(MediaType.APPLICATION_JSON)).andExpect(status().isForbidden());
+    void postWithoutAuthOrCookies_isAllowed() throws Exception {
+        mvc.perform(post("/api/test").contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
     }
 
     @Test

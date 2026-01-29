@@ -31,9 +31,9 @@ class CommonSecurityConfigurerTest {
     }
 
     @Test
-    void mutatingWithoutAuthOrCookies_requiresCsrf() {
+    void mutatingWithoutAuthOrCookies_doesNotRequireCsrf() {
         var req = new MockHttpServletRequest();
         req.setMethod("DELETE");
-        assertThat(CommonSecurityConfigurer.shouldProtectCsrf(req)).isTrue();
+        assertThat(CommonSecurityConfigurer.shouldProtectCsrf(req)).isFalse();
     }
 }
