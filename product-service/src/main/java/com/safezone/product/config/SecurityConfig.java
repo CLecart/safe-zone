@@ -53,6 +53,13 @@ public class SecurityConfig {
         /**
          * Configures the security filter chain with JWT authentication.
          *
+         * <p>
+         * CSRF protection is disabled because this service provides a stateless
+         * REST API secured by JWT bearer tokens; public read-only endpoints are
+         * limited to GET operations. For the Sonar S4502 justification and
+         * reviewer guidance, see `.github/SONAR_S4502_JUSTIFICATION.md`.
+         * </p>
+         *
          * @param http the HttpSecurity builder
          * @return the configured SecurityFilterChain
          * @throws Exception if configuration fails

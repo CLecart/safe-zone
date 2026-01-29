@@ -1,12 +1,12 @@
 package com.safezone.gateway.config;
 
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsWebFilter;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
-
-import java.util.List;
 
 /**
  * CORS configuration for the API Gateway.
@@ -23,24 +23,31 @@ import java.util.List;
 public class CorsConfig {
 
     /**
-     * Creates a CORS filter with permissive settings.
+     * Creates a CORS filter with configurable settings.
      * <p>
-     * Configuration allows:
-     * <ul>
-     *   <li>All origin patterns</li>
-     *   <li>Common HTTP methods (GET, POST, PUT, PATCH, DELETE, OPTIONS)</li>
-     *   <li>All headers</li>
-     *   <li>Credentials (cookies, authorization headers)</li>
-     *   <li>1 hour preflight cache</li>
-     * </ul>
+     * For security, allowed origins should be explicitly configured in production
+     * using the `cors.allowed-origins` property (comma-separated). In development
+     * the default is `http://localhost` and `http://127.0.0.1` to support local
+     * web clients. Avoid using wildcard origins (`*`) in production.
      * </p>
      *
      * @return the configured CORS web filter
      */
     @Bean
-    public CorsWebFilter corsWebFilter() {
+    public CorsWebFilter corsWebFilter(
+            @org.springframework.beans.factory.annotation.Value("${cors.allowed-origins:http://localhost,http://127.0.0.1}") String allowedOriginsProp) {
         CorsConfiguration corsConfig = new CorsConfiguration();
-        corsConfig.setAllowedOriginPatterns(List.of("*"));
+        java.util.List<String> allowedOrigins = java.util.Arrays.stream(allowedOriginsProp.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
+        // If a single wildcard is provided explicitly, allow origin patterns; otherwise
+        // use explicit origins
+        if (allowedOrigins.size() == 1 && "*".equals(allowedOrigins.get(0))) {
+            corsConfig.setAllowedOriginPatterns(List.of("*"));
+        } else {
+            corsConfig.setAllowedOrigins(allowedOrigins);
+        }
         corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         corsConfig.setAllowedHeaders(List.of("*"));
         corsConfig.setExposedHeaders(List.of("Authorization", "Content-Type"));

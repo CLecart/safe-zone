@@ -52,36 +52,16 @@ public class SecurityConfig {
     }
 
     /**
-     * Creates a BCrypt password encoder bean.
+     * Configures the HTTP security filter chain for the User Service.
+     *
      * <p>
-     * Used for securely hashing user passwords during registration
-     * and verifying passwords during authentication.
-     * 
-     * @Bean
-     *       public SecurityFilterChain securityFilterChain(HttpSecurity http)
-     *       throws Exception {
-     *       http
-     *       .csrf(AbstractHttpConfigurer::disable)
-     *       .sessionManagement(session ->
-     *       session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-     *       .authorizeHttpRequests(auth -> auth
-     *       .requestMatchers("/actuator/**").permitAll()
-     *       .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-     *       .requestMatchers("/api/v1/auth/**").permitAll()
-     *       .anyRequest().authenticated()
-     *       );
-     *       http.exceptionHandling(ex -> ex
-     *       .authenticationEntryPoint((request, response, authException) -> {
-     *       response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-     *       "Unauthorized");
-     *       })
-     *       );
-     *       http.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
-     *       UsernamePasswordAuthenticationFilter.class);
-     *       return http.build();
-     *       }
-     *       </ul>
-     *       </p>
+     * CSRF protection is disabled intentionally because this service exposes a
+     * stateless JSON API secured by JWT bearer tokens. State-changing operations
+     * require a valid JWT and are therefore not vulnerable to browser-based CSRF
+     * attacks in this architecture. Public endpoints are limited to read-only
+     * GET requests as shown below. For the complete Sonar S4502 justification
+     * and reviewer guidance, see `.github/SONAR_S4502_JUSTIFICATION.md`.
+     * </p>
      *
      * @param http the HttpSecurity builder to configure
      * @return the configured SecurityFilterChain
