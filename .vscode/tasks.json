@@ -1,0 +1,11 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Test Maven api-gateway",
+			"type": "shell",
+			"command": "mvn test -pl api-gateway",
+			"group": "test"
+		}
+	]
+}
