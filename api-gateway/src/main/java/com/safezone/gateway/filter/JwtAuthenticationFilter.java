@@ -107,18 +107,6 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
     }
 
     /**
-     * Checks whether a 'test' profile is active via system properties or
-     * environment.
-     * Useful to relax certain runtime checks during unit/integration tests while
-     * avoiding hard-coded secrets in the repository.
-     */
-    private static boolean isTestProfileActive() {
-        String prop = System.getProperty("spring.profiles.active");
-        String env = System.getenv("SPRING_PROFILES_ACTIVE");
-        return (prop != null && prop.contains("test")) || (env != null && env.contains("test"));
-    }
-
-    /**
      * Handles authentication errors by returning an error response.
      *
      * @param exchange the server web exchange
