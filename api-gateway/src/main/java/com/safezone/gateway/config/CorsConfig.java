@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.lang.NonNull;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsWebFilter;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
@@ -35,7 +36,8 @@ public class CorsConfig {
      * Factorized logic for building a CorsConfiguration, used by both the bean and
      * tests.
      */
-    public CorsConfiguration buildCorsConfiguration(String allowedOriginsProp, boolean allowWildcard) {
+    public @NonNull CorsConfiguration buildCorsConfiguration(String allowedOriginsProp, boolean allowWildcard) {
+        @NonNull
         CorsConfiguration corsConfig = new CorsConfiguration();
         List<String> allowedOrigins = java.util.Arrays.stream(allowedOriginsProp.split(","))
                 .map(String::trim)
@@ -78,13 +80,14 @@ public class CorsConfig {
     private static final Logger logger = LoggerFactory.getLogger(CorsConfig.class);
 
     @Bean
-    public CorsWebFilter corsWebFilter(@Value("${cors.allowed-origins:}") String allowedOriginsProp,
+    public @NonNull CorsWebFilter corsWebFilter(@Value("${cors.allowed-origins:}") String allowedOriginsProp,
             @Value("${cors.allow-wildcard:false}") boolean allowWildcard) {
         if (allowedOriginsProp == null || allowedOriginsProp.isBlank()) {
             allowedOriginsProp = "http://localhost,http://127.0.0.1";
             logger.warn(
                     "'cors.allowed-origins' not set; defaulting to localhost origins for development. Set a strict list in production.");
         }
+        @NonNull
         CorsConfiguration corsConfig = buildCorsConfiguration(allowedOriginsProp, allowWildcard);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
