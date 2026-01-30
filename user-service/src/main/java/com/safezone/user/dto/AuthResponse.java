@@ -2,9 +2,8 @@ package com.safezone.user.dto;
 
 /**
  * Response DTO for authentication operations.
- * <p>
- * Contains the JWT token, token metadata, and authenticated user information.
- * </p>
+ *
+ * <p>Contains the JWT token, token metadata, and authenticated user information.
  *
  * @param token the JWT access token
  * @param tokenType the token type (always "Bearer")
@@ -14,12 +13,7 @@ package com.safezone.user.dto;
  * @version 1.0.0
  * @since 2024-01-06
  */
-public record AuthResponse(
-        String token,
-        String tokenType,
-        Long expiresIn,
-        UserResponse user
-) {
+public record AuthResponse(String token, String tokenType, Long expiresIn, UserResponse user) {
     /**
      * Factory method to create an AuthResponse with Bearer token type.
      *

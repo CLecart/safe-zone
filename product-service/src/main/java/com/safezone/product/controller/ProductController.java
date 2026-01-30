@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,14 +30,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 /**
- * REST controller for product management operations.
- * Provides CRUD endpoints for products with role-based access control.
+ * REST controller for product management operations. Provides CRUD endpoints for products with
+ * role-based access control.
  *
- * <p>Endpoints support pagination, filtering, and search capabilities.
- * Admin role required for write operations.</p>
+ * <p>Endpoints support pagination, filtering, and search capabilities. Admin role required for
+ * write operations.
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -164,7 +163,9 @@ public class ProductController {
     @Operation(summary = "Update product stock")
     public ResponseEntity<ApiResponse<ProductResponse>> updateStock(
             @Parameter(description = "Product ID") @PathVariable Long id,
-            @Parameter(description = "Quantity to add (positive) or remove (negative)") @RequestParam Integer quantity) {
+            @Parameter(description = "Quantity to add (positive) or remove (negative)")
+                    @RequestParam
+                    Integer quantity) {
 
         ProductResponse product = productService.updateStock(id, quantity);
         return ResponseEntity.ok(ApiResponse.success("Stock updated successfully", product));
@@ -174,7 +175,8 @@ public class ProductController {
     @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY')")
     @Operation(summary = "Get products with low stock")
     public ResponseEntity<ApiResponse<List<ProductResponse>>> getLowStockProducts(
-            @Parameter(description = "Stock threshold") @RequestParam(defaultValue = "10") Integer threshold) {
+            @Parameter(description = "Stock threshold") @RequestParam(defaultValue = "10")
+                    Integer threshold) {
 
         List<ProductResponse> products = productService.getLowStockProducts(threshold);
         return ResponseEntity.ok(ApiResponse.success(products));
@@ -193,16 +195,17 @@ public class ProductController {
     /**
      * Creates a Pageable object from pagination parameters.
      *
-     * @param page    page number (zero-based)
-     * @param size    number of elements per page
-     * @param sortBy  field to sort by
+     * @param page page number (zero-based)
+     * @param size number of elements per page
+     * @param sortBy field to sort by
      * @param sortDir sort direction ("asc" or "desc")
      * @return configured Pageable instance
      */
     private Pageable createPageable(int page, int size, String sortBy, String sortDir) {
-        Sort sort = sortDir.equalsIgnoreCase("desc")
-                ? Sort.by(sortBy).descending()
-                : Sort.by(sortBy).ascending();
+        Sort sort =
+                sortDir.equalsIgnoreCase("desc")
+                        ? Sort.by(sortBy).descending()
+                        : Sort.by(sortBy).ascending();
         return PageRequest.of(page, size, sort);
     }
 
@@ -210,15 +213,11 @@ public class ProductController {
      * Converts a Spring Data Page to a PageResponse DTO.
      *
      * @param page the source Page object
-     * @param <T>  the type of page content
+     * @param <T> the type of page content
      * @return the converted PageResponse
      */
     private <T> PageResponse<T> toPageResponse(Page<T> page) {
         return PageResponse.of(
-                page.getContent(),
-                page.getNumber(),
-                page.getSize(),
-                page.getTotalElements()
-        );
+                page.getContent(), page.getNumber(), page.getSize(), page.getTotalElements());
     }
 }

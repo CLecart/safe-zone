@@ -10,9 +10,11 @@ class CorsConfigTest {
     @Test
     void defaultAllowedOrigins_shouldContainLocalhost() {
         CorsConfig cfg = new CorsConfig();
-        CorsConfiguration cors = cfg.buildCorsConfiguration("http://localhost,http://127.0.0.1", false);
+        CorsConfiguration cors =
+                cfg.buildCorsConfiguration("http://localhost,http://127.0.0.1", false);
 
-        assertThat(cors.getAllowedOrigins()).containsExactly("http://localhost", "http://127.0.0.1");
+        assertThat(cors.getAllowedOrigins())
+                .containsExactly("http://localhost", "http://127.0.0.1");
     }
 
     @Test
@@ -26,7 +28,7 @@ class CorsConfigTest {
     @Test
     void wildcard_without_allowWildcard_shouldFail() {
         CorsConfig cfg = new CorsConfig();
-        org.junit.jupiter.api.Assertions.assertThrows(IllegalStateException.class,
-                () -> cfg.buildCorsConfiguration("*", false));
+        org.junit.jupiter.api.Assertions.assertThrows(
+                IllegalStateException.class, () -> cfg.buildCorsConfiguration("*", false));
     }
 }

@@ -4,14 +4,13 @@ import com.safezone.product.dto.CreateProductRequest;
 import com.safezone.product.dto.ProductResponse;
 import com.safezone.product.dto.UpdateProductRequest;
 import com.safezone.product.entity.ProductCategory;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-
 /**
- * Service interface for product management operations.
- * Provides CRUD operations and business logic for products in the e-commerce platform.
+ * Service interface for product management operations. Provides CRUD operations and business logic
+ * for products in the e-commerce platform.
  *
  * @author SafeZone Team
  * @version 1.0.0

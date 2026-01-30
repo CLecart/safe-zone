@@ -4,14 +4,13 @@ import com.safezone.order.dto.OrderItemResponse;
 import com.safezone.order.dto.OrderResponse;
 import com.safezone.order.entity.Order;
 import com.safezone.order.entity.OrderItem;
+import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 
-import java.util.List;
-
 /**
- * MapStruct mapper for Order entity and DTO conversions.
- * Provides compile-time generated mapping implementations.
+ * MapStruct mapper for Order entity and DTO conversions. Provides compile-time generated mapping
+ * implementations.
  *
  * @author SafeZone Team
  * @version 1.0.0

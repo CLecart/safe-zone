@@ -4,13 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * Additional coverage tests for Product entity.
- * Tests all builder methods and getter/setter combinations for 100% coverage.
+ * Additional coverage tests for Product entity. Tests all builder methods and getter/setter
+ * combinations for 100% coverage.
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -23,18 +22,19 @@ class ProductCoverageTest {
     @DisplayName("Builder covers all setters and toString")
     void builderCoversAllMethods() {
         LocalDateTime now = LocalDateTime.now();
-        Product p = Product.builder()
-                .id(10L)
-                .name("Full")
-                .description("Complete")
-                .price(BigDecimal.TEN)
-                .stockQuantity(50)
-                .sku("FULL-SKU")
-                .category(ProductCategory.BOOKS)
-                .active(false)
-                .createdAt(now)
-                .updatedAt(now)
-                .build();
+        Product p =
+                Product.builder()
+                        .id(10L)
+                        .name("Full")
+                        .description("Complete")
+                        .price(BigDecimal.TEN)
+                        .stockQuantity(50)
+                        .sku("FULL-SKU")
+                        .category(ProductCategory.BOOKS)
+                        .active(false)
+                        .createdAt(now)
+                        .updatedAt(now)
+                        .build();
 
         // Test all getters
         assertThat(p.getId()).isEqualTo(10L);
@@ -91,17 +91,18 @@ class ProductCoverageTest {
         assertThat(p1.getId()).isNull();
 
         LocalDateTime now = LocalDateTime.now();
-        Product p2 = new Product(
-                5L,
-                "Constructed",
-                "Desc",
-                BigDecimal.valueOf(25.5),
-                30,
-                "CONS-SKU",
-                ProductCategory.AUTOMOTIVE,
-                true,
-                now,
-                now);
+        Product p2 =
+                new Product(
+                        5L,
+                        "Constructed",
+                        "Desc",
+                        BigDecimal.valueOf(25.5),
+                        30,
+                        "CONS-SKU",
+                        ProductCategory.AUTOMOTIVE,
+                        true,
+                        now,
+                        now);
 
         assertThat(p2.getId()).isEqualTo(5L);
         assertThat(p2.getName()).isEqualTo("Constructed");

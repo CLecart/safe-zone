@@ -5,11 +5,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * Main application class for the User microservice.
- * <p>
- * This service handles user authentication, registration, profile management,
- * and role-based access control. It provides JWT-based authentication
- * for the entire e-commerce platform.
- * </p>
+ *
+ * <p>This service handles user authentication, registration, profile management, and role-based
+ * access control. It provides JWT-based authentication for the entire e-commerce platform.
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -20,9 +18,8 @@ public class UserServiceApplication {
 
     /**
      * Application entry point.
-     * <p>
-     * Bootstraps the Spring Boot application and starts the embedded server.
-     * </p>
+     *
+     * <p>Bootstraps the Spring Boot application and starts the embedded server.
      *
      * @param args command line arguments passed to the application
      */

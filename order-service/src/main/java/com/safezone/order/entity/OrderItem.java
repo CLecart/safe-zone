@@ -9,20 +9,19 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
-
 /**
- * Entity representing an individual item within an order.
- * Contains product reference, quantity, pricing, and subtotal calculation.
+ * Entity representing an individual item within an order. Contains product reference, quantity,
+ * pricing, and subtotal calculation.
  *
- * <p>Order items are managed through the parent {@link Order} entity
- * and automatically calculate their subtotal based on quantity and unit price.</p>
+ * <p>Order items are managed through the parent {@link Order} entity and automatically calculate
+ * their subtotal based on quantity and unit price.
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -73,8 +72,8 @@ public class OrderItem {
     private BigDecimal subtotal;
 
     /**
-     * Calculates and sets the subtotal based on quantity and unit price.
-     * Should be called whenever quantity or unit price changes.
+     * Calculates and sets the subtotal based on quantity and unit price. Should be called whenever
+     * quantity or unit price changes.
      */
     public void calculateSubtotal() {
         this.subtotal = this.unitPrice.multiply(BigDecimal.valueOf(this.quantity));

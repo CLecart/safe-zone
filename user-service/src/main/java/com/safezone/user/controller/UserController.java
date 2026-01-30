@@ -1,5 +1,15 @@
 package com.safezone.user.controller;
 
+import com.safezone.common.dto.ApiResponse;
+import com.safezone.common.dto.PageResponse;
+import com.safezone.user.dto.UpdateUserRequest;
+import com.safezone.user.dto.UserResponse;
+import com.safezone.user.entity.UserRole;
+import com.safezone.user.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,26 +27,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.safezone.common.dto.ApiResponse;
-import com.safezone.common.dto.PageResponse;
-import com.safezone.user.dto.UpdateUserRequest;
-import com.safezone.user.dto.UserResponse;
-import com.safezone.user.entity.UserRole;
-import com.safezone.user.service.UserService;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-
 /**
- * REST controller for user management operations.
- * Provides endpoints for user CRUD operations and role management.
+ * REST controller for user management operations. Provides endpoints for user CRUD operations and
+ * role management.
  *
- * <p>
- * Most endpoints require authentication. Admin role required for
- * user deletion and role management operations.
- * </p>
+ * <p>Most endpoints require authentication. Admin role required for user deletion and role
+ * management operations.
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -168,17 +164,15 @@ public class UserController {
     }
 
     private Pageable createPageable(int page, int size, String sortBy, String sortDir) {
-        Sort sort = sortDir.equalsIgnoreCase("desc")
-                ? Sort.by(sortBy).descending()
-                : Sort.by(sortBy).ascending();
+        Sort sort =
+                sortDir.equalsIgnoreCase("desc")
+                        ? Sort.by(sortBy).descending()
+                        : Sort.by(sortBy).ascending();
         return PageRequest.of(page, size, sort);
     }
 
     private <T> PageResponse<T> toPageResponse(Page<T> page) {
         return PageResponse.of(
-                page.getContent(),
-                page.getNumber(),
-                page.getSize(),
-                page.getTotalElements());
+                page.getContent(), page.getNumber(), page.getSize(), page.getTotalElements());
     }
 }

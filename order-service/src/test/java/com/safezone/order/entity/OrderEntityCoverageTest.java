@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -24,18 +23,19 @@ class OrderEntityCoverageTest {
     void orderBuilderCreatesValidInstance() {
         LocalDateTime now = LocalDateTime.now();
 
-        Order order = Order.builder()
-                .id(1L)
-                .orderNumber("ORD-001")
-                .userId(10L)
-                .status(OrderStatus.PENDING)
-                .totalAmount(BigDecimal.valueOf(299.99))
-                .shippingAddress("123 Test St")
-                .billingAddress("456 Bill Ave")
-                .items(new ArrayList<>())
-                .createdAt(now)
-                .updatedAt(now)
-                .build();
+        Order order =
+                Order.builder()
+                        .id(1L)
+                        .orderNumber("ORD-001")
+                        .userId(10L)
+                        .status(OrderStatus.PENDING)
+                        .totalAmount(BigDecimal.valueOf(299.99))
+                        .shippingAddress("123 Test St")
+                        .billingAddress("456 Bill Ave")
+                        .items(new ArrayList<>())
+                        .createdAt(now)
+                        .updatedAt(now)
+                        .build();
 
         assertThat(order.getId()).isEqualTo(1L);
         assertThat(order.getOrderNumber()).isEqualTo("ORD-001");
@@ -80,17 +80,18 @@ class OrderEntityCoverageTest {
     void orderAllArgsConstructorCreatesValidInstance() {
         LocalDateTime now = LocalDateTime.now();
 
-        Order order = new Order(
-                3L,
-                "ORD-003",
-                30L,
-                OrderStatus.PROCESSING,
-                BigDecimal.valueOf(199.99),
-                "111 Construct St",
-                "222 Build Ave",
-                new ArrayList<>(),
-                now,
-                now);
+        Order order =
+                new Order(
+                        3L,
+                        "ORD-003",
+                        30L,
+                        OrderStatus.PROCESSING,
+                        BigDecimal.valueOf(199.99),
+                        "111 Construct St",
+                        "222 Build Ave",
+                        new ArrayList<>(),
+                        now,
+                        now);
 
         assertThat(order.getId()).isEqualTo(3L);
         assertThat(order.getOrderNumber()).isEqualTo("ORD-003");
@@ -137,11 +138,12 @@ class OrderEntityCoverageTest {
     @DisplayName("addItem adds OrderItem to order")
     void addItemAddsOrderItemToOrder() {
         Order order = Order.builder().items(new ArrayList<>()).build();
-        OrderItem item = OrderItem.builder()
-                .productId(100L)
-                .quantity(2)
-                .unitPrice(BigDecimal.valueOf(50.00))
-                .build();
+        OrderItem item =
+                OrderItem.builder()
+                        .productId(100L)
+                        .quantity(2)
+                        .unitPrice(BigDecimal.valueOf(50.00))
+                        .build();
 
         order.addItem(item);
 
@@ -154,11 +156,12 @@ class OrderEntityCoverageTest {
     @DisplayName("removeItem removes OrderItem from order")
     void removeItemRemovesOrderItemFromOrder() {
         Order order = Order.builder().items(new ArrayList<>()).build();
-        OrderItem item = OrderItem.builder()
-                .productId(100L)
-                .quantity(2)
-                .unitPrice(BigDecimal.valueOf(50.00))
-                .build();
+        OrderItem item =
+                OrderItem.builder()
+                        .productId(100L)
+                        .quantity(2)
+                        .unitPrice(BigDecimal.valueOf(50.00))
+                        .build();
 
         order.addItem(item);
         assertThat(order.getItems()).hasSize(1);

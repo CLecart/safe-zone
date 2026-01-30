@@ -2,25 +2,23 @@ package com.safezone.user.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.safezone.user.dto.RegisterRequest;
+import com.safezone.user.dto.UserResponse;
+import com.safezone.user.entity.User;
+import com.safezone.user.entity.UserRole;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.safezone.user.dto.RegisterRequest;
-import com.safezone.user.dto.UserResponse;
-import com.safezone.user.entity.User;
-import com.safezone.user.entity.UserRole;
-
 /**
- * Coverage tests for {@link UserMapper} MapStruct generated code.
- * Focuses on null handling, empty lists, and multiple entity conversions.
+ * Coverage tests for {@link UserMapper} MapStruct generated code. Focuses on null handling, empty
+ * lists, and multiple entity conversions.
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -30,27 +28,27 @@ import com.safezone.user.entity.UserRole;
 @DisplayName("UserMapper Coverage Tests")
 class UserMapperCoverageTest {
 
-    @Autowired
-    private UserMapper userMapper;
+    @Autowired private UserMapper userMapper;
 
     private User testUser;
 
     @BeforeEach
     void setUp() {
-        testUser = User.builder()
-                .id(1L)
-                .username("testuser")
-                .email("test@example.com")
-                .firstName("John")
-                .lastName("Doe")
-                .phone("+1234567890")
-                .password("encoded_password")
-                .roles(new HashSet<>(List.of(UserRole.USER)))
-                .enabled(true)
-                .locked(false)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
+        testUser =
+                User.builder()
+                        .id(1L)
+                        .username("testuser")
+                        .email("test@example.com")
+                        .firstName("John")
+                        .lastName("Doe")
+                        .phone("+1234567890")
+                        .password("encoded_password")
+                        .roles(new HashSet<>(List.of(UserRole.USER)))
+                        .enabled(true)
+                        .locked(false)
+                        .createdAt(LocalDateTime.now())
+                        .updatedAt(LocalDateTime.now())
+                        .build();
     }
 
     @Test
@@ -77,10 +75,13 @@ class UserMapperCoverageTest {
     @Test
     @DisplayName("toResponse with multiple roles")
     void toResponseWithMultipleRoles() {
-        testUser.setRoles(new HashSet<>(List.of(UserRole.USER, UserRole.ADMIN, UserRole.INVENTORY)));
+        testUser.setRoles(
+                new HashSet<>(List.of(UserRole.USER, UserRole.ADMIN, UserRole.INVENTORY)));
         UserResponse response = userMapper.toResponse(testUser);
 
-        assertThat(response.roles()).hasSize(3).contains(UserRole.USER, UserRole.ADMIN, UserRole.INVENTORY);
+        assertThat(response.roles())
+                .hasSize(3)
+                .contains(UserRole.USER, UserRole.ADMIN, UserRole.INVENTORY);
     }
 
     @Test
@@ -88,20 +89,21 @@ class UserMapperCoverageTest {
     void toResponseListConvertsMultiple() {
         List<User> users = new ArrayList<>();
         users.add(testUser);
-        users.add(User.builder()
-                .id(2L)
-                .username("user2")
-                .email("user2@example.com")
-                .firstName("Jane")
-                .lastName("Smith")
-                .phone("+9876543210")
-                .password("password")
-                .roles(new HashSet<>())
-                .enabled(true)
-                .locked(false)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build());
+        users.add(
+                User.builder()
+                        .id(2L)
+                        .username("user2")
+                        .email("user2@example.com")
+                        .firstName("Jane")
+                        .lastName("Smith")
+                        .phone("+9876543210")
+                        .password("password")
+                        .roles(new HashSet<>())
+                        .enabled(true)
+                        .locked(false)
+                        .createdAt(LocalDateTime.now())
+                        .updatedAt(LocalDateTime.now())
+                        .build());
 
         List<UserResponse> responses = userMapper.toResponseList(users);
 
@@ -148,13 +150,14 @@ class UserMapperCoverageTest {
     @Test
     @DisplayName("toEntity maps RegisterRequest fields and ignores generated ones")
     void toEntityMapsRegisterRequest() {
-        RegisterRequest req = new RegisterRequest(
-                "newuser",
-                "new@example.com",
-                "Password123",
-                "Jane",
-                "Smith",
-                "+330123456789");
+        RegisterRequest req =
+                new RegisterRequest(
+                        "newuser",
+                        "new@example.com",
+                        "Password123",
+                        "Jane",
+                        "Smith",
+                        "+330123456789");
 
         User mapped = userMapper.toEntity(req);
 

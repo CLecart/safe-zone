@@ -1,15 +1,5 @@
 package com.safezone.product.service.impl;
 
-import java.util.List;
-import java.util.Objects;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.safezone.common.exception.BusinessException;
 import com.safezone.common.exception.ResourceNotFoundException;
 import com.safezone.product.dto.CreateProductRequest;
@@ -20,15 +10,21 @@ import com.safezone.product.entity.ProductCategory;
 import com.safezone.product.mapper.ProductMapper;
 import com.safezone.product.repository.ProductRepository;
 import com.safezone.product.service.ProductService;
+import java.util.List;
+import java.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Implementation of the {@link ProductService} interface.
- * Provides product management business logic with transactional support.
+ * Implementation of the {@link ProductService} interface. Provides product management business
+ * logic with transactional support.
  *
- * <p>
- * Handles product CRUD operations, stock management, and product search.
- * All write operations are transactional.
- * </p>
+ * <p>Handles product CRUD operations, stock management, and product search. All write operations
+ * are transactional.
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -48,7 +44,7 @@ public class ProductServiceImpl implements ProductService {
      * Constructs a ProductServiceImpl with required dependencies.
      *
      * @param productRepository repository for product persistence
-     * @param productMapper     mapper for DTO/entity conversion
+     * @param productMapper mapper for DTO/entity conversion
      */
     public ProductServiceImpl(ProductRepository productRepository, ProductMapper productMapper) {
         this.productRepository = productRepository;
@@ -60,7 +56,8 @@ public class ProductServiceImpl implements ProductService {
         logger.info("Creating new product with SKU: {}", request.sku());
 
         if (productRepository.existsBySku(request.sku())) {
-            throw new BusinessException("DUPLICATE_SKU", "Product with SKU " + request.sku() + " already exists");
+            throw new BusinessException(
+                    "DUPLICATE_SKU", "Product with SKU " + request.sku() + " already exists");
         }
 
         Product product = productMapper.toEntity(request);
@@ -83,8 +80,11 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(readOnly = true)
     public ProductResponse getProductBySku(String sku) {
         logger.debug("Fetching product by SKU: {}", sku);
-        Product product = productRepository.findBySku(sku)
-                .orElseThrow(() -> new ResourceNotFoundException(PRODUCT_RESOURCE, "sku", sku));
+        Product product =
+                productRepository
+                        .findBySku(sku)
+                        .orElseThrow(
+                                () -> new ResourceNotFoundException(PRODUCT_RESOURCE, "sku", sku));
         return productMapper.toResponse(product);
     }
 
@@ -92,7 +92,8 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(readOnly = true)
     public Page<ProductResponse> getAllProducts(Pageable pageable) {
         logger.debug("Fetching all products with pagination");
-        return productRepository.findAll(Objects.requireNonNull(pageable, "Pageable must not be null"))
+        return productRepository
+                .findAll(Objects.requireNonNull(pageable, "Pageable must not be null"))
                 .map(productMapper::toResponse);
     }
 
@@ -100,15 +101,16 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(readOnly = true)
     public Page<ProductResponse> getActiveProducts(Pageable pageable) {
         logger.debug("Fetching active products with pagination");
-        return productRepository.findByActiveTrue(pageable)
-                .map(productMapper::toResponse);
+        return productRepository.findByActiveTrue(pageable).map(productMapper::toResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ProductResponse> getProductsByCategory(ProductCategory category, Pageable pageable) {
+    public Page<ProductResponse> getProductsByCategory(
+            ProductCategory category, Pageable pageable) {
         logger.debug("Fetching products by category: {}", category);
-        return productRepository.findByCategoryAndActiveTrue(category, pageable)
+        return productRepository
+                .findByCategoryAndActiveTrue(category, pageable)
                 .map(productMapper::toResponse);
     }
 
@@ -116,8 +118,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(readOnly = true)
     public Page<ProductResponse> searchProducts(String search, Pageable pageable) {
         logger.debug("Searching products with term: {}", search);
-        return productRepository.searchProducts(search, pageable)
-                .map(productMapper::toResponse);
+        return productRepository.searchProducts(search, pageable).map(productMapper::toResponse);
     }
 
     @Override
@@ -127,7 +128,8 @@ public class ProductServiceImpl implements ProductService {
         Product product = findProductById(id);
 
         updateProductFields(product, request);
-        Product updatedProduct = productRepository.save(Objects.requireNonNull(product, "Product must not be null"));
+        Product updatedProduct =
+                productRepository.save(Objects.requireNonNull(product, "Product must not be null"));
 
         logger.info("Product updated successfully with ID: {}", id);
         return productMapper.toResponse(updatedProduct);
@@ -152,8 +154,11 @@ public class ProductServiceImpl implements ProductService {
 
         int newStock = product.getStockQuantity() + quantity;
         if (newStock < 0) {
-            throw new BusinessException("INSUFFICIENT_STOCK",
-                    "Insufficient stock. Available: " + product.getStockQuantity() + ", Requested: "
+            throw new BusinessException(
+                    "INSUFFICIENT_STOCK",
+                    "Insufficient stock. Available: "
+                            + product.getStockQuantity()
+                            + ", Requested: "
                             + Math.abs(quantity));
         }
 
@@ -168,7 +173,8 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(readOnly = true)
     public List<ProductResponse> getLowStockProducts(Integer threshold) {
         logger.debug("Fetching low stock products with threshold: {}", threshold);
-        return productMapper.toResponseList(productRepository.findLowStockActiveProducts(threshold));
+        return productMapper.toResponseList(
+                productRepository.findLowStockActiveProducts(threshold));
     }
 
     @Override
@@ -187,13 +193,14 @@ public class ProductServiceImpl implements ProductService {
      * @throws ResourceNotFoundException if product not found
      */
     private Product findProductById(Long id) {
-        return productRepository.findById(Objects.requireNonNull(id, "Product ID must not be null"))
+        return productRepository
+                .findById(Objects.requireNonNull(id, "Product ID must not be null"))
                 .orElseThrow(() -> new ResourceNotFoundException(PRODUCT_RESOURCE, "id", id));
     }
 
     /**
-     * Updates product fields from the update request.
-     * Only non-null fields in the request are applied.
+     * Updates product fields from the update request. Only non-null fields in the request are
+     * applied.
      *
      * @param product the product entity to update
      * @param request the update request containing new values

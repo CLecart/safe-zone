@@ -1,38 +1,38 @@
 package com.safezone.order;
 
+import com.safezone.order.config.ApplicationProperties;
+import com.safezone.order.config.JwtProperties;
+import com.safezone.order.config.ServiceProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
-import com.safezone.order.config.ApplicationProperties;
-import com.safezone.order.config.JwtProperties;
-import com.safezone.order.config.ServiceProperties;
-
 /**
  * Main application class for the Order microservice.
- * <p>
- * This service handles all order-related operations including order creation,
- * status management, and order history retrieval. It communicates with the
- * Product Service to validate product availability and update stock levels.
- * </p>
- * <p>
- * The service scans both order and common packages for components.
- * </p>
+ *
+ * <p>This service handles all order-related operations including order creation, status management,
+ * and order history retrieval. It communicates with the Product Service to validate product
+ * availability and update stock levels.
+ *
+ * <p>The service scans both order and common packages for components.
  *
  * @author SafeZone Team
  * @version 1.0.0
  * @since 2024-01-06
  */
-@SpringBootApplication(scanBasePackages = { "com.safezone.order", "com.safezone.common" })
-@ConfigurationPropertiesScan(basePackageClasses = { ServiceProperties.class, JwtProperties.class,
-        ApplicationProperties.class })
+@SpringBootApplication(scanBasePackages = {"com.safezone.order", "com.safezone.common"})
+@ConfigurationPropertiesScan(
+        basePackageClasses = {
+            ServiceProperties.class,
+            JwtProperties.class,
+            ApplicationProperties.class
+        })
 public class OrderServiceApplication {
 
     /**
      * Application entry point.
-     * <p>
-     * Bootstraps the Spring Boot application and starts the embedded server.
-     * </p>
+     *
+     * <p>Bootstraps the Spring Boot application and starts the embedded server.
      *
      * @param args command line arguments passed to the application
      */

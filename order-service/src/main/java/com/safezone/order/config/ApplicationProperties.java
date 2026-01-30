@@ -4,8 +4,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 /**
- * Configuration properties for application settings.
- * Maps properties under "application" prefix from application.yml.
+ * Configuration properties for application settings. Maps properties under "application" prefix
+ * from application.yml.
  *
  * @author SafeZone Team
  * @version 1.0.0

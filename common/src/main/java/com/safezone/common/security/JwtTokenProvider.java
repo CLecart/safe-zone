@@ -1,17 +1,5 @@
 package com.safezone.common.security;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-
-import javax.crypto.SecretKey;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -19,15 +7,22 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import javax.crypto.SecretKey;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 /**
- * JWT token provider for authentication and authorization.
- * Handles token generation, validation, and claim extraction.
+ * JWT token provider for authentication and authorization. Handles token generation, validation,
+ * and claim extraction.
  *
- * <p>
- * This component uses HMAC-SHA algorithm for signing tokens
- * and supports configurable expiration times.
- * </p>
+ * <p>This component uses HMAC-SHA algorithm for signing tokens and supports configurable expiration
+ * times.
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -44,7 +39,7 @@ public class JwtTokenProvider {
     /**
      * Constructs a new JwtTokenProvider with the specified configuration.
      *
-     * @param secret       the secret key for signing tokens (minimum 256 bits)
+     * @param secret the secret key for signing tokens (minimum 256 bits)
      * @param expirationMs token expiration time in milliseconds
      */
     public JwtTokenProvider(
@@ -56,8 +51,9 @@ public class JwtTokenProvider {
             // local runs to proceed without embedding a secret in the repo. In
             // CI/production
             // a real secret should be provided via environment or configuration.
-            logger.warn("'jwt.secret' not provided; generating a secure random key for runtime. "
-                    + "Provide a proper 'jwt.secret' in production environments.");
+            logger.warn(
+                    "'jwt.secret' not provided; generating a secure random key for runtime. "
+                            + "Provide a proper 'jwt.secret' in production environments.");
             byte[] generated = new byte[32];
             new java.security.SecureRandom().nextBytes(generated);
             tmpSecretKey = Keys.hmacShaKeyFor(generated);
@@ -93,7 +89,7 @@ public class JwtTokenProvider {
      * Generates a JWT token for the specified user.
      *
      * @param username the username to include as the subject
-     * @param roles    the list of roles to include in the token claims
+     * @param roles the list of roles to include in the token claims
      * @return the generated JWT token string
      */
     public String generateToken(String username, List<String> roles) {
@@ -127,16 +123,17 @@ public class JwtTokenProvider {
      */
     public List<String> extractRoles(String token) {
         return extractClaims(token)
-                .map(claims -> {
-                    Object rolesObj = claims.get("roles");
-                    if (rolesObj instanceof List<?> rawList) {
-                        return rawList.stream()
-                                .filter(String.class::isInstance)
-                                .map(String.class::cast)
-                                .toList();
-                    }
-                    return List.<String>of();
-                })
+                .map(
+                        claims -> {
+                            Object rolesObj = claims.get("roles");
+                            if (rolesObj instanceof List<?> rawList) {
+                                return rawList.stream()
+                                        .filter(String.class::isInstance)
+                                        .map(String.class::cast)
+                                        .toList();
+                            }
+                            return List.<String>of();
+                        })
                 .orElse(List.of());
     }
 
@@ -158,11 +155,12 @@ public class JwtTokenProvider {
      */
     private Optional<Claims> extractClaims(String token) {
         try {
-            Claims claims = Jwts.parser()
-                    .verifyWith(secretKey)
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
+            Claims claims =
+                    Jwts.parser()
+                            .verifyWith(secretKey)
+                            .build()
+                            .parseSignedClaims(token)
+                            .getPayload();
             return Optional.of(claims);
         } catch (SignatureException ex) {
             logger.error("Invalid JWT signature");

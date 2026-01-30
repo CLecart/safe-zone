@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -40,8 +39,7 @@ class PageResponseTest {
     @Test
     @DisplayName("Should identify first page correctly")
     void shouldIdentifyFirstPage() {
-        PageResponse<Integer> response = PageResponse.of(
-                Collections.singletonList(1), 0, 10, 100);
+        PageResponse<Integer> response = PageResponse.of(Collections.singletonList(1), 0, 10, 100);
 
         assertThat(response.first()).isTrue();
         assertThat(response.last()).isFalse();
@@ -50,8 +48,7 @@ class PageResponseTest {
     @Test
     @DisplayName("Should identify last page correctly")
     void shouldIdentifyLastPage() {
-        PageResponse<Integer> response = PageResponse.of(
-                Collections.singletonList(1), 9, 10, 100);
+        PageResponse<Integer> response = PageResponse.of(Collections.singletonList(1), 9, 10, 100);
 
         assertThat(response.first()).isFalse();
         assertThat(response.last()).isTrue();

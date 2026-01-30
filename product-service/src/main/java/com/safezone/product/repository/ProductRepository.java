@@ -2,6 +2,8 @@ package com.safezone.product.repository;
 
 import com.safezone.product.entity.Product;
 import com.safezone.product.entity.ProductCategory;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,12 +11,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
-
 /**
- * Spring Data JPA repository for Product entities.
- * Provides CRUD operations and custom queries for product management.
+ * Spring Data JPA repository for Product entities. Provides CRUD operations and custom queries for
+ * product management.
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -68,12 +67,13 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     /**
      * Searches products by name or description.
      *
-     * @param search   the search term
+     * @param search the search term
      * @param pageable pagination parameters
      * @return page of matching products
      */
-    @Query("SELECT p FROM Product p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%')) " +
-            "OR LOWER(p.description) LIKE LOWER(CONCAT('%', :search, '%'))")
+    @Query(
+            "SELECT p FROM Product p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%')) "
+                    + "OR LOWER(p.description) LIKE LOWER(CONCAT('%', :search, '%'))")
     Page<Product> searchProducts(@Param("search") String search, Pageable pageable);
 
     /**

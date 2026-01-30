@@ -7,26 +7,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
 import com.safezone.common.exception.BusinessException;
 import com.safezone.common.exception.ResourceNotFoundException;
 import com.safezone.common.security.JwtTokenProvider;
@@ -40,41 +20,53 @@ import com.safezone.user.entity.UserRole;
 import com.safezone.user.mapper.UserMapper;
 import com.safezone.user.repository.UserRepository;
 import com.safezone.user.service.impl.UserServiceImpl;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
- * Comprehensive unit tests for {@link UserServiceImpl} with 100% code and
- * branch coverage.
- * 
- * <p>
- * <strong>Test Organization:</strong>
- * This test class uses nested test classes to organize tests by functional
- * area:
+ * Comprehensive unit tests for {@link UserServiceImpl} with 100% code and branch coverage.
+ *
+ * <p><strong>Test Organization:</strong> This test class uses nested test classes to organize tests
+ * by functional area:
+ *
  * <ul>
- * <li>{@link RegistrationTests} - User account creation and validation</li>
- * <li>{@link LoginTests} - Authentication and access control</li>
- * <li>{@link GetUserTests} - User retrieval by ID, username, and search</li>
- * <li>{@link UpdateUserTests} - Profile updates and email/phone changes</li>
- * <li>{@link RoleManagementTests} - Role assignment and removal</li>
- * <li>{@link StatusManagementTests} - User enable/disable operations</li>
+ *   <li>{@link RegistrationTests} - User account creation and validation
+ *   <li>{@link LoginTests} - Authentication and access control
+ *   <li>{@link GetUserTests} - User retrieval by ID, username, and search
+ *   <li>{@link UpdateUserTests} - Profile updates and email/phone changes
+ *   <li>{@link RoleManagementTests} - Role assignment and removal
+ *   <li>{@link StatusManagementTests} - User enable/disable operations
  * </ul>
- * 
- * <p>
- * <strong>Coverage Strategy:</strong>
+ *
+ * <p><strong>Coverage Strategy:</strong>
+ *
  * <ul>
- * <li>Happy path testing: All successful operations with valid inputs</li>
- * <li>Error path testing: All validation failures and exception scenarios</li>
- * <li>Edge cases: Boundary conditions, empty data, state transitions</li>
- * <li>Branch coverage: All conditional logic branches tested (100% branch
- * coverage)</li>
+ *   <li>Happy path testing: All successful operations with valid inputs
+ *   <li>Error path testing: All validation failures and exception scenarios
+ *   <li>Edge cases: Boundary conditions, empty data, state transitions
+ *   <li>Branch coverage: All conditional logic branches tested (100% branch coverage)
  * </ul>
- * 
- * <p>
- * <strong>Testing Approach:</strong>
- * Uses Mockito for dependency injection and BDD-style given/when/then assertion
- * patterns.
- * All external dependencies (Repository, Mapper, PasswordEncoder,
- * JwtTokenProvider) are mocked.
- * 
+ *
+ * <p><strong>Testing Approach:</strong> Uses Mockito for dependency injection and BDD-style
+ * given/when/then assertion patterns. All external dependencies (Repository, Mapper,
+ * PasswordEncoder, JwtTokenProvider) are mocked.
+ *
  * @author SafeZone Team
  * @version 2.0.0 - Fully Documented Edition
  * @since 2024-01-06
@@ -85,130 +77,110 @@ class UserServiceDocumentedTest {
     // ==================== MOCK DEPENDENCIES ====================
 
     /** Mock for user database repository - handles all persistence operations. */
-    @Mock
-    private UserRepository userRepository;
+    @Mock private UserRepository userRepository;
 
-    /**
-     * Mock for user entity-to-DTO mapper - converts between domain and transfer
-     * objects.
-     */
-    @Mock
-    private UserMapper userMapper;
+    /** Mock for user entity-to-DTO mapper - converts between domain and transfer objects. */
+    @Mock private UserMapper userMapper;
 
-    /**
-     * Mock for password encoding/hashing - secures passwords using BCrypt or
-     * similar.
-     */
-    @Mock
-    private PasswordEncoder passwordEncoder;
+    /** Mock for password encoding/hashing - secures passwords using BCrypt or similar. */
+    @Mock private PasswordEncoder passwordEncoder;
 
     /** Mock for JWT token generation - creates secure authentication tokens. */
-    @Mock
-    private JwtTokenProvider jwtTokenProvider;
+    @Mock private JwtTokenProvider jwtTokenProvider;
 
     // ==================== SERVICE UNDER TEST ====================
 
-    /**
-     * The UserServiceImpl instance being tested with all mocked dependencies
-     * injected.
-     */
+    /** The UserServiceImpl instance being tested with all mocked dependencies injected. */
     private UserServiceImpl userService;
 
     // ==================== TEST FIXTURES ====================
 
     /**
-     * Standard test user with ID=1, enabled, not locked.
-     * Used as baseline test data for most test cases.
+     * Standard test user with ID=1, enabled, not locked. Used as baseline test data for most test
+     * cases.
      */
     private User testUser;
 
-    /**
-     * Corresponding DTO for testUser.
-     * Used to verify mapping from entity to response objects.
-     */
+    /** Corresponding DTO for testUser. Used to verify mapping from entity to response objects. */
     private UserResponse testUserResponse;
 
     // ==================== SETUP & TEARDOWN ====================
 
     /**
      * Initializes test fixtures and mock dependencies before each test method.
-     * 
-     * <p>
-     * <strong>Setup Operations:</strong>
+     *
+     * <p><strong>Setup Operations:</strong>
+     *
      * <ul>
-     * <li>Creates fresh UserServiceImpl with 24-hour token expiry (86400000L
-     * milliseconds)</li>
-     * <li>Initializes testUser entity with standard attributes</li>
-     * <li>Initializes testUserResponse DTO matching the entity</li>
-     * <li>Sets up USER role for role-based testing</li>
+     *   <li>Creates fresh UserServiceImpl with 24-hour token expiry (86400000L milliseconds)
+     *   <li>Initializes testUser entity with standard attributes
+     *   <li>Initializes testUserResponse DTO matching the entity
+     *   <li>Sets up USER role for role-based testing
      * </ul>
-     * 
-     * <p>
-     * <strong>Default User State:</strong>
-     * ID=1, username="testuser", email="test@example.com",
+     *
+     * <p><strong>Default User State:</strong> ID=1, username="testuser", email="test@example.com",
      * enabled=true, locked=false, roles={USER}
-     * 
+     *
      * @since 2024-01-06
      */
     @BeforeEach
     void setUp() {
         // Create UserService with 24-hour token expiry (86400000 ms = 24 * 60 * 60 *
         // 1000)
-        userService = new UserServiceImpl(
-                userRepository,
-                userMapper,
-                passwordEncoder,
-                jwtTokenProvider,
-                86400000L);
+        userService =
+                new UserServiceImpl(
+                        userRepository, userMapper, passwordEncoder, jwtTokenProvider, 86400000L);
 
         // Initialize test user roles
         Set<UserRole> roles = new HashSet<>();
         roles.add(UserRole.USER);
 
         // Build test user entity with standard attributes
-        testUser = User.builder()
-                .id(1L)
-                .username("testuser")
-                .email("test@example.com")
-                .password("encodedPassword")
-                .firstName("Test")
-                .lastName("User")
-                .roles(roles)
-                .enabled(true)
-                .locked(false)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
+        testUser =
+                User.builder()
+                        .id(1L)
+                        .username("testuser")
+                        .email("test@example.com")
+                        .password("encodedPassword")
+                        .firstName("Test")
+                        .lastName("User")
+                        .roles(roles)
+                        .enabled(true)
+                        .locked(false)
+                        .createdAt(LocalDateTime.now())
+                        .updatedAt(LocalDateTime.now())
+                        .build();
 
         // Build corresponding response DTO
-        testUserResponse = new UserResponse(
-                1L,
-                "testuser",
-                "test@example.com",
-                "Test",
-                "User",
-                null, // phone
-                "Test User",
-                Set.of(UserRole.USER),
-                true, // enabled
-                LocalDateTime.now(),
-                null // deleted_at
-        );
+        testUserResponse =
+                new UserResponse(
+                        1L,
+                        "testuser",
+                        "test@example.com",
+                        "Test",
+                        "User",
+                        null, // phone
+                        "Test User",
+                        Set.of(UserRole.USER),
+                        true, // enabled
+                        LocalDateTime.now(),
+                        null // deleted_at
+                        );
     }
 
     // ==================== REGISTRATION TESTS ====================
 
     /**
-     * Nested test class for user registration scenarios.
-     * Tests cover successful registration and validation failure scenarios.
-     * 
-     * <p>
-     * Validation Rules Tested:
+     * Nested test class for user registration scenarios. Tests cover successful registration and
+     * validation failure scenarios.
+     *
+     * <p>Validation Rules Tested:
+     *
      * <ul>
-     * <li>Username must be unique</li>
-     * <li>Email must be unique</li>
-     * <li>Password must be encoded before storage</li>
-     * <li>User roles must be initialized</li>
+     *   <li>Username must be unique
+     *   <li>Email must be unique
+     *   <li>Password must be encoded before storage
+     *   <li>User roles must be initialized
      * </ul>
      */
     @Nested
@@ -217,51 +189,42 @@ class UserServiceDocumentedTest {
 
         /**
          * Tests successful user registration with valid, unique credentials.
-         * 
-         * <p>
-         * <strong>Scenario:</strong> New user provides unique username and email
-         * with valid password.
-         * 
-         * <p>
-         * <strong>Given:</strong>
+         *
+         * <p><strong>Scenario:</strong> New user provides unique username and email with valid
+         * password.
+         *
+         * <p><strong>Given:</strong>
+         *
          * <ul>
-         * <li>Username "newuser" does not exist in database</li>
-         * <li>Email "new@example.com" does not exist in database</li>
-         * <li>Password "Password123" encodes to "encodedPassword"</li>
-         * <li>User entity saves successfully to database</li>
-         * <li>JWT token is generated as "jwt-token"</li>
+         *   <li>Username "newuser" does not exist in database
+         *   <li>Email "new@example.com" does not exist in database
+         *   <li>Password "Password123" encodes to "encodedPassword"
+         *   <li>User entity saves successfully to database
+         *   <li>JWT token is generated as "jwt-token"
          * </ul>
-         * 
-         * <p>
-         * <strong>When:</strong> register() method is called with valid
-         * RegisterRequest.
-         * 
-         * <p>
-         * <strong>Then:</strong> Method returns AuthResponse with:
+         *
+         * <p><strong>When:</strong> register() method is called with valid RegisterRequest.
+         *
+         * <p><strong>Then:</strong> Method returns AuthResponse with:
+         *
          * <ul>
-         * <li>Valid JWT token</li>
-         * <li>24-hour expiry (86400L seconds)</li>
+         *   <li>Valid JWT token
+         *   <li>24-hour expiry (86400L seconds)
          * </ul>
-         * 
-         * <p>
-         * <strong>Coverage:</strong>
-         * Tests the complete happy path of user registration including username
-         * availability check, email availability check, password encoding, user
+         *
+         * <p><strong>Coverage:</strong> Tests the complete happy path of user registration
+         * including username availability check, email availability check, password encoding, user
          * persistence, JWT token generation, and response mapping.
-         * 
+         *
          * @see UserServiceImpl#register(RegisterRequest)
          */
         @Test
         @DisplayName("Should register user successfully")
         void shouldRegisterUserSuccessfully() {
             // Arrange: Prepare registration request with unique credentials
-            RegisterRequest request = new RegisterRequest(
-                    "newuser",
-                    "new@example.com",
-                    "Password123",
-                    "New",
-                    "User",
-                    null);
+            RegisterRequest request =
+                    new RegisterRequest(
+                            "newuser", "new@example.com", "Password123", "New", "User", null);
 
             // Mock: Set up repository to indicate username and email are available
             given(userRepository.existsByUsername("newuser")).willReturn(false);
@@ -296,32 +259,25 @@ class UserServiceDocumentedTest {
 
         /**
          * Tests registration failure when username is already taken.
-         * 
-         * <p>
-         * <strong>Scenario:</strong> User attempts to register with username
-         * that already exists in the system.
-         * 
-         * <p>
-         * <strong>Given:</strong>
+         *
+         * <p><strong>Scenario:</strong> User attempts to register with username that already exists
+         * in the system.
+         *
+         * <p><strong>Given:</strong>
+         *
          * <ul>
-         * <li>Username "existinguser" already exists in database</li>
+         *   <li>Username "existinguser" already exists in database
          * </ul>
-         * 
-         * <p>
-         * <strong>When:</strong> register() method is called with duplicate username.
-         * 
-         * <p>
-         * <strong>Then:</strong> Method throws BusinessException with message
-         * "Username is already taken".
-         * 
-         * <p>
-         * <strong>Coverage:</strong>
-         * Tests the first validation check in registration (username uniqueness).
-         * This prevents account hijacking and ensures usernames uniquely identify
-         * users.
-         * Registration process stops immediately upon username conflict (no email
-         * check).
-         * 
+         *
+         * <p><strong>When:</strong> register() method is called with duplicate username.
+         *
+         * <p><strong>Then:</strong> Method throws BusinessException with message "Username is
+         * already taken".
+         *
+         * <p><strong>Coverage:</strong> Tests the first validation check in registration (username
+         * uniqueness). This prevents account hijacking and ensures usernames uniquely identify
+         * users. Registration process stops immediately upon username conflict (no email check).
+         *
          * @see UserServiceImpl#register(RegisterRequest)
          * @throws BusinessException when username already exists
          */
@@ -329,13 +285,9 @@ class UserServiceDocumentedTest {
         @DisplayName("Should throw exception for duplicate username")
         void shouldThrowExceptionForDuplicateUsername() {
             // Arrange: Prepare registration request with duplicate username
-            RegisterRequest request = new RegisterRequest(
-                    "existinguser",
-                    "new@example.com",
-                    "Password123",
-                    null,
-                    null,
-                    null);
+            RegisterRequest request =
+                    new RegisterRequest(
+                            "existinguser", "new@example.com", "Password123", null, null, null);
 
             // Mock: Repository indicates username already exists
             given(userRepository.existsByUsername("existinguser")).willReturn(true);
@@ -348,33 +300,27 @@ class UserServiceDocumentedTest {
 
         /**
          * Tests registration failure when email is already in use.
-         * 
-         * <p>
-         * <strong>Scenario:</strong> User attempts to register with email address
-         * that is already associated with another account.
-         * 
-         * <p>
-         * <strong>Given:</strong>
+         *
+         * <p><strong>Scenario:</strong> User attempts to register with email address that is
+         * already associated with another account.
+         *
+         * <p><strong>Given:</strong>
+         *
          * <ul>
-         * <li>Username "newuser" does not exist (passed first validation)</li>
-         * <li>Email "existing@example.com" already exists in database</li>
+         *   <li>Username "newuser" does not exist (passed first validation)
+         *   <li>Email "existing@example.com" already exists in database
          * </ul>
-         * 
-         * <p>
-         * <strong>When:</strong> register() method is called with duplicate email.
-         * 
-         * <p>
-         * <strong>Then:</strong> Method throws BusinessException with message
-         * "Email is already in use".
-         * 
-         * <p>
-         * <strong>Coverage:</strong>
-         * Tests the second validation check in registration (email uniqueness).
-         * Email must be unique because it serves as recovery channel and communication
-         * endpoint.
-         * Tests sequential validation - email check only happens after username check
+         *
+         * <p><strong>When:</strong> register() method is called with duplicate email.
+         *
+         * <p><strong>Then:</strong> Method throws BusinessException with message "Email is already
+         * in use".
+         *
+         * <p><strong>Coverage:</strong> Tests the second validation check in registration (email
+         * uniqueness). Email must be unique because it serves as recovery channel and communication
+         * endpoint. Tests sequential validation - email check only happens after username check
          * passes.
-         * 
+         *
          * @see UserServiceImpl#register(RegisterRequest)
          * @throws BusinessException when email already exists
          */
@@ -382,13 +328,9 @@ class UserServiceDocumentedTest {
         @DisplayName("Should throw exception for duplicate email")
         void shouldThrowExceptionForDuplicateEmail() {
             // Arrange: Prepare registration request with duplicate email
-            RegisterRequest request = new RegisterRequest(
-                    "newuser",
-                    "existing@example.com",
-                    "Password123",
-                    null,
-                    null,
-                    null);
+            RegisterRequest request =
+                    new RegisterRequest(
+                            "newuser", "existing@example.com", "Password123", null, null, null);
 
             // Mock: Username doesn't exist (passes first check)
             given(userRepository.existsByUsername("newuser")).willReturn(false);
@@ -406,16 +348,16 @@ class UserServiceDocumentedTest {
     // ==================== LOGIN TESTS ====================
 
     /**
-     * Nested test class for authentication/login scenarios.
-     * Tests cover successful authentication and various failure scenarios.
-     * 
-     * <p>
-     * Authentication Validation Rules Tested:
+     * Nested test class for authentication/login scenarios. Tests cover successful authentication
+     * and various failure scenarios.
+     *
+     * <p>Authentication Validation Rules Tested:
+     *
      * <ul>
-     * <li>User must exist in database</li>
-     * <li>Password must match encoded password</li>
-     * <li>User account must be enabled</li>
-     * <li>User account must not be locked</li>
+     *   <li>User must exist in database
+     *   <li>Password must match encoded password
+     *   <li>User account must be enabled
+     *   <li>User account must not be locked
      * </ul>
      */
     @Nested
@@ -424,36 +366,32 @@ class UserServiceDocumentedTest {
 
         /**
          * Tests successful user authentication with valid credentials.
-         * 
-         * <p>
-         * <strong>Scenario:</strong> User provides correct username and password.
-         * 
-         * <p>
-         * <strong>Given:</strong>
+         *
+         * <p><strong>Scenario:</strong> User provides correct username and password.
+         *
+         * <p><strong>Given:</strong>
+         *
          * <ul>
-         * <li>User "testuser" exists in database</li>
-         * <li>Password "password123" matches encoded password on file</li>
-         * <li>User account is enabled</li>
-         * <li>User account is not locked</li>
-         * <li>JWT token is generated successfully</li>
+         *   <li>User "testuser" exists in database
+         *   <li>Password "password123" matches encoded password on file
+         *   <li>User account is enabled
+         *   <li>User account is not locked
+         *   <li>JWT token is generated successfully
          * </ul>
-         * 
-         * <p>
-         * <strong>When:</strong> login() method is called with correct credentials.
-         * 
-         * <p>
-         * <strong>Then:</strong> Method returns AuthResponse with:
+         *
+         * <p><strong>When:</strong> login() method is called with correct credentials.
+         *
+         * <p><strong>Then:</strong> Method returns AuthResponse with:
+         *
          * <ul>
-         * <li>Valid JWT token</li>
-         * <li>24-hour expiry (86400L seconds)</li>
+         *   <li>Valid JWT token
+         *   <li>24-hour expiry (86400L seconds)
          * </ul>
-         * 
-         * <p>
-         * <strong>Coverage:</strong>
-         * Tests complete successful authentication flow including username lookup,
-         * password verification, account state checks, JWT token generation,
-         * and response mapping.
-         * 
+         *
+         * <p><strong>Coverage:</strong> Tests complete successful authentication flow including
+         * username lookup, password verification, account state checks, JWT token generation, and
+         * response mapping.
+         *
          * @see UserServiceImpl#login(LoginRequest)
          */
         @Test
@@ -488,30 +426,25 @@ class UserServiceDocumentedTest {
 
         /**
          * Tests login failure when password is incorrect.
-         * 
-         * <p>
-         * <strong>Scenario:</strong> User provides correct username but wrong password.
-         * 
-         * <p>
-         * <strong>Given:</strong>
+         *
+         * <p><strong>Scenario:</strong> User provides correct username but wrong password.
+         *
+         * <p><strong>Given:</strong>
+         *
          * <ul>
-         * <li>User "testuser" exists in database</li>
-         * <li>Password "wrongpassword" does NOT match encoded password on file</li>
+         *   <li>User "testuser" exists in database
+         *   <li>Password "wrongpassword" does NOT match encoded password on file
          * </ul>
-         * 
-         * <p>
-         * <strong>When:</strong> login() method is called with incorrect password.
-         * 
-         * <p>
-         * <strong>Then:</strong> Method throws BusinessException with message
-         * "Invalid username or password".
-         * 
-         * <p>
-         * <strong>Coverage:</strong>
-         * Tests password verification validation. Error message is intentionally
-         * generic
-         * ("Invalid username or password") to prevent username enumeration attacks.
-         * 
+         *
+         * <p><strong>When:</strong> login() method is called with incorrect password.
+         *
+         * <p><strong>Then:</strong> Method throws BusinessException with message "Invalid username
+         * or password".
+         *
+         * <p><strong>Coverage:</strong> Tests password verification validation. Error message is
+         * intentionally generic ("Invalid username or password") to prevent username enumeration
+         * attacks.
+         *
          * @see UserServiceImpl#login(LoginRequest)
          * @throws BusinessException when password is incorrect
          */
@@ -535,30 +468,24 @@ class UserServiceDocumentedTest {
 
         /**
          * Tests login failure when username does not exist.
-         * 
-         * <p>
-         * <strong>Scenario:</strong> User attempts to login with non-existent username.
-         * 
-         * <p>
-         * <strong>Given:</strong>
+         *
+         * <p><strong>Scenario:</strong> User attempts to login with non-existent username.
+         *
+         * <p><strong>Given:</strong>
+         *
          * <ul>
-         * <li>Username "nonexistent" does not exist in database</li>
+         *   <li>Username "nonexistent" does not exist in database
          * </ul>
-         * 
-         * <p>
-         * <strong>When:</strong> login() method is called with non-existent username.
-         * 
-         * <p>
-         * <strong>Then:</strong> Method throws BusinessException with message
-         * "Invalid username or password".
-         * 
-         * <p>
-         * <strong>Coverage:</strong>
-         * Tests the user existence check (repository findByUsername returns
-         * Optional.empty).
-         * Error message matches password failure to prevent username enumeration.
-         * Tests the lambda expression in the login method's exception handling.
-         * 
+         *
+         * <p><strong>When:</strong> login() method is called with non-existent username.
+         *
+         * <p><strong>Then:</strong> Method throws BusinessException with message "Invalid username
+         * or password".
+         *
+         * <p><strong>Coverage:</strong> Tests the user existence check (repository findByUsername
+         * returns Optional.empty). Error message matches password failure to prevent username
+         * enumeration. Tests the lambda expression in the login method's exception handling.
+         *
          * @see UserServiceImpl#login(LoginRequest)
          * @throws BusinessException when username does not exist
          */
@@ -579,31 +506,27 @@ class UserServiceDocumentedTest {
 
         /**
          * Tests login failure when user account is disabled.
-         * 
-         * <p>
-         * <strong>Scenario:</strong> User provides correct credentials but account
-         * has been disabled by administrator.
-         * 
-         * <p>
-         * <strong>Given:</strong>
+         *
+         * <p><strong>Scenario:</strong> User provides correct credentials but account has been
+         * disabled by administrator.
+         *
+         * <p><strong>Given:</strong>
+         *
          * <ul>
-         * <li>User "testuser" exists and password is correct</li>
-         * <li>User account enabled flag is set to FALSE</li>
+         *   <li>User "testuser" exists and password is correct
+         *   <li>User account enabled flag is set to FALSE
          * </ul>
-         * 
-         * <p>
-         * <strong>When:</strong> login() method is called with valid credentials
-         * for disabled account.
-         * 
-         * <p>
-         * <strong>Then:</strong> Method throws BusinessException with message
-         * "Account is disabled".
-         * 
-         * <p>
-         * <strong>Coverage:</strong>
-         * Tests account enabled state validation. Disabled accounts cannot authenticate
-         * even with valid credentials. This allows administrators to revoke access.
-         * 
+         *
+         * <p><strong>When:</strong> login() method is called with valid credentials for disabled
+         * account.
+         *
+         * <p><strong>Then:</strong> Method throws BusinessException with message "Account is
+         * disabled".
+         *
+         * <p><strong>Coverage:</strong> Tests account enabled state validation. Disabled accounts
+         * cannot authenticate even with valid credentials. This allows administrators to revoke
+         * access.
+         *
          * @see UserServiceImpl#login(LoginRequest)
          * @throws BusinessException when account is disabled
          */
@@ -626,32 +549,27 @@ class UserServiceDocumentedTest {
 
         /**
          * Tests login failure when user account is locked.
-         * 
-         * <p>
-         * <strong>Scenario:</strong> User provides correct credentials but account
-         * has been locked (possibly due to security incident).
-         * 
-         * <p>
-         * <strong>Given:</strong>
+         *
+         * <p><strong>Scenario:</strong> User provides correct credentials but account has been
+         * locked (possibly due to security incident).
+         *
+         * <p><strong>Given:</strong>
+         *
          * <ul>
-         * <li>User "testuser" exists and password is correct</li>
-         * <li>User account locked flag is set to TRUE</li>
+         *   <li>User "testuser" exists and password is correct
+         *   <li>User account locked flag is set to TRUE
          * </ul>
-         * 
-         * <p>
-         * <strong>When:</strong> login() method is called with valid credentials
-         * for locked account.
-         * 
-         * <p>
-         * <strong>Then:</strong> Method throws BusinessException with message
-         * "Account is locked".
-         * 
-         * <p>
-         * <strong>Coverage:</strong>
-         * Tests account locked state validation. Locked accounts cannot authenticate
-         * even with valid credentials. Lock state typically indicates suspicious
-         * activity.
-         * 
+         *
+         * <p><strong>When:</strong> login() method is called with valid credentials for locked
+         * account.
+         *
+         * <p><strong>Then:</strong> Method throws BusinessException with message "Account is
+         * locked".
+         *
+         * <p><strong>Coverage:</strong> Tests account locked state validation. Locked accounts
+         * cannot authenticate even with valid credentials. Lock state typically indicates
+         * suspicious activity.
+         *
          * @see UserServiceImpl#login(LoginRequest)
          * @throws BusinessException when account is locked
          */
@@ -676,16 +594,16 @@ class UserServiceDocumentedTest {
     // ==================== USER RETRIEVAL TESTS ====================
 
     /**
-     * Nested test class for user lookup operations.
-     * Tests cover retrieval by ID, username, and paginated search queries.
-     * 
-     * <p>
-     * Retrieval Operations Tested:
+     * Nested test class for user lookup operations. Tests cover retrieval by ID, username, and
+     * paginated search queries.
+     *
+     * <p>Retrieval Operations Tested:
+     *
      * <ul>
-     * <li>getUserById(Long) - Retrieve user by primary key</li>
-     * <li>getUserByUsername(String) - Retrieve user by username</li>
-     * <li>getAllUsers(Pageable) - Paginated retrieval of all users</li>
-     * <li>searchUsers(String, Pageable) - Paginated search with keyword</li>
+     *   <li>getUserById(Long) - Retrieve user by primary key
+     *   <li>getUserByUsername(String) - Retrieve user by username
+     *   <li>getAllUsers(Pageable) - Paginated retrieval of all users
+     *   <li>searchUsers(String, Pageable) - Paginated search with keyword
      * </ul>
      */
     @Nested
@@ -694,27 +612,22 @@ class UserServiceDocumentedTest {
 
         /**
          * Tests successful user retrieval by ID.
-         * 
-         * <p>
-         * <strong>Scenario:</strong> Retrieve user entity using primary key.
-         * 
-         * <p>
-         * <strong>Given:</strong>
+         *
+         * <p><strong>Scenario:</strong> Retrieve user entity using primary key.
+         *
+         * <p><strong>Given:</strong>
+         *
          * <ul>
-         * <li>User with ID=1 exists in database</li>
+         *   <li>User with ID=1 exists in database
          * </ul>
-         * 
-         * <p>
-         * <strong>When:</strong> getUserById(1L) is called.
-         * 
-         * <p>
-         * <strong>Then:</strong> Method returns UserResponse with ID=1.
-         * 
-         * <p>
-         * <strong>Coverage:</strong>
-         * Tests repository find by ID operation and entity-to-response mapping.
-         * Verifies successful lookup path.
-         * 
+         *
+         * <p><strong>When:</strong> getUserById(1L) is called.
+         *
+         * <p><strong>Then:</strong> Method returns UserResponse with ID=1.
+         *
+         * <p><strong>Coverage:</strong> Tests repository find by ID operation and
+         * entity-to-response mapping. Verifies successful lookup path.
+         *
          * @see UserServiceImpl#getUserById(Long)
          */
         @Test
@@ -734,28 +647,23 @@ class UserServiceDocumentedTest {
 
         /**
          * Tests user retrieval failure when ID does not exist.
-         * 
-         * <p>
-         * <strong>Scenario:</strong> Attempt to retrieve user with non-existent ID.
-         * 
-         * <p>
-         * <strong>Given:</strong>
+         *
+         * <p><strong>Scenario:</strong> Attempt to retrieve user with non-existent ID.
+         *
+         * <p><strong>Given:</strong>
+         *
          * <ul>
-         * <li>No user exists with ID=999 in database</li>
+         *   <li>No user exists with ID=999 in database
          * </ul>
-         * 
-         * <p>
-         * <strong>When:</strong> getUserById(999L) is called.
-         * 
-         * <p>
-         * <strong>Then:</strong> Method throws ResourceNotFoundException with message
-         * "User not found".
-         * 
-         * <p>
-         * <strong>Coverage:</strong>
-         * Tests error handling for non-existent user lookups.
+         *
+         * <p><strong>When:</strong> getUserById(999L) is called.
+         *
+         * <p><strong>Then:</strong> Method throws ResourceNotFoundException with message "User not
+         * found".
+         *
+         * <p><strong>Coverage:</strong> Tests error handling for non-existent user lookups.
          * ResourceNotFoundException signals REST endpoint to return 404 Not Found.
-         * 
+         *
          * @see UserServiceImpl#getUserById(Long)
          * @throws ResourceNotFoundException when user ID does not exist
          */
@@ -773,27 +681,22 @@ class UserServiceDocumentedTest {
 
         /**
          * Tests successful user retrieval by username.
-         * 
-         * <p>
-         * <strong>Scenario:</strong> Retrieve user entity using username lookup.
-         * 
-         * <p>
-         * <strong>Given:</strong>
+         *
+         * <p><strong>Scenario:</strong> Retrieve user entity using username lookup.
+         *
+         * <p><strong>Given:</strong>
+         *
          * <ul>
-         * <li>User with username "testuser" exists in database</li>
+         *   <li>User with username "testuser" exists in database
          * </ul>
-         * 
-         * <p>
-         * <strong>When:</strong> getUserByUsername("testuser") is called.
-         * 
-         * <p>
-         * <strong>Then:</strong> Method returns UserResponse with username="testuser".
-         * 
-         * <p>
-         * <strong>Coverage:</strong>
-         * Tests repository find by username operation.
-         * Used for login operations and username-based lookups.
-         * 
+         *
+         * <p><strong>When:</strong> getUserByUsername("testuser") is called.
+         *
+         * <p><strong>Then:</strong> Method returns UserResponse with username="testuser".
+         *
+         * <p><strong>Coverage:</strong> Tests repository find by username operation. Used for login
+         * operations and username-based lookups.
+         *
          * @see UserServiceImpl#getUserByUsername(String)
          */
         @Test
@@ -813,27 +716,21 @@ class UserServiceDocumentedTest {
 
         /**
          * Tests user retrieval failure when username does not exist.
-         * 
-         * <p>
-         * <strong>Scenario:</strong> Attempt to retrieve user with non-existent
-         * username.
-         * 
-         * <p>
-         * <strong>Given:</strong>
+         *
+         * <p><strong>Scenario:</strong> Attempt to retrieve user with non-existent username.
+         *
+         * <p><strong>Given:</strong>
+         *
          * <ul>
-         * <li>No user with username "missing" exists in database</li>
+         *   <li>No user with username "missing" exists in database
          * </ul>
-         * 
-         * <p>
-         * <strong>When:</strong> getUserByUsername("missing") is called.
-         * 
-         * <p>
-         * <strong>Then:</strong> Method throws ResourceNotFoundException.
-         * 
-         * <p>
-         * <strong>Coverage:</strong>
-         * Tests error handling for non-existent username lookups.
-         * 
+         *
+         * <p><strong>When:</strong> getUserByUsername("missing") is called.
+         *
+         * <p><strong>Then:</strong> Method throws ResourceNotFoundException.
+         *
+         * <p><strong>Coverage:</strong> Tests error handling for non-existent username lookups.
+         *
          * @see UserServiceImpl#getUserByUsername(String)
          * @throws ResourceNotFoundException when username does not exist
          */
@@ -850,28 +747,23 @@ class UserServiceDocumentedTest {
 
         /**
          * Tests paginated retrieval of all users.
-         * 
-         * <p>
-         * <strong>Scenario:</strong> Retrieve paginated list of all users from
-         * database.
-         * 
-         * <p>
-         * <strong>Given:</strong>
+         *
+         * <p><strong>Scenario:</strong> Retrieve paginated list of all users from database.
+         *
+         * <p><strong>Given:</strong>
+         *
          * <ul>
-         * <li>Database contains at least one user (testUser)</li>
-         * <li>Page request for page 0, size 10</li>
+         *   <li>Database contains at least one user (testUser)
+         *   <li>Page request for page 0, size 10
          * </ul>
-         * 
-         * <p>
-         * <strong>When:</strong> getAllUsers(pageable) is called with valid Pageable.
-         * 
-         * <p>
-         * <strong>Then:</strong> Method returns Page containing user responses.
-         * 
-         * <p>
-         * <strong>Coverage:</strong>
-         * Tests paginated repository query and DTO mapping for collections.
-         * 
+         *
+         * <p><strong>When:</strong> getAllUsers(pageable) is called with valid Pageable.
+         *
+         * <p><strong>Then:</strong> Method returns Page containing user responses.
+         *
+         * <p><strong>Coverage:</strong> Tests paginated repository query and DTO mapping for
+         * collections.
+         *
          * @see UserServiceImpl#getAllUsers(Pageable)
          */
         @Test
@@ -895,27 +787,22 @@ class UserServiceDocumentedTest {
 
         /**
          * Tests null pointer exception when Pageable is not provided.
-         * 
-         * <p>
-         * <strong>Scenario:</strong> Call getAllUsers without pagination parameters.
-         * 
-         * <p>
-         * <strong>Given:</strong>
+         *
+         * <p><strong>Scenario:</strong> Call getAllUsers without pagination parameters.
+         *
+         * <p><strong>Given:</strong>
+         *
          * <ul>
-         * <li>Pageable argument is null</li>
+         *   <li>Pageable argument is null
          * </ul>
-         * 
-         * <p>
-         * <strong>When:</strong> getAllUsers(null) is called.
-         * 
-         * <p>
-         * <strong>Then:</strong> Method throws NullPointerException with message
-         * "Pageable must not be null".
-         * 
-         * <p>
-         * <strong>Coverage:</strong>
-         * Tests input validation for required Pageable parameter.
-         * 
+         *
+         * <p><strong>When:</strong> getAllUsers(null) is called.
+         *
+         * <p><strong>Then:</strong> Method throws NullPointerException with message "Pageable must
+         * not be null".
+         *
+         * <p><strong>Coverage:</strong> Tests input validation for required Pageable parameter.
+         *
          * @see UserServiceImpl#getAllUsers(Pageable)
          * @throws NullPointerException when Pageable is null
          */
@@ -932,8 +819,8 @@ class UserServiceDocumentedTest {
     // ==================== USER SEARCH TESTS ====================
 
     /**
-     * Nested test class for user search operations.
-     * Tests paginated search queries with keyword filtering.
+     * Nested test class for user search operations. Tests paginated search queries with keyword
+     * filtering.
      */
     @Nested
     @DisplayName("Search Users Tests")
@@ -941,28 +828,23 @@ class UserServiceDocumentedTest {
 
         /**
          * Tests paginated search of users with keyword matching.
-         * 
-         * <p>
-         * <strong>Scenario:</strong> Search users by keyword (username/email prefix).
-         * 
-         * <p>
-         * <strong>Given:</strong>
+         *
+         * <p><strong>Scenario:</strong> Search users by keyword (username/email prefix).
+         *
+         * <p><strong>Given:</strong>
+         *
          * <ul>
-         * <li>Database contains user with username "testuser"</li>
-         * <li>Search keyword is "te" (prefix match)</li>
-         * <li>Page request for page 0, size 5</li>
+         *   <li>Database contains user with username "testuser"
+         *   <li>Search keyword is "te" (prefix match)
+         *   <li>Page request for page 0, size 5
          * </ul>
-         * 
-         * <p>
-         * <strong>When:</strong> searchUsers("te", pageable) is called.
-         * 
-         * <p>
-         * <strong>Then:</strong> Method returns Page containing matching user.
-         * 
-         * <p>
-         * <strong>Coverage:</strong>
-         * Tests repository search method and collection mapping.
-         * 
+         *
+         * <p><strong>When:</strong> searchUsers("te", pageable) is called.
+         *
+         * <p><strong>Then:</strong> Method returns Page containing matching user.
+         *
+         * <p><strong>Coverage:</strong> Tests repository search method and collection mapping.
+         *
          * @see UserServiceImpl#searchUsers(String, Pageable)
          */
         @Test
@@ -989,16 +871,16 @@ class UserServiceDocumentedTest {
     // ==================== USER UPDATE TESTS ====================
 
     /**
-     * Nested test class for user profile update operations.
-     * Tests cover updates to name, email, phone, and combined field updates.
-     * 
-     * <p>
-     * Update Operations Tested:
+     * Nested test class for user profile update operations. Tests cover updates to name, email,
+     * phone, and combined field updates.
+     *
+     * <p>Update Operations Tested:
+     *
      * <ul>
-     * <li>Name updates (firstName, lastName)</li>
-     * <li>Email updates (with uniqueness validation)</li>
-     * <li>Phone updates</li>
-     * <li>Combined multi-field updates</li>
+     *   <li>Name updates (firstName, lastName)
+     *   <li>Email updates (with uniqueness validation)
+     *   <li>Phone updates
+     *   <li>Combined multi-field updates
      * </ul>
      */
     @Nested
@@ -1007,38 +889,30 @@ class UserServiceDocumentedTest {
 
         /**
          * Tests successful update of user profile with new name and phone.
-         * 
-         * <p>
-         * <strong>Scenario:</strong> Update user name and phone number.
-         * 
-         * <p>
-         * <strong>Given:</strong>
+         *
+         * <p><strong>Scenario:</strong> Update user name and phone number.
+         *
+         * <p><strong>Given:</strong>
+         *
          * <ul>
-         * <li>User with ID=1 exists in database</li>
-         * <li>Update request contains new firstName and lastName</li>
+         *   <li>User with ID=1 exists in database
+         *   <li>Update request contains new firstName and lastName
          * </ul>
-         * 
-         * <p>
-         * <strong>When:</strong> updateUser(1L, request) is called.
-         * 
-         * <p>
-         * <strong>Then:</strong> Method returns UserResponse with updated data.
-         * 
-         * <p>
-         * <strong>Coverage:</strong>
-         * Tests successful update path for name fields.
-         * 
+         *
+         * <p><strong>When:</strong> updateUser(1L, request) is called.
+         *
+         * <p><strong>Then:</strong> Method returns UserResponse with updated data.
+         *
+         * <p><strong>Coverage:</strong> Tests successful update path for name fields.
+         *
          * @see UserServiceImpl#updateUser(Long, UpdateUserRequest)
          */
         @Test
         @DisplayName("Should update user successfully")
         void shouldUpdateUserSuccessfully() {
             // Arrange: Prepare update request with new names
-            UpdateUserRequest request = new UpdateUserRequest(
-                    "UpdatedFirst",
-                    "UpdatedLast",
-                    null,
-                    null);
+            UpdateUserRequest request =
+                    new UpdateUserRequest("UpdatedFirst", "UpdatedLast", null, null);
 
             // Mock: Find existing user and save updated entity
             given(userRepository.findById(1L)).willReturn(Optional.of(testUser));
@@ -1055,30 +929,24 @@ class UserServiceDocumentedTest {
 
         /**
          * Tests email update failure when email is already in use by another user.
-         * 
-         * <p>
-         * <strong>Scenario:</strong> User attempts to change email to one already used.
-         * 
-         * <p>
-         * <strong>Given:</strong>
+         *
+         * <p><strong>Scenario:</strong> User attempts to change email to one already used.
+         *
+         * <p><strong>Given:</strong>
+         *
          * <ul>
-         * <li>User with ID=1 exists in database</li>
-         * <li>Email "existing@example.com" is already used by another user</li>
+         *   <li>User with ID=1 exists in database
+         *   <li>Email "existing@example.com" is already used by another user
          * </ul>
-         * 
-         * <p>
-         * <strong>When:</strong> updateUser(1L, request) is called with duplicate
-         * email.
-         * 
-         * <p>
-         * <strong>Then:</strong> Method throws BusinessException with message
-         * "Email is already in use".
-         * 
-         * <p>
-         * <strong>Coverage:</strong>
-         * Tests email uniqueness validation during updates.
-         * Prevents users from claiming emails belonging to other accounts.
-         * 
+         *
+         * <p><strong>When:</strong> updateUser(1L, request) is called with duplicate email.
+         *
+         * <p><strong>Then:</strong> Method throws BusinessException with message "Email is already
+         * in use".
+         *
+         * <p><strong>Coverage:</strong> Tests email uniqueness validation during updates. Prevents
+         * users from claiming emails belonging to other accounts.
+         *
          * @see UserServiceImpl#updateUser(Long, UpdateUserRequest)
          * @throws BusinessException when email already in use
          */
@@ -1086,11 +954,8 @@ class UserServiceDocumentedTest {
         @DisplayName("Should throw exception when email already in use")
         void shouldThrowExceptionWhenEmailInUse() {
             // Arrange: Prepare update request with email used by another user
-            UpdateUserRequest request = new UpdateUserRequest(
-                    null,
-                    null,
-                    "existing@example.com",
-                    null);
+            UpdateUserRequest request =
+                    new UpdateUserRequest(null, null, "existing@example.com", null);
 
             // Mock: Find user and verify email is taken by another user
             given(userRepository.findById(1L)).willReturn(Optional.of(testUser));
@@ -1104,38 +969,31 @@ class UserServiceDocumentedTest {
 
         /**
          * Tests successful email update when new email is available.
-         * 
-         * <p>
-         * <strong>Scenario:</strong> User changes email to an available address.
-         * 
-         * <p>
-         * <strong>Given:</strong>
+         *
+         * <p><strong>Scenario:</strong> User changes email to an available address.
+         *
+         * <p><strong>Given:</strong>
+         *
          * <ul>
-         * <li>User with ID=1 exists in database</li>
-         * <li>Email "newemail@example.com" is not used by any user</li>
+         *   <li>User with ID=1 exists in database
+         *   <li>Email "newemail@example.com" is not used by any user
          * </ul>
-         * 
-         * <p>
-         * <strong>When:</strong> updateUser(1L, request) is called with new email.
-         * 
-         * <p>
-         * <strong>Then:</strong> Method returns UserResponse and email is updated.
-         * 
-         * <p>
-         * <strong>Coverage:</strong>
-         * Tests successful email update path after uniqueness validation.
-         * 
+         *
+         * <p><strong>When:</strong> updateUser(1L, request) is called with new email.
+         *
+         * <p><strong>Then:</strong> Method returns UserResponse and email is updated.
+         *
+         * <p><strong>Coverage:</strong> Tests successful email update path after uniqueness
+         * validation.
+         *
          * @see UserServiceImpl#updateUser(Long, UpdateUserRequest)
          */
         @Test
         @DisplayName("Should update email when not in use")
         void shouldUpdateEmailWhenNotInUse() {
             // Arrange: Prepare update request with available email
-            UpdateUserRequest request = new UpdateUserRequest(
-                    null,
-                    null,
-                    "newemail@example.com",
-                    null);
+            UpdateUserRequest request =
+                    new UpdateUserRequest(null, null, "newemail@example.com", null);
 
             // Mock: Find user and verify email is available
             given(userRepository.findById(1L)).willReturn(Optional.of(testUser));
@@ -1153,38 +1011,29 @@ class UserServiceDocumentedTest {
 
         /**
          * Tests successful phone number update.
-         * 
-         * <p>
-         * <strong>Scenario:</strong> User updates phone number in profile.
-         * 
-         * <p>
-         * <strong>Given:</strong>
+         *
+         * <p><strong>Scenario:</strong> User updates phone number in profile.
+         *
+         * <p><strong>Given:</strong>
+         *
          * <ul>
-         * <li>User with ID=1 exists in database</li>
-         * <li>Update request contains new phone number</li>
+         *   <li>User with ID=1 exists in database
+         *   <li>Update request contains new phone number
          * </ul>
-         * 
-         * <p>
-         * <strong>When:</strong> updateUser(1L, request) is called with phone.
-         * 
-         * <p>
-         * <strong>Then:</strong> Method returns UserResponse with updated phone.
-         * 
-         * <p>
-         * <strong>Coverage:</strong>
-         * Tests phone field update (no validation applied to phone).
-         * 
+         *
+         * <p><strong>When:</strong> updateUser(1L, request) is called with phone.
+         *
+         * <p><strong>Then:</strong> Method returns UserResponse with updated phone.
+         *
+         * <p><strong>Coverage:</strong> Tests phone field update (no validation applied to phone).
+         *
          * @see UserServiceImpl#updateUser(Long, UpdateUserRequest)
          */
         @Test
         @DisplayName("Should update phone when provided")
         void shouldUpdatePhoneWhenProvided() {
             // Arrange: Prepare update request with phone number
-            UpdateUserRequest request = new UpdateUserRequest(
-                    null,
-                    null,
-                    null,
-                    "+33612345678");
+            UpdateUserRequest request = new UpdateUserRequest(null, null, null, "+33612345678");
 
             // Mock: Find user and save updated entity
             given(userRepository.findById(1L)).willReturn(Optional.of(testUser));
@@ -1201,40 +1050,32 @@ class UserServiceDocumentedTest {
 
         /**
          * Tests update of all profile fields simultaneously.
-         * 
-         * <p>
-         * <strong>Scenario:</strong> User updates name, email, and phone in single
-         * request.
-         * 
-         * <p>
-         * <strong>Given:</strong>
+         *
+         * <p><strong>Scenario:</strong> User updates name, email, and phone in single request.
+         *
+         * <p><strong>Given:</strong>
+         *
          * <ul>
-         * <li>User with ID=1 exists in database</li>
-         * <li>All fields in update request are populated</li>
-         * <li>New email is available for use</li>
+         *   <li>User with ID=1 exists in database
+         *   <li>All fields in update request are populated
+         *   <li>New email is available for use
          * </ul>
-         * 
-         * <p>
-         * <strong>When:</strong> updateUser(1L, request) is called with all fields.
-         * 
-         * <p>
-         * <strong>Then:</strong> Method returns UserResponse with all updates applied.
-         * 
-         * <p>
-         * <strong>Coverage:</strong>
-         * Tests multi-field update scenario with email validation.
-         * 
+         *
+         * <p><strong>When:</strong> updateUser(1L, request) is called with all fields.
+         *
+         * <p><strong>Then:</strong> Method returns UserResponse with all updates applied.
+         *
+         * <p><strong>Coverage:</strong> Tests multi-field update scenario with email validation.
+         *
          * @see UserServiceImpl#updateUser(Long, UpdateUserRequest)
          */
         @Test
         @DisplayName("Should update all fields when provided")
         void shouldUpdateAllFieldsWhenProvided() {
             // Arrange: Prepare update request with all fields
-            UpdateUserRequest request = new UpdateUserRequest(
-                    "NewFirst",
-                    "NewLast",
-                    "newemail@example.com",
-                    "+33612345678");
+            UpdateUserRequest request =
+                    new UpdateUserRequest(
+                            "NewFirst", "NewLast", "newemail@example.com", "+33612345678");
 
             // Mock: Find user, verify email availability, save updates
             given(userRepository.findById(1L)).willReturn(Optional.of(testUser));
@@ -1253,42 +1094,37 @@ class UserServiceDocumentedTest {
 
         /**
          * Tests that email validation is skipped when user provides same email.
-         * 
-         * <p>
-         * <strong>Scenario:</strong> User submits email update request with current
-         * email.
-         * 
-         * <p>
-         * <strong>Given:</strong>
+         *
+         * <p><strong>Scenario:</strong> User submits email update request with current email.
+         *
+         * <p><strong>Given:</strong>
+         *
          * <ul>
-         * <li>User current email is "test@example.com"</li>
-         * <li>Update request email is also "test@example.com"</li>
+         *   <li>User current email is "test@example.com"
+         *   <li>Update request email is also "test@example.com"
          * </ul>
-         * 
-         * <p>
-         * <strong>When:</strong> updateUser(1L, request) is called with same email.
-         * 
-         * <p>
-         * <strong>Then:</strong> Method returns UserResponse without email validation
+         *
+         * <p><strong>When:</strong> updateUser(1L, request) is called with same email.
+         *
+         * <p><strong>Then:</strong> Method returns UserResponse without email validation
          * (optimization - no need to check uniqueness for unchanged email).
-         * 
-         * <p>
-         * <strong>Coverage:</strong>
-         * Tests branch condition where email equals() check prevents redundant
-         * database query for uniqueness validation. Tests the false branch of
-         * the !request.email().equals(user.getEmail()) condition.
-         * 
+         *
+         * <p><strong>Coverage:</strong> Tests branch condition where email equals() check prevents
+         * redundant database query for uniqueness validation. Tests the false branch of the
+         * !request.email().equals(user.getEmail()) condition.
+         *
          * @see UserServiceImpl#updateUser(Long, UpdateUserRequest)
          */
         @Test
         @DisplayName("Should skip email update when email unchanged")
         void shouldSkipEmailUpdateWhenUnchanged() {
             // Arrange: Update request contains user's current email
-            UpdateUserRequest request = new UpdateUserRequest(
-                    null,
-                    null,
-                    "test@example.com", // Same as testUser email
-                    null);
+            UpdateUserRequest request =
+                    new UpdateUserRequest(
+                            null,
+                            null,
+                            "test@example.com", // Same as testUser email
+                            null);
 
             // Mock: Find user and save (no email uniqueness check needed)
             given(userRepository.findById(1L)).willReturn(Optional.of(testUser));
@@ -1307,16 +1143,16 @@ class UserServiceDocumentedTest {
     // ==================== ROLE MANAGEMENT TESTS ====================
 
     /**
-     * Nested test class for user role assignment and removal.
-     * Tests cover adding roles, removing roles, and validation constraints.
-     * 
-     * <p>
-     * Role Management Rules Tested:
+     * Nested test class for user role assignment and removal. Tests cover adding roles, removing
+     * roles, and validation constraints.
+     *
+     * <p>Role Management Rules Tested:
+     *
      * <ul>
-     * <li>Users must have at least one role (USER)</li>
-     * <li>Additional roles (ADMIN, SUPPORT, etc.) can be added</li>
-     * <li>Non-required roles can be removed</li>
-     * <li>Last role (USER) cannot be removed</li>
+     *   <li>Users must have at least one role (USER)
+     *   <li>Additional roles (ADMIN, SUPPORT, etc.) can be added
+     *   <li>Non-required roles can be removed
+     *   <li>Last role (USER) cannot be removed
      * </ul>
      */
     @Nested
@@ -1325,26 +1161,21 @@ class UserServiceDocumentedTest {
 
         /**
          * Tests successful assignment of additional role to user.
-         * 
-         * <p>
-         * <strong>Scenario:</strong> Grant administrative role to existing user.
-         * 
-         * <p>
-         * <strong>Given:</strong>
+         *
+         * <p><strong>Scenario:</strong> Grant administrative role to existing user.
+         *
+         * <p><strong>Given:</strong>
+         *
          * <ul>
-         * <li>User with ID=1 currently has role USER</li>
+         *   <li>User with ID=1 currently has role USER
          * </ul>
-         * 
-         * <p>
-         * <strong>When:</strong> addRole(1L, ADMIN) is called.
-         * 
-         * <p>
-         * <strong>Then:</strong> Method returns UserResponse with ADMIN role added.
-         * 
-         * <p>
-         * <strong>Coverage:</strong>
-         * Tests role addition to user's role collection.
-         * 
+         *
+         * <p><strong>When:</strong> addRole(1L, ADMIN) is called.
+         *
+         * <p><strong>Then:</strong> Method returns UserResponse with ADMIN role added.
+         *
+         * <p><strong>Coverage:</strong> Tests role addition to user's role collection.
+         *
          * @see UserServiceImpl#addRole(Long, UserRole)
          */
         @Test
@@ -1365,29 +1196,23 @@ class UserServiceDocumentedTest {
 
         /**
          * Tests role removal failure when user has only one role.
-         * 
-         * <p>
-         * <strong>Scenario:</strong> Attempt to remove USER role when it's the only
-         * role.
-         * 
-         * <p>
-         * <strong>Given:</strong>
+         *
+         * <p><strong>Scenario:</strong> Attempt to remove USER role when it's the only role.
+         *
+         * <p><strong>Given:</strong>
+         *
          * <ul>
-         * <li>User with ID=1 has only role USER (required minimum)</li>
+         *   <li>User with ID=1 has only role USER (required minimum)
          * </ul>
-         * 
-         * <p>
-         * <strong>When:</strong> removeRole(1L, USER) is called.
-         * 
-         * <p>
-         * <strong>Then:</strong> Method throws BusinessException with message
-         * "Cannot remove the last role".
-         * 
-         * <p>
-         * <strong>Coverage:</strong>
-         * Tests constraint that users must retain at least one role.
+         *
+         * <p><strong>When:</strong> removeRole(1L, USER) is called.
+         *
+         * <p><strong>Then:</strong> Method throws BusinessException with message "Cannot remove the
+         * last role".
+         *
+         * <p><strong>Coverage:</strong> Tests constraint that users must retain at least one role.
          * Prevents complete removal of access permissions.
-         * 
+         *
          * @see UserServiceImpl#removeRole(Long, UserRole)
          * @throws BusinessException when attempting to remove last role
          */
@@ -1406,29 +1231,23 @@ class UserServiceDocumentedTest {
 
         /**
          * Tests successful removal of secondary role when user has multiple roles.
-         * 
-         * <p>
-         * <strong>Scenario:</strong> Remove ADMIN role from user who has USER and
-         * ADMIN.
-         * 
-         * <p>
-         * <strong>Given:</strong>
+         *
+         * <p><strong>Scenario:</strong> Remove ADMIN role from user who has USER and ADMIN.
+         *
+         * <p><strong>Given:</strong>
+         *
          * <ul>
-         * <li>User with ID=1 has roles USER and ADMIN (multiple roles)</li>
+         *   <li>User with ID=1 has roles USER and ADMIN (multiple roles)
          * </ul>
-         * 
-         * <p>
-         * <strong>When:</strong> removeRole(1L, ADMIN) is called.
-         * 
-         * <p>
-         * <strong>Then:</strong> Method returns UserResponse with ADMIN role removed,
-         * USER role remaining.
-         * 
-         * <p>
-         * <strong>Coverage:</strong>
-         * Tests successful role removal when constraint is satisfied (at least one role
-         * remains).
-         * 
+         *
+         * <p><strong>When:</strong> removeRole(1L, ADMIN) is called.
+         *
+         * <p><strong>Then:</strong> Method returns UserResponse with ADMIN role removed, USER role
+         * remaining.
+         *
+         * <p><strong>Coverage:</strong> Tests successful role removal when constraint is satisfied
+         * (at least one role remains).
+         *
          * @see UserServiceImpl#removeRole(Long, UserRole)
          */
         @Test
@@ -1450,29 +1269,24 @@ class UserServiceDocumentedTest {
 
         /**
          * Tests successful removal of USER role when user has multiple roles.
-         * 
-         * <p>
-         * <strong>Scenario:</strong> Remove USER role from user with multiple roles
-         * (USER, ADMIN). This covers the branch where role==USER but size>1.
-         * 
-         * <p>
-         * <strong>Given:</strong>
+         *
+         * <p><strong>Scenario:</strong> Remove USER role from user with multiple roles (USER,
+         * ADMIN). This covers the branch where role==USER but size>1.
+         *
+         * <p><strong>Given:</strong>
+         *
          * <ul>
-         * <li>User with ID=1 has roles USER and ADMIN</li>
+         *   <li>User with ID=1 has roles USER and ADMIN
          * </ul>
-         * 
-         * <p>
-         * <strong>When:</strong> removeRole(1L, USER) is called.
-         * 
-         * <p>
-         * <strong>Then:</strong> Method returns UserResponse with USER removed,
-         * ADMIN remaining. The validation allows this because size > 1.
-         * 
-         * <p>
-         * <strong>Coverage:</strong>
-         * Tests the else branch where role==USER but user has multiple roles.
-         * This is the critical missing branch coverage case.
-         * 
+         *
+         * <p><strong>When:</strong> removeRole(1L, USER) is called.
+         *
+         * <p><strong>Then:</strong> Method returns UserResponse with USER removed, ADMIN remaining.
+         * The validation allows this because size > 1.
+         *
+         * <p><strong>Coverage:</strong> Tests the else branch where role==USER but user has
+         * multiple roles. This is the critical missing branch coverage case.
+         *
          * @see UserServiceImpl#removeRole(Long, UserRole)
          */
         @Test
@@ -1494,36 +1308,31 @@ class UserServiceDocumentedTest {
 
         /**
          * Tests successful removal of non-USER role when user has multiple roles.
-         * 
-         * <p>
-         * <strong>Scenario:</strong> Remove SUPPORT role from user with USER, ADMIN,
-         * SUPPORT.
-         * 
-         * <p>
-         * <strong>Given:</strong>
+         *
+         * <p><strong>Scenario:</strong> Remove SUPPORT role from user with USER, ADMIN, SUPPORT.
+         *
+         * <p><strong>Given:</strong>
+         *
          * <ul>
-         * <li>User with ID=1 has roles USER, ADMIN, and SUPPORT</li>
+         *   <li>User with ID=1 has roles USER, ADMIN, and SUPPORT
          * </ul>
-         * 
-         * <p>
-         * <strong>When:</strong> removeRole(1L, SUPPORT) is called.
-         * 
-         * <p>
-         * <strong>Then:</strong> Method returns UserResponse with SUPPORT removed,
-         * USER and ADMIN remaining.
-         * 
-         * <p>
-         * <strong>Coverage:</strong>
-         * Tests role removal of non-critical role from multi-role user.
-         * Covers the branch where role != USER in the removal logic.
-         * 
+         *
+         * <p><strong>When:</strong> removeRole(1L, SUPPORT) is called.
+         *
+         * <p><strong>Then:</strong> Method returns UserResponse with SUPPORT removed, USER and
+         * ADMIN remaining.
+         *
+         * <p><strong>Coverage:</strong> Tests role removal of non-critical role from multi-role
+         * user. Covers the branch where role != USER in the removal logic.
+         *
          * @see UserServiceImpl#removeRole(Long, UserRole)
          */
         @Test
         @DisplayName("Should remove non-USER role when multiple roles exist")
         void shouldRemoveNonUserRoleWhenMultipleRolesExist() {
             // Arrange: Set user to have USER, ADMIN, and SUPPORT roles
-            testUser.setRoles(new HashSet<>(Set.of(UserRole.USER, UserRole.ADMIN, UserRole.SUPPORT)));
+            testUser.setRoles(
+                    new HashSet<>(Set.of(UserRole.USER, UserRole.ADMIN, UserRole.SUPPORT)));
             given(userRepository.findById(1L)).willReturn(Optional.of(testUser));
             given(userRepository.save(Objects.requireNonNull(testUser))).willReturn(testUser);
             given(userMapper.toResponse(testUser)).willReturn(testUserResponse);
@@ -1540,15 +1349,15 @@ class UserServiceDocumentedTest {
     // ==================== STATUS MANAGEMENT TESTS ====================
 
     /**
-     * Nested test class for user account state management.
-     * Tests cover enabling, disabling, and deleting user accounts.
-     * 
-     * <p>
-     * Account State Operations Tested:
+     * Nested test class for user account state management. Tests cover enabling, disabling, and
+     * deleting user accounts.
+     *
+     * <p>Account State Operations Tested:
+     *
      * <ul>
-     * <li>deleteUser(Long) - Soft delete (disable user)</li>
-     * <li>enableUser(Long) - Enable disabled account</li>
-     * <li>disableUser(Long) - Disable enabled account</li>
+     *   <li>deleteUser(Long) - Soft delete (disable user)
+     *   <li>enableUser(Long) - Enable disabled account
+     *   <li>disableUser(Long) - Disable enabled account
      * </ul>
      */
     @Nested
@@ -1557,29 +1366,23 @@ class UserServiceDocumentedTest {
 
         /**
          * Tests user soft deletion (account disabling).
-         * 
-         * <p>
-         * <strong>Scenario:</strong> Disable user account (soft delete, not hard
-         * delete).
-         * 
-         * <p>
-         * <strong>Given:</strong>
+         *
+         * <p><strong>Scenario:</strong> Disable user account (soft delete, not hard delete).
+         *
+         * <p><strong>Given:</strong>
+         *
          * <ul>
-         * <li>User with ID=1 exists and is enabled</li>
+         *   <li>User with ID=1 exists and is enabled
          * </ul>
-         * 
-         * <p>
-         * <strong>When:</strong> deleteUser(1L) is called.
-         * 
-         * <p>
-         * <strong>Then:</strong> Method disables user account (sets enabled=false)
-         * without deleting data from database.
-         * 
-         * <p>
-         * <strong>Coverage:</strong>
-         * Tests soft delete implementation. Data is retained for audit trails.
-         * User cannot login with disabled account (see LoginTests).
-         * 
+         *
+         * <p><strong>When:</strong> deleteUser(1L) is called.
+         *
+         * <p><strong>Then:</strong> Method disables user account (sets enabled=false) without
+         * deleting data from database.
+         *
+         * <p><strong>Coverage:</strong> Tests soft delete implementation. Data is retained for
+         * audit trails. User cannot login with disabled account (see LoginTests).
+         *
          * @see UserServiceImpl#deleteUser(Long)
          */
         @Test
@@ -1598,27 +1401,23 @@ class UserServiceDocumentedTest {
 
         /**
          * Tests enabling a previously disabled user account.
-         * 
-         * <p>
-         * <strong>Scenario:</strong> Re-enable a user account that was disabled.
-         * 
-         * <p>
-         * <strong>Given:</strong>
+         *
+         * <p><strong>Scenario:</strong> Re-enable a user account that was disabled.
+         *
+         * <p><strong>Given:</strong>
+         *
          * <ul>
-         * <li>User with ID=1 exists and is disabled (enabled=false)</li>
+         *   <li>User with ID=1 exists and is disabled (enabled=false)
          * </ul>
-         * 
-         * <p>
-         * <strong>When:</strong> enableUser(1L) is called.
-         * 
-         * <p>
-         * <strong>Then:</strong> Method re-enables user account (sets enabled=true)
-         * and user can login again.
-         * 
-         * <p>
-         * <strong>Coverage:</strong>
-         * Tests account re-enablement. User data is intact from soft delete.
-         * 
+         *
+         * <p><strong>When:</strong> enableUser(1L) is called.
+         *
+         * <p><strong>Then:</strong> Method re-enables user account (sets enabled=true) and user can
+         * login again.
+         *
+         * <p><strong>Coverage:</strong> Tests account re-enablement. User data is intact from soft
+         * delete.
+         *
          * @see UserServiceImpl#enableUser(Long)
          */
         @Test
@@ -1638,27 +1437,22 @@ class UserServiceDocumentedTest {
 
         /**
          * Tests disabling an enabled user account.
-         * 
-         * <p>
-         * <strong>Scenario:</strong> Disable an active user account.
-         * 
-         * <p>
-         * <strong>Given:</strong>
+         *
+         * <p><strong>Scenario:</strong> Disable an active user account.
+         *
+         * <p><strong>Given:</strong>
+         *
          * <ul>
-         * <li>User with ID=1 exists and is enabled (enabled=true)</li>
+         *   <li>User with ID=1 exists and is enabled (enabled=true)
          * </ul>
-         * 
-         * <p>
-         * <strong>When:</strong> disableUser(1L) is called.
-         * 
-         * <p>
-         * <strong>Then:</strong> Method disables user account (sets enabled=false).
-         * 
-         * <p>
-         * <strong>Coverage:</strong>
-         * Tests explicit disable operation (separate from deleteUser).
-         * User cannot authenticate until re-enabled.
-         * 
+         *
+         * <p><strong>When:</strong> disableUser(1L) is called.
+         *
+         * <p><strong>Then:</strong> Method disables user account (sets enabled=false).
+         *
+         * <p><strong>Coverage:</strong> Tests explicit disable operation (separate from
+         * deleteUser). User cannot authenticate until re-enabled.
+         *
          * @see UserServiceImpl#disableUser(Long)
          */
         @Test

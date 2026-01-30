@@ -14,22 +14,21 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
-
 /**
- * Entity representing a user account in the e-commerce system.
- * Contains authentication credentials, profile information, and role assignments.
+ * Entity representing a user account in the e-commerce system. Contains authentication credentials,
+ * profile information, and role assignments.
  *
- * <p>Users can have multiple roles and track their login activity.
- * Account status is managed through enabled/locked flags.</p>
+ * <p>Users can have multiple roles and track their login activity. Account status is managed
+ * through enabled/locked flags.
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -102,8 +101,8 @@ public class User {
     private LocalDateTime lastLoginAt;
 
     /**
-     * JPA lifecycle callback executed before persisting a new user.
-     * Sets default values for timestamps and account status.
+     * JPA lifecycle callback executed before persisting a new user. Sets default values for
+     * timestamps and account status.
      */
     @PrePersist
     protected void onCreate() {
@@ -121,8 +120,8 @@ public class User {
     }
 
     /**
-     * JPA lifecycle callback executed before updating an existing user.
-     * Updates the modification timestamp.
+     * JPA lifecycle callback executed before updating an existing user. Updates the modification
+     * timestamp.
      */
     @PreUpdate
     protected void onUpdate() {

@@ -1,18 +1,5 @@
 package com.safezone.user.service.impl;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.safezone.common.exception.BusinessException;
 import com.safezone.common.exception.ResourceNotFoundException;
 import com.safezone.common.security.JwtTokenProvider;
@@ -26,15 +13,24 @@ import com.safezone.user.entity.UserRole;
 import com.safezone.user.mapper.UserMapper;
 import com.safezone.user.repository.UserRepository;
 import com.safezone.user.service.UserService;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Implementation of the {@link UserService} interface.
- * Provides user management and authentication business logic.
+ * Implementation of the {@link UserService} interface. Provides user management and authentication
+ * business logic.
  *
- * <p>
- * Handles user registration, authentication, profile management,
- * and role-based access control. Passwords are securely hashed.
- * </p>
+ * <p>Handles user registration, authentication, profile management, and role-based access control.
+ * Passwords are securely hashed.
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -56,11 +52,11 @@ public class UserServiceImpl implements UserService {
     /**
      * Constructs a UserServiceImpl with required dependencies.
      *
-     * @param userRepository   repository for user persistence
-     * @param userMapper       mapper for DTO/entity conversion
-     * @param passwordEncoder  encoder for secure password hashing
+     * @param userRepository repository for user persistence
+     * @param userMapper mapper for DTO/entity conversion
+     * @param passwordEncoder encoder for secure password hashing
      * @param jwtTokenProvider provider for JWT token operations
-     * @param jwtExpiration    JWT token expiration time in milliseconds
+     * @param jwtExpiration JWT token expiration time in milliseconds
      */
     public UserServiceImpl(
             UserRepository userRepository,
@@ -97,8 +93,14 @@ public class UserServiceImpl implements UserService {
     public AuthResponse login(LoginRequest request) {
         logger.info("User login attempt: {}", request.username());
 
-        User user = userRepository.findByUsername(request.username())
-                .orElseThrow(() -> new BusinessException("INVALID_CREDENTIALS", "Invalid username or password"));
+        User user =
+                userRepository
+                        .findByUsername(request.username())
+                        .orElseThrow(
+                                () ->
+                                        new BusinessException(
+                                                "INVALID_CREDENTIALS",
+                                                "Invalid username or password"));
 
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
             logger.warn("Invalid password for user: {}", request.username());
@@ -132,8 +134,13 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public UserResponse getUserByUsername(String username) {
         logger.debug("Fetching user by username: {}", username);
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException(USER_RESOURCE, "username", username));
+        User user =
+                userRepository
+                        .findByUsername(username)
+                        .orElseThrow(
+                                () ->
+                                        new ResourceNotFoundException(
+                                                USER_RESOURCE, "username", username));
         return userMapper.toResponse(user);
     }
 
@@ -141,7 +148,8 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public Page<UserResponse> getAllUsers(Pageable pageable) {
         logger.debug("Fetching all users with pagination");
-        return userRepository.findAll(Objects.requireNonNull(pageable, "Pageable must not be null"))
+        return userRepository
+                .findAll(Objects.requireNonNull(pageable, "Pageable must not be null"))
                 .map(userMapper::toResponse);
     }
 
@@ -149,8 +157,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public Page<UserResponse> searchUsers(String search, Pageable pageable) {
         logger.debug("Searching users with term: {}", search);
-        return userRepository.searchUsers(search, pageable)
-                .map(userMapper::toResponse);
+        return userRepository.searchUsers(search, pageable).map(userMapper::toResponse);
     }
 
     @Override
@@ -176,7 +183,8 @@ public class UserServiceImpl implements UserService {
             user.setPhone(request.phone());
         }
 
-        User updatedUser = userRepository.save(Objects.requireNonNull(user, "User must not be null"));
+        User updatedUser =
+                userRepository.save(Objects.requireNonNull(user, "User must not be null"));
         logger.info("User updated successfully: {}", id);
         return userMapper.toResponse(updatedUser);
     }
@@ -205,7 +213,8 @@ public class UserServiceImpl implements UserService {
         User user = findUserById(userId);
 
         if (role == UserRole.USER && user.getRoles().size() == 1) {
-            throw new BusinessException("INVALID_OPERATION", "Cannot remove the last role from user");
+            throw new BusinessException(
+                    "INVALID_OPERATION", "Cannot remove the last role from user");
         }
 
         user.removeRole(role);
@@ -230,7 +239,8 @@ public class UserServiceImpl implements UserService {
     }
 
     private User findUserById(Long id) {
-        return userRepository.findById(Objects.requireNonNull(id, "User ID must not be null"))
+        return userRepository
+                .findById(Objects.requireNonNull(id, "User ID must not be null"))
                 .orElseThrow(() -> new ResourceNotFoundException(USER_RESOURCE, "id", id));
     }
 
@@ -244,9 +254,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private AuthResponse createAuthResponse(User user) {
-        List<String> roles = user.getRoles().stream()
-                .map(UserRole::name)
-                .toList();
+        List<String> roles = user.getRoles().stream().map(UserRole::name).toList();
 
         String token = jwtTokenProvider.generateToken(user.getUsername(), roles);
         UserResponse userResponse = userMapper.toResponse(user);

@@ -1,47 +1,40 @@
 {
-	"version": "2.0.0",
-	"tasks": [
-		{
-<<<<<<< HEAD
-			"label": "Test Maven api-gateway",
-			"type": "shell",
-			"command": "mvn test -pl api-gateway",
-			"group": "test"
-=======
-			"label": "Maven verify (no skipTests)",
-			"type": "shell",
-			"command": "mvn",
-			"args": [
-				"-B",
-				"-q",
-				"-DskipTests=false",
-				"-Dmaven.project.sourceRoots.warningsDisabled=true",
-				"clean",
-				"verify"
-			]
-		},
-		{
-			"label": "Maven verify (no skipTests, after CORS fix)",
-			"type": "shell",
-			"command": "mvn",
-			"args": [
-				"-B",
-				"-Dmaven.project.sourceRoots.warningsDisabled=true",
-				"clean",
-				"verify"
-			]
-		},
-		{
-			"label": "Maven verify (final strict CORS revert)",
-			"type": "shell",
-			"command": "mvn",
-			"args": [
-				"-B",
-				"-Dmaven.project.sourceRoots.warningsDisabled=true",
-				"clean",
-				"verify"
-			]
->>>>>>> 219ae99 (fix(sonar): reduce duplication & centralize CSRF, share JwtTokenProvider and fix tests (#16))
-		}
-	]
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Maven verify (no skipTests)",
+      "type": "shell",
+      "command": "mvn",
+      "args": [
+        "-B",
+        "-q",
+        "-DskipTests=false",
+        "-Dmaven.project.sourceRoots.warningsDisabled=true",
+        "clean",
+        "verify"
+      ]
+    },
+    {
+      "label": "Maven verify (no skipTests, after CORS fix)",
+      "type": "shell",
+      "command": "mvn",
+      "args": [
+        "-B",
+        "-Dmaven.project.sourceRoots.warningsDisabled=true",
+        "clean",
+        "verify"
+      ]
+    },
+    {
+      "label": "Maven verify (final strict CORS revert)",
+      "type": "shell",
+      "command": "mvn",
+      "args": [
+        "-B",
+        "-Dmaven.project.sourceRoots.warningsDisabled=true",
+        "clean",
+        "verify"
+      ]
+    }
+  ]
 }

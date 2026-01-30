@@ -4,10 +4,9 @@ import java.math.BigDecimal;
 
 /**
  * Response DTO for an order item.
- * <p>
- * Contains complete item information including product details,
- * quantity, pricing, and calculated subtotal.
- * </p>
+ *
+ * <p>Contains complete item information including product details, quantity, pricing, and
+ * calculated subtotal.
  *
  * @param id the unique identifier of the order item
  * @param productId the ID of the associated product
@@ -27,5 +26,4 @@ public record OrderItemResponse(
         String productSku,
         Integer quantity,
         BigDecimal unitPrice,
-        BigDecimal subtotal
-) {}
+        BigDecimal subtotal) {}

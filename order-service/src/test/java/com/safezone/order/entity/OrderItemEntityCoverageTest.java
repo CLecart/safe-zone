@@ -3,7 +3,6 @@ package com.safezone.order.entity;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -22,16 +21,17 @@ class OrderItemEntityCoverageTest {
     void orderItemBuilderCreatesValidInstance() {
         Order order = Order.builder().id(1L).build();
 
-        OrderItem item = OrderItem.builder()
-                .id(10L)
-                .order(order)
-                .productId(100L)
-                .productName("Test Product")
-                .productSku("TEST-SKU")
-                .quantity(5)
-                .unitPrice(BigDecimal.valueOf(19.99))
-                .subtotal(BigDecimal.valueOf(99.95))
-                .build();
+        OrderItem item =
+                OrderItem.builder()
+                        .id(10L)
+                        .order(order)
+                        .productId(100L)
+                        .productName("Test Product")
+                        .productSku("TEST-SKU")
+                        .quantity(5)
+                        .unitPrice(BigDecimal.valueOf(19.99))
+                        .subtotal(BigDecimal.valueOf(99.95))
+                        .build();
 
         assertThat(item.getId()).isEqualTo(10L);
         assertThat(item.getOrder()).isEqualTo(order);
@@ -73,15 +73,16 @@ class OrderItemEntityCoverageTest {
     void orderItemAllArgsConstructorCreatesValidInstance() {
         Order order = Order.builder().id(3L).build();
 
-        OrderItem item = new OrderItem(
-                30L,
-                order,
-                300L,
-                "Constructor Product",
-                "CONS-SKU",
-                2,
-                BigDecimal.valueOf(49.99),
-                BigDecimal.valueOf(99.98));
+        OrderItem item =
+                new OrderItem(
+                        30L,
+                        order,
+                        300L,
+                        "Constructor Product",
+                        "CONS-SKU",
+                        2,
+                        BigDecimal.valueOf(49.99),
+                        BigDecimal.valueOf(99.98));
 
         assertThat(item.getId()).isEqualTo(30L);
         assertThat(item.getProductId()).isEqualTo(300L);
@@ -101,10 +102,8 @@ class OrderItemEntityCoverageTest {
     @Test
     @DisplayName("calculateSubtotal computes correct value")
     void calculateSubtotalComputesCorrectValue() {
-        OrderItem item = OrderItem.builder()
-                .quantity(4)
-                .unitPrice(BigDecimal.valueOf(12.50))
-                .build();
+        OrderItem item =
+                OrderItem.builder().quantity(4).unitPrice(BigDecimal.valueOf(12.50)).build();
 
         item.calculateSubtotal();
 
@@ -114,10 +113,8 @@ class OrderItemEntityCoverageTest {
     @Test
     @DisplayName("calculateSubtotal handles decimal quantities correctly")
     void calculateSubtotalHandlesDecimalQuantitiesCorrectly() {
-        OrderItem item = OrderItem.builder()
-                .quantity(7)
-                .unitPrice(BigDecimal.valueOf(19.99))
-                .build();
+        OrderItem item =
+                OrderItem.builder().quantity(7).unitPrice(BigDecimal.valueOf(19.99)).build();
 
         item.calculateSubtotal();
 

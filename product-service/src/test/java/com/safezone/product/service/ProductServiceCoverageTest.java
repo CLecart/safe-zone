@@ -6,12 +6,19 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
+import com.safezone.common.exception.ResourceNotFoundException;
+import com.safezone.product.dto.ProductResponse;
+import com.safezone.product.dto.UpdateProductRequest;
+import com.safezone.product.entity.Product;
+import com.safezone.product.entity.ProductCategory;
+import com.safezone.product.mapper.ProductMapper;
+import com.safezone.product.repository.ProductRepository;
+import com.safezone.product.service.impl.ProductServiceImpl;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,18 +31,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import com.safezone.common.exception.ResourceNotFoundException;
-import com.safezone.product.dto.ProductResponse;
-import com.safezone.product.dto.UpdateProductRequest;
-import com.safezone.product.entity.Product;
-import com.safezone.product.entity.ProductCategory;
-import com.safezone.product.mapper.ProductMapper;
-import com.safezone.product.repository.ProductRepository;
-import com.safezone.product.service.impl.ProductServiceImpl;
-
 /**
- * Additional coverage tests for ProductServiceImpl to reach 100%.
- * Focuses on exception paths and edge cases.
+ * Additional coverage tests for ProductServiceImpl to reach 100%. Focuses on exception paths and
+ * edge cases.
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -45,44 +43,43 @@ import com.safezone.product.service.impl.ProductServiceImpl;
 @DisplayName("ProductServiceImpl Coverage Tests")
 class ProductServiceCoverageTest {
 
-    @Mock
-    private ProductRepository productRepository;
+    @Mock private ProductRepository productRepository;
 
-    @Mock
-    private ProductMapper productMapper;
+    @Mock private ProductMapper productMapper;
 
-    @InjectMocks
-    private ProductServiceImpl productService;
+    @InjectMocks private ProductServiceImpl productService;
 
     private Product testProduct;
     private ProductResponse testProductResponse;
 
     @BeforeEach
     void setUp() {
-        testProduct = Product.builder()
-                .id(1L)
-                .name("Test")
-                .description("Desc")
-                .price(BigDecimal.TEN)
-                .stockQuantity(50)
-                .sku("SKU-1")
-                .category(ProductCategory.ELECTRONICS)
-                .active(true)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
+        testProduct =
+                Product.builder()
+                        .id(1L)
+                        .name("Test")
+                        .description("Desc")
+                        .price(BigDecimal.TEN)
+                        .stockQuantity(50)
+                        .sku("SKU-1")
+                        .category(ProductCategory.ELECTRONICS)
+                        .active(true)
+                        .createdAt(LocalDateTime.now())
+                        .updatedAt(LocalDateTime.now())
+                        .build();
 
-        testProductResponse = new ProductResponse(
-                1L,
-                "Test",
-                "Desc",
-                BigDecimal.TEN,
-                50,
-                "SKU-1",
-                ProductCategory.ELECTRONICS,
-                true,
-                LocalDateTime.now(),
-                LocalDateTime.now());
+        testProductResponse =
+                new ProductResponse(
+                        1L,
+                        "Test",
+                        "Desc",
+                        BigDecimal.TEN,
+                        50,
+                        "SKU-1",
+                        ProductCategory.ELECTRONICS,
+                        true,
+                        LocalDateTime.now(),
+                        LocalDateTime.now());
     }
 
     @Test
@@ -115,13 +112,14 @@ class ProductServiceCoverageTest {
     @Test
     @DisplayName("updateProduct applies all non-null fields")
     void updateProductAppliesAllFields() {
-        UpdateProductRequest request = new UpdateProductRequest(
-                "New Name",
-                "New Desc",
-                BigDecimal.valueOf(200),
-                75,
-                ProductCategory.BOOKS,
-                false);
+        UpdateProductRequest request =
+                new UpdateProductRequest(
+                        "New Name",
+                        "New Desc",
+                        BigDecimal.valueOf(200),
+                        75,
+                        ProductCategory.BOOKS,
+                        false);
 
         given(productRepository.findById(1L)).willReturn(Optional.of(testProduct));
         given(productRepository.save(any(Product.class))).willReturn(testProduct);
@@ -136,13 +134,8 @@ class ProductServiceCoverageTest {
     @Test
     @DisplayName("updateProduct with partial fields only updates non-null")
     void updateProductPartial() {
-        UpdateProductRequest request = new UpdateProductRequest(
-                "Only Name",
-                null,
-                null,
-                null,
-                null,
-                null);
+        UpdateProductRequest request =
+                new UpdateProductRequest("Only Name", null, null, null, null, null);
 
         given(productRepository.findById(1L)).willReturn(Optional.of(testProduct));
         given(productRepository.save(any(Product.class))).willReturn(testProduct);
@@ -204,13 +197,8 @@ class ProductServiceCoverageTest {
     @Test
     @DisplayName("updateProduct with description set to null")
     void updateProductWithDescriptionNull() {
-        UpdateProductRequest request = new UpdateProductRequest(
-                null,
-                "Description",
-                null,
-                null,
-                null,
-                null);
+        UpdateProductRequest request =
+                new UpdateProductRequest(null, "Description", null, null, null, null);
 
         given(productRepository.findById(1L)).willReturn(Optional.of(testProduct));
         given(productRepository.save(any(Product.class))).willReturn(testProduct);
