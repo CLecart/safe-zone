@@ -1,8 +1,8 @@
 package com.safezone.product.entity;
 
 /**
- * Enumeration of product categories for catalog organization.
- * Used to classify products and enable category-based filtering.
+ * Enumeration of product categories for catalog organization. Used to classify products and enable
+ * category-based filtering.
  *
  * @author SafeZone Team
  * @version 1.0.0

@@ -14,16 +14,16 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 /**
  * CORS configuration for the API Gateway.
+ *
  * <p>
- * Configures Cross-Origin Resource Sharing to allow requests from
- * web applications hosted on different domains.
- * </p>
+ * Configures Cross-Origin Resource Sharing to allow requests from web
+ * applications hosted on
+ * different domains.
  *
  * @author SafeZone Team
  * @version 1.0.0
  * @since 2024-01-06
  */
-
 @Configuration
 public class CorsConfig {
 
@@ -35,8 +35,8 @@ public class CorsConfig {
      * Factorized logic for building a CorsConfiguration, used by both the bean and
      * tests.
      */
-    public @NonNull CorsConfiguration buildCorsConfiguration(String allowedOriginsProp, boolean allowWildcard) {
-        @NonNull
+    public @NonNull CorsConfiguration buildCorsConfiguration(
+            String allowedOriginsProp, boolean allowWildcard) {
         CorsConfiguration corsConfig = new CorsConfiguration();
         List<String> allowedOrigins = java.util.Arrays.stream(allowedOriginsProp.split(","))
                 .map(String::trim)
@@ -68,11 +68,13 @@ public class CorsConfig {
 
     /**
      * Creates a CORS filter with configurable settings.
+     *
      * <p>
      * The bean reads `cors.allowed-origins` and `cors.allow-wildcard` to determine
-     * the effective configuration. When `cors.allowed-origins` is empty, the
-     * bean defaults to localhost origins for development convenience.
-     * </p>
+     * the effective
+     * configuration. When `cors.allowed-origins` is empty, the bean defaults to
+     * localhost origins
+     * for development convenience.
      *
      * @return the configured CORS web filter
      */
@@ -87,7 +89,6 @@ public class CorsConfig {
             logger.warn(
                     "'cors.allowed-origins' not set; defaulting to localhost origins for development. Set a strict list in production.");
         }
-        @NonNull
         CorsConfiguration corsConfig = buildCorsConfiguration(allowedOriginsProp, allowWildcard);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

@@ -4,8 +4,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 /**
- * Configuration properties for external services.
- * Maps properties under "services" prefix from application.yml.
+ * Configuration properties for external services. Maps properties under "services" prefix from
+ * application.yml.
  *
  * @author SafeZone Team
  * @version 1.0.0

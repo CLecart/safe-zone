@@ -6,8 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * Coverage tests for {@link OrderStatus} enum.
- * Tests all enum values are accessible.
+ * Coverage tests for {@link OrderStatus} enum. Tests all enum values are accessible.
  *
  * @author SafeZone Team
  * @version 1.0.0

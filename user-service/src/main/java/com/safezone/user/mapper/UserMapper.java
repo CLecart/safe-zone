@@ -3,15 +3,14 @@ package com.safezone.user.mapper;
 import com.safezone.user.dto.RegisterRequest;
 import com.safezone.user.dto.UserResponse;
 import com.safezone.user.entity.User;
+import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 
-import java.util.List;
-
 /**
- * MapStruct mapper for User entity and DTO conversions.
- * Provides compile-time generated mapping implementations.
+ * MapStruct mapper for User entity and DTO conversions. Provides compile-time generated mapping
+ * implementations.
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -21,8 +20,8 @@ import java.util.List;
 public interface UserMapper {
 
     /**
-     * Converts a registration request to a User entity.
-     * Generated fields (id, timestamps, status) are ignored.
+     * Converts a registration request to a User entity. Generated fields (id, timestamps, status)
+     * are ignored.
      *
      * @param request the registration request
      * @return the mapped User entity

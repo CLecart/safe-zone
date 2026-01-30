@@ -1,5 +1,15 @@
 package com.safezone.order.controller;
 
+import com.safezone.common.dto.ApiResponse;
+import com.safezone.common.dto.PageResponse;
+import com.safezone.order.dto.CreateOrderRequest;
+import com.safezone.order.dto.OrderResponse;
+import com.safezone.order.entity.OrderStatus;
+import com.safezone.order.service.OrderService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,26 +26,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.safezone.common.dto.ApiResponse;
-import com.safezone.common.dto.PageResponse;
-import com.safezone.order.dto.CreateOrderRequest;
-import com.safezone.order.dto.OrderResponse;
-import com.safezone.order.entity.OrderStatus;
-import com.safezone.order.service.OrderService;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-
 /**
- * REST controller for order management operations.
- * Provides endpoints for order creation, retrieval, and status management.
+ * REST controller for order management operations. Provides endpoints for order creation,
+ * retrieval, and status management.
  *
- * <p>
- * All endpoints require authentication. Admin role required for
- * viewing all orders and updating order status.
- * </p>
+ * <p>All endpoints require authentication. Admin role required for viewing all orders and updating
+ * order status.
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -149,17 +145,15 @@ public class OrderController {
     }
 
     private Pageable createPageable(int page, int size, String sortBy, String sortDir) {
-        Sort sort = sortDir.equalsIgnoreCase("desc")
-                ? Sort.by(sortBy).descending()
-                : Sort.by(sortBy).ascending();
+        Sort sort =
+                sortDir.equalsIgnoreCase("desc")
+                        ? Sort.by(sortBy).descending()
+                        : Sort.by(sortBy).ascending();
         return PageRequest.of(page, size, sort);
     }
 
     private <T> PageResponse<T> toPageResponse(Page<T> page) {
         return PageResponse.of(
-                page.getContent(),
-                page.getNumber(),
-                page.getSize(),
-                page.getTotalElements());
+                page.getContent(), page.getNumber(), page.getSize(), page.getTotalElements());
     }
 }

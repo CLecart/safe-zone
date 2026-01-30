@@ -1,8 +1,8 @@
 package com.safezone.user.entity;
 
 /**
- * Enumeration of user roles for access control.
- * Defines the permission levels available in the system.
+ * Enumeration of user roles for access control. Defines the permission levels available in the
+ * system.
  *
  * @author SafeZone Team
  * @version 1.0.0

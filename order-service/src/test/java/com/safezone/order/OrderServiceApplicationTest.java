@@ -12,10 +12,9 @@ import org.springframework.web.client.RestTemplate;
 
 /**
  * Integration tests for the Order Service Application.
- * <p>
- * Verifies that the Spring application context loads correctly
- * and all required beans are properly configured.
- * </p>
+ *
+ * <p>Verifies that the Spring application context loads correctly and all required beans are
+ * properly configured.
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -25,11 +24,9 @@ import org.springframework.web.client.RestTemplate;
 @DisplayName("Order Service Application Tests")
 class OrderServiceApplicationTest {
 
-    @Autowired
-    private ApplicationContext applicationContext;
+    @Autowired private ApplicationContext applicationContext;
 
-    @MockitoBean
-    private RestTemplate restTemplate;
+    @MockitoBean private RestTemplate restTemplate;
 
     @Test
     @DisplayName("Should load application context successfully")

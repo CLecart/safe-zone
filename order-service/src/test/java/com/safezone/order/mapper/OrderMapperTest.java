@@ -2,21 +2,19 @@ package com.safezone.order.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-
 import com.safezone.order.dto.OrderItemResponse;
 import com.safezone.order.dto.OrderResponse;
 import com.safezone.order.entity.Order;
 import com.safezone.order.entity.OrderItem;
 import com.safezone.order.entity.OrderStatus;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * Tests for OrderMapper to reach 100% coverage.
@@ -29,24 +27,24 @@ import com.safezone.order.entity.OrderStatus;
 @DisplayName("OrderMapper Tests")
 class OrderMapperTest {
 
-    @Autowired
-    private OrderMapper mapper;
+    @Autowired private OrderMapper mapper;
 
     @Test
     @DisplayName("toResponse maps order entity to DTO")
     void toResponseMapsOrder() {
-        Order order = Order.builder()
-                .id(1L)
-                .orderNumber("ORD-001")
-                .userId(100L)
-                .status(OrderStatus.PENDING)
-                .totalAmount(BigDecimal.valueOf(299.99))
-                .shippingAddress("123 Ship St")
-                .billingAddress("456 Bill Ave")
-                .items(new ArrayList<>())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
+        Order order =
+                Order.builder()
+                        .id(1L)
+                        .orderNumber("ORD-001")
+                        .userId(100L)
+                        .status(OrderStatus.PENDING)
+                        .totalAmount(BigDecimal.valueOf(299.99))
+                        .shippingAddress("123 Ship St")
+                        .billingAddress("456 Bill Ave")
+                        .items(new ArrayList<>())
+                        .createdAt(LocalDateTime.now())
+                        .updatedAt(LocalDateTime.now())
+                        .build();
 
         OrderResponse dto = mapper.toResponse(order);
 
@@ -68,15 +66,16 @@ class OrderMapperTest {
     @Test
     @DisplayName("toItemResponse maps order item entity to DTO")
     void toItemResponseMapsOrderItem() {
-        OrderItem item = OrderItem.builder()
-                .id(10L)
-                .productId(500L)
-                .productName("Test Product")
-                .productSku("TEST-SKU")
-                .quantity(3)
-                .unitPrice(BigDecimal.valueOf(49.99))
-                .subtotal(BigDecimal.valueOf(149.97))
-                .build();
+        OrderItem item =
+                OrderItem.builder()
+                        .id(10L)
+                        .productId(500L)
+                        .productName("Test Product")
+                        .productSku("TEST-SKU")
+                        .quantity(3)
+                        .unitPrice(BigDecimal.valueOf(49.99))
+                        .subtotal(BigDecimal.valueOf(149.97))
+                        .build();
 
         OrderItemResponse dto = mapper.toItemResponse(item);
 
@@ -100,23 +99,25 @@ class OrderMapperTest {
     @Test
     @DisplayName("toResponseList maps order list to DTOs")
     void toResponseListMapsOrderList() {
-        Order order1 = Order.builder()
-                .id(1L)
-                .orderNumber("ORD-001")
-                .userId(100L)
-                .status(OrderStatus.CONFIRMED)
-                .totalAmount(BigDecimal.valueOf(99.99))
-                .items(new ArrayList<>())
-                .build();
+        Order order1 =
+                Order.builder()
+                        .id(1L)
+                        .orderNumber("ORD-001")
+                        .userId(100L)
+                        .status(OrderStatus.CONFIRMED)
+                        .totalAmount(BigDecimal.valueOf(99.99))
+                        .items(new ArrayList<>())
+                        .build();
 
-        Order order2 = Order.builder()
-                .id(2L)
-                .orderNumber("ORD-002")
-                .userId(200L)
-                .status(OrderStatus.PROCESSING)
-                .totalAmount(BigDecimal.valueOf(199.99))
-                .items(new ArrayList<>())
-                .build();
+        Order order2 =
+                Order.builder()
+                        .id(2L)
+                        .orderNumber("ORD-002")
+                        .userId(200L)
+                        .status(OrderStatus.PROCESSING)
+                        .totalAmount(BigDecimal.valueOf(199.99))
+                        .items(new ArrayList<>())
+                        .build();
 
         List<OrderResponse> dtoList = mapper.toResponseList(List.of(order1, order2));
 

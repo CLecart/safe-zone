@@ -14,11 +14,13 @@ import com.safezone.common.security.JwtTokenProvider;
 
 /**
  * Security configuration for the Order Service.
+ *
  * <p>
- * Configures JWT-based authentication with stateless session management.
- * Public endpoints include actuator health checks and Swagger documentation.
- * All other endpoints require authentication.
- * </p>
+ * Configures JWT-based authentication with stateless session management. Public
+ * endpoints
+ * include actuator health checks and Swagger documentation. All other endpoints
+ * require
+ * authentication.
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -43,36 +45,42 @@ public class SecurityConfig {
 
         /**
          * Configures the security filter chain for HTTP requests.
+         *
          * <p>
          * Security configuration includes:
+         *
          * <ul>
-         * <li>CSRF protection disabled for stateless API</li>
-         * <li>Stateless session management</li>
-         * <li>Public access to actuator and Swagger endpoints</li>
-         * <li>JWT authentication filter for protected endpoints</li>
+         * <li>CSRF protection disabled for stateless API
+         * <li>Stateless session management
+         * <li>Public access to actuator and Swagger endpoints
+         * <li>JWT authentication filter for protected endpoints
          * </ul>
-         * </p>
+         *
          * <p>
-         * Rationale: CSRF is disabled because the API is stateless and protected by
-         * JWT bearer tokens; state-changing endpoints require authentication. See
-         * `.github/SONAR_S4502_JUSTIFICATION.md` for the Sonar S4502 justification
-         * and reviewer checklist.
-         * </p>
+         * Rationale: CSRF is disabled because the API is stateless and protected by JWT
+         * bearer
+         * tokens; state-changing endpoints require authentication. See
+         * `.github/SONAR_S4502_JUSTIFICATION.md` for the Sonar S4502 justification and
+         * reviewer
+         * checklist.
          *
          * @param http the HttpSecurity builder to configure
          * @return the configured SecurityFilterChain
          * @throws Exception if security configuration fails
          */
         @Bean
-        public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                        CorsConfigurationSource corsConfigurationSource) throws Exception {
-                // See CommonSecurityConfigurer for CSRF/CORS policy and S4502 justification.
-                CommonSecurityConfigurer.applyDefaultSecurity(http, jwtTokenProvider, corsConfigurationSource)
-                                .authorizeHttpRequests(auth -> auth
-                                                .requestMatchers(HttpMethod.GET, "/api/v1/orders/{id}",
+        public SecurityFilterChain securityFilterChain(
+                        HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception {
+                CommonSecurityConfigurer.applyDefaultSecurity(
+                                http, jwtTokenProvider, corsConfigurationSource)
+                                .authorizeHttpRequests(
+                                                auth -> auth.requestMatchers(
+                                                                HttpMethod.GET,
+                                                                "/api/v1/orders/{id}",
                                                                 "/api/v1/orders/number/{orderNumber}")
-                                                .permitAll()
-                                                .anyRequest().authenticated());
+                                                                .permitAll()
+                                                                .anyRequest()
+                                                                .authenticated());
                 return http.build();
         }
 }

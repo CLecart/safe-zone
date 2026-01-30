@@ -2,13 +2,12 @@ package com.safezone.common.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.swagger.v3.oas.models.OpenAPI;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-
-import io.swagger.v3.oas.models.OpenAPI;
 
 /**
  * Unit tests for {@link OpenApiConfig}.
@@ -18,13 +17,10 @@ import io.swagger.v3.oas.models.OpenAPI;
  * @since 2026-01-08
  */
 @SpringBootTest(classes = OpenApiConfig.class)
-@TestPropertySource(properties = {
-        "spring.application.name=Test Service"
-})
+@TestPropertySource(properties = {"spring.application.name=Test Service"})
 class OpenApiConfigTest {
 
-    @Autowired
-    private OpenAPI openAPI;
+    @Autowired private OpenAPI openAPI;
 
     @Test
     @DisplayName("Should create OpenAPI bean with JWT security")

@@ -1,8 +1,8 @@
 package com.safezone.order.entity;
 
 /**
- * Enumeration of order lifecycle states.
- * Represents the progression of an order from creation to completion.
+ * Enumeration of order lifecycle states. Represents the progression of an order from creation to
+ * completion.
  *
  * @author SafeZone Team
  * @version 1.0.0

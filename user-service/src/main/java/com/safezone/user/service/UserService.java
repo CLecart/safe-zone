@@ -10,8 +10,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 /**
- * Service interface for user management and authentication operations.
- * Provides user registration, authentication, and role management functionality.
+ * Service interface for user management and authentication operations. Provides user registration,
+ * authentication, and role management functionality.
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -33,7 +33,8 @@ public interface UserService {
      *
      * @param request the login request with username and password
      * @return authentication response with JWT token and user info
-     * @throws com.safezone.common.exception.BusinessException if credentials invalid or account disabled
+     * @throws com.safezone.common.exception.BusinessException if credentials invalid or account
+     *     disabled
      */
     AuthResponse login(LoginRequest request);
 

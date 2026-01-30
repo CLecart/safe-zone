@@ -23,12 +23,16 @@ class CommonSecurityConfigTest {
         MockHttpServletRequest req = new MockHttpServletRequest();
         req.setRequestURI("/api/test");
 
-        CorsConfiguration cors = java.util.Objects.requireNonNull(
-                source.getCorsConfiguration(req),
-                "CorsConfigurationSource returned null for request: " + req.getRequestURI());
+        CorsConfiguration cors =
+                java.util.Objects.requireNonNull(
+                        source.getCorsConfiguration(req),
+                        "CorsConfigurationSource returned null for request: "
+                                + req.getRequestURI());
         assertThat(cors).isNotNull();
-        assertThat(cors.getAllowedOrigins()).contains("http://localhost:3000", "http://127.0.0.1:3000");
-        assertThat(cors.getAllowedMethods()).contains("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS");
+        assertThat(cors.getAllowedOrigins())
+                .contains("http://localhost:3000", "http://127.0.0.1:3000");
+        assertThat(cors.getAllowedMethods())
+                .contains("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS");
         assertThat(cors.getAllowedHeaders()).contains("*");
         assertThat(cors.getExposedHeaders()).contains("Authorization", "Content-Type");
         assertThat(cors.getAllowCredentials()).isFalse();

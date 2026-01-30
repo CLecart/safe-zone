@@ -2,21 +2,19 @@ package com.safezone.user.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.safezone.user.dto.RegisterRequest;
+import com.safezone.user.dto.UserResponse;
+import com.safezone.user.entity.User;
+import com.safezone.user.entity.UserRole;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import com.safezone.user.dto.RegisterRequest;
-import com.safezone.user.dto.UserResponse;
-import com.safezone.user.entity.User;
-import com.safezone.user.entity.UserRole;
 
 /**
  * Tests for UserMapper to achieve 100% coverage.
@@ -29,19 +27,19 @@ import com.safezone.user.entity.UserRole;
 @DisplayName("UserMapper Tests")
 class UserMapperTest {
 
-    @Autowired
-    private UserMapper mapper;
+    @Autowired private UserMapper mapper;
 
     @Test
     @DisplayName("toEntity maps RegisterRequest to User with ignored fields")
     void toEntityMapsRegisterRequestToUser() {
-        RegisterRequest request = new RegisterRequest(
-                "testuser",
-                "test@example.com",
-                "password123",
-                "John",
-                "Doe",
-                "+1234567890");
+        RegisterRequest request =
+                new RegisterRequest(
+                        "testuser",
+                        "test@example.com",
+                        "password123",
+                        "John",
+                        "Doe",
+                        "+1234567890");
 
         User user = mapper.toEntity(request);
 
@@ -54,9 +52,9 @@ class UserMapperTest {
         assertThat(user.getLastName()).isEqualTo("Doe");
         assertThat(user.getPhone()).isEqualTo("+1234567890");
         // MapStruct may initialize collections to empty instead of null
-        assertThat(user.getRoles()).satisfiesAnyOf(
-                roles -> assertThat(roles).isNull(),
-                roles -> assertThat(roles).isEmpty());
+        assertThat(user.getRoles())
+                .satisfiesAnyOf(
+                        roles -> assertThat(roles).isNull(), roles -> assertThat(roles).isEmpty());
         assertThat(user.getEnabled()).isNull();
         assertThat(user.getLocked()).isNull();
         assertThat(user.getCreatedAt()).isNull();
@@ -78,19 +76,20 @@ class UserMapperTest {
         roles.add(UserRole.USER);
         roles.add(UserRole.ADMIN);
 
-        User user = User.builder()
-                .id(1L)
-                .username("johndoe")
-                .email("john@example.com")
-                .firstName("John")
-                .lastName("Doe")
-                .phone("+9876543210")
-                .roles(roles)
-                .enabled(true)
-                .locked(false)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
+        User user =
+                User.builder()
+                        .id(1L)
+                        .username("johndoe")
+                        .email("john@example.com")
+                        .firstName("John")
+                        .lastName("Doe")
+                        .phone("+9876543210")
+                        .roles(roles)
+                        .enabled(true)
+                        .locked(false)
+                        .createdAt(LocalDateTime.now())
+                        .updatedAt(LocalDateTime.now())
+                        .build();
 
         UserResponse response = mapper.toResponse(user);
 
@@ -115,27 +114,29 @@ class UserMapperTest {
     @Test
     @DisplayName("toResponseList maps User list to UserResponse list")
     void toResponseListMapsUserListToUserResponseList() {
-        User user1 = User.builder()
-                .id(1L)
-                .username("user1")
-                .email("user1@example.com")
-                .firstName("First1")
-                .lastName("Last1")
-                .roles(new HashSet<>())
-                .enabled(true)
-                .locked(false)
-                .build();
+        User user1 =
+                User.builder()
+                        .id(1L)
+                        .username("user1")
+                        .email("user1@example.com")
+                        .firstName("First1")
+                        .lastName("Last1")
+                        .roles(new HashSet<>())
+                        .enabled(true)
+                        .locked(false)
+                        .build();
 
-        User user2 = User.builder()
-                .id(2L)
-                .username("user2")
-                .email("user2@example.com")
-                .firstName("First2")
-                .lastName("Last2")
-                .roles(new HashSet<>())
-                .enabled(false)
-                .locked(true)
-                .build();
+        User user2 =
+                User.builder()
+                        .id(2L)
+                        .username("user2")
+                        .email("user2@example.com")
+                        .firstName("First2")
+                        .lastName("Last2")
+                        .roles(new HashSet<>())
+                        .enabled(false)
+                        .locked(true)
+                        .build();
 
         List<UserResponse> responseList = mapper.toResponseList(List.of(user1, user2));
 

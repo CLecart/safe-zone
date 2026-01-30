@@ -4,9 +4,8 @@ import java.math.BigDecimal;
 
 /**
  * Data Transfer Object for product information from the Product Service.
- * <p>
- * Used by the Order Service to cache product details when processing orders.
- * </p>
+ *
+ * <p>Used by the Order Service to cache product details when processing orders.
  *
  * @param id the unique identifier of the product
  * @param name the name of the product
@@ -24,5 +23,4 @@ public record ProductDto(
         String sku,
         BigDecimal price,
         Integer stockQuantity,
-        Boolean active
-) {}
+        Boolean active) {}

@@ -1,16 +1,16 @@
 package com.safezone.product;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
- * Integration tests for the Product Service application context.
- * Verifies that the Spring context loads correctly and required beans are present.
+ * Integration tests for the Product Service application context. Verifies that the Spring context
+ * loads correctly and required beans are present.
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -21,8 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ProductServiceApplicationTest {
 
     /** The Spring application context for bean verification. */
-    @Autowired
-    private ApplicationContext applicationContext;
+    @Autowired private ApplicationContext applicationContext;
 
     @Test
     @DisplayName("Should load application context successfully")

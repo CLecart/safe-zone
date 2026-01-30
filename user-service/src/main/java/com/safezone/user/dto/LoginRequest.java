@@ -4,9 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 
 /**
  * Request DTO for user authentication.
- * <p>
- * Contains credentials for logging into the system.
- * </p>
+ *
+ * <p>Contains credentials for logging into the system.
  *
  * @param username the username for authentication
  * @param password the password for authentication
@@ -15,9 +14,5 @@ import jakarta.validation.constraints.NotBlank;
  * @since 2024-01-06
  */
 public record LoginRequest(
-        @NotBlank(message = "Username is required")
-        String username,
-
-        @NotBlank(message = "Password is required")
-        String password
-) {}
+        @NotBlank(message = "Username is required") String username,
+        @NotBlank(message = "Password is required") String password) {}

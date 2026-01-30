@@ -14,10 +14,9 @@ import org.springframework.test.context.ActiveProfiles;
 
 /**
  * Integration tests for the API Gateway Application.
- * <p>
- * Verifies that the Spring application context loads correctly,
- * routes are properly configured, and filters are working.
- * </p>
+ *
+ * <p>Verifies that the Spring application context loads correctly, routes are properly configured,
+ * and filters are working.
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -28,11 +27,9 @@ import org.springframework.test.context.ActiveProfiles;
 @DisplayName("API Gateway Application Tests")
 class ApiGatewayApplicationTest {
 
-    @Autowired
-    private ApplicationContext applicationContext;
+    @Autowired private ApplicationContext applicationContext;
 
-    @Autowired
-    private RouteLocator routeLocator;
+    @Autowired private RouteLocator routeLocator;
 
     // Test configuration to provide beans required during context startup (e.g.
     // JwtTokenProvider)
@@ -47,7 +44,6 @@ class ApiGatewayApplicationTest {
             String secret = java.util.Base64.getEncoder().encodeToString(key);
             return new com.safezone.common.security.JwtTokenProvider(secret, 86400000L);
         }
-
     }
 
     @Test
@@ -64,7 +60,7 @@ class ApiGatewayApplicationTest {
     }
 
     @ParameterizedTest(name = "Should have {0} service route")
-    @ValueSource(strings = { "product", "order", "user" })
+    @ValueSource(strings = {"product", "order", "user"})
     @DisplayName("Should have service routes configured")
     void shouldHaveServiceRoute(String serviceName) {
         var routes = routeLocator.getRoutes().collectList().block();

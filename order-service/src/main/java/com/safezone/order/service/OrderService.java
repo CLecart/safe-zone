@@ -7,8 +7,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 /**
- * Service interface for order management operations.
- * Handles order lifecycle from creation through fulfillment and cancellation.
+ * Service interface for order management operations. Handles order lifecycle from creation through
+ * fulfillment and cancellation.
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -17,8 +17,8 @@ import org.springframework.data.domain.Pageable;
 public interface OrderService {
 
     /**
-     * Creates a new order from the provided request.
-     * Validates product availability and calculates total amount.
+     * Creates a new order from the provided request. Validates product availability and calculates
+     * total amount.
      *
      * @param request the order creation request with items and addresses
      * @return the created order response with generated order number
@@ -71,8 +71,7 @@ public interface OrderService {
     Page<OrderResponse> getOrdersByStatus(OrderStatus status, Pageable pageable);
 
     /**
-     * Updates the status of an order.
-     * Validates status transitions according to business rules.
+     * Updates the status of an order. Validates status transitions according to business rules.
      *
      * @param id the order ID
      * @param status the new order status
@@ -82,8 +81,7 @@ public interface OrderService {
     OrderResponse updateOrderStatus(Long id, OrderStatus status);
 
     /**
-     * Cancels an existing order.
-     * Only orders in PENDING or CONFIRMED status can be cancelled.
+     * Cancels an existing order. Only orders in PENDING or CONFIRMED status can be cancelled.
      *
      * @param id the order ID to cancel
      * @return the cancelled order response

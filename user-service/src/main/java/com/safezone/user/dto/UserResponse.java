@@ -1,15 +1,13 @@
 package com.safezone.user.dto;
 
 import com.safezone.user.entity.UserRole;
-
 import java.time.LocalDateTime;
 import java.util.Set;
 
 /**
  * Response DTO for user information.
- * <p>
- * Contains user profile data excluding sensitive information like passwords.
- * </p>
+ *
+ * <p>Contains user profile data excluding sensitive information like passwords.
  *
  * @param id the unique identifier of the user
  * @param username the username
@@ -37,5 +35,4 @@ public record UserResponse(
         Set<UserRole> roles,
         Boolean enabled,
         LocalDateTime createdAt,
-        LocalDateTime lastLoginAt
-) {}
+        LocalDateTime lastLoginAt) {}

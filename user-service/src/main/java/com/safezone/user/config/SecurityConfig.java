@@ -12,11 +12,13 @@ import com.safezone.common.security.JwtTokenProvider;
 
 /**
  * Security configuration for the User Service.
+ *
  * <p>
  * Configures JWT-based authentication with stateless session management.
- * Provides password encoder bean and security filter chain.
- * Public endpoints include auth endpoints, actuator, and Swagger docs.
- * </p>
+ * Provides password
+ * encoder bean and security filter chain. Public endpoints include auth
+ * endpoints, actuator, and
+ * Swagger docs.
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -27,9 +29,7 @@ import com.safezone.common.security.JwtTokenProvider;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    /**
-     * Provides a BCrypt password encoder bean for secure password hashing.
-     */
+    /** Provides a BCrypt password encoder bean for secure password hashing. */
     @Bean
     public org.springframework.security.crypto.password.PasswordEncoder passwordEncoder() {
         return new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
@@ -52,27 +52,39 @@ public class SecurityConfig {
      *
      * <p>
      * CSRF protection is disabled intentionally because this service exposes a
-     * stateless JSON API secured by JWT bearer tokens. State-changing operations
-     * require a valid JWT and are therefore not vulnerable to browser-based CSRF
-     * attacks in this architecture. For the complete Sonar S4502 justification
-     * and reviewer guidance, see `.github/SONAR_S4502_JUSTIFICATION.md`.
-     * </p>
+     * stateless JSON
+     * API secured by JWT bearer tokens. State-changing operations require a valid
+     * JWT and are
+     * therefore not vulnerable to browser-based CSRF attacks in this architecture.
+     * For the complete
+     * Sonar S4502 justification and reviewer guidance, see
+     * `.github/SONAR_S4502_JUSTIFICATION.md`.
      *
      * @param http the HttpSecurity builder to configure
      * @return the configured SecurityFilterChain
      * @throws Exception if security configuration fails
      */
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http,
-            org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource) throws Exception {
-        // See CommonSecurityConfigurer for CSRF/CORS policy and S4502 justification
-        CommonSecurityConfigurer.applyDefaultSecurity(http, jwtTokenProvider, corsConfigurationSource)
-                .authorizeHttpRequests(auth -> auth
-                        // Common public endpoints (actuator & swagger) are configured in
-                        // CommonSecurityConfigurer
-                        .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/users/{id}").permitAll()
-                        .anyRequest().authenticated());
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource)
+            throws Exception {
+        // Centralized default security configuration (CSRF/CORS/S4502 justification)
+        CommonSecurityConfigurer.applyDefaultSecurity(
+                http, jwtTokenProvider, corsConfigurationSource)
+                .authorizeHttpRequests(
+                        auth -> auth
+                                // Common public endpoints (actuator & swagger) are
+                                // configured in
+                                // CommonSecurityConfigurer
+                                .requestMatchers("/api/v1/auth/**")
+                                .permitAll()
+                                .requestMatchers(
+                                        org.springframework.http.HttpMethod.GET,
+                                        "/api/v1/users/{id}")
+                                .permitAll()
+                                .anyRequest()
+                                .authenticated());
         return http.build();
     }
 }

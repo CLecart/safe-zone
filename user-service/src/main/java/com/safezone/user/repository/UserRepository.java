@@ -2,6 +2,7 @@ package com.safezone.user.repository;
 
 import com.safezone.user.entity.User;
 import com.safezone.user.entity.UserRole;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,11 +10,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
-
 /**
- * Spring Data JPA repository for User entities.
- * Provides CRUD operations and custom queries for user management.
+ * Spring Data JPA repository for User entities. Provides CRUD operations and custom queries for
+ * user management.
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -65,7 +64,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     /**
      * Finds users with a specific role.
      *
-     * @param role     the user role
+     * @param role the user role
      * @param pageable pagination parameters
      * @return page of users with the given role
      */
@@ -75,13 +74,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
     /**
      * Searches users by username, email, or name.
      *
-     * @param search   the search term
+     * @param search the search term
      * @param pageable pagination parameters
      * @return page of matching users
      */
-    @Query("SELECT u FROM User u WHERE LOWER(u.username) LIKE LOWER(CONCAT('%', :search, '%')) " +
-            "OR LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%')) " +
-            "OR LOWER(u.firstName) LIKE LOWER(CONCAT('%', :search, '%')) " +
-            "OR LOWER(u.lastName) LIKE LOWER(CONCAT('%', :search, '%'))")
+    @Query(
+            "SELECT u FROM User u WHERE LOWER(u.username) LIKE LOWER(CONCAT('%', :search, '%')) "
+                    + "OR LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%')) "
+                    + "OR LOWER(u.firstName) LIKE LOWER(CONCAT('%', :search, '%')) "
+                    + "OR LOWER(u.lastName) LIKE LOWER(CONCAT('%', :search, '%'))")
     Page<User> searchUsers(@Param("search") String search, Pageable pageable);
 }

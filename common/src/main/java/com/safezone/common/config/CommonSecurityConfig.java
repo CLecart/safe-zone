@@ -1,8 +1,6 @@
-
 package com.safezone.common.config;
 
 import java.util.List;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -10,19 +8,15 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 /**
- * Common utility for security configuration (CORS, CSRF, etc.)
- * to be used in all microservices to avoid duplication.
+ * Common utility for security configuration (CORS, CSRF, etc.) to be used in all microservices to
+ * avoid duplication.
  */
 @Configuration(proxyBeanMethods = false)
 public class CommonSecurityConfig {
     // Prevent instantiation
-    private CommonSecurityConfig() {
-    }
+    private CommonSecurityConfig() {}
 
-    /**
-     * Shared CORS bean: always disallows credentials at the service level.
-     */
-
+    /** Shared CORS bean: always disallows credentials at the service level. */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();

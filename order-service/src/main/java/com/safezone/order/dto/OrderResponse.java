@@ -1,17 +1,15 @@
 package com.safezone.order.dto;
 
 import com.safezone.order.entity.OrderStatus;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
 /**
  * Response DTO for order information.
- * <p>
- * Contains complete order details including order number, status,
- * items, addresses, and timestamps.
- * </p>
+ *
+ * <p>Contains complete order details including order number, status, items, addresses, and
+ * timestamps.
  *
  * @param id the unique identifier of the order
  * @param orderNumber the unique order number for reference
@@ -37,5 +35,4 @@ public record OrderResponse(
         String billingAddress,
         List<OrderItemResponse> items,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt
-) {}
+        LocalDateTime updatedAt) {}

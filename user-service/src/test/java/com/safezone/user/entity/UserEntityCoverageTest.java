@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -27,21 +26,22 @@ class UserEntityCoverageTest {
         roles.add(UserRole.USER);
         roles.add(UserRole.ADMIN);
 
-        User user = User.builder()
-                .id(1L)
-                .username("testuser")
-                .email("test@example.com")
-                .password("hashedpassword")
-                .firstName("John")
-                .lastName("Doe")
-                .phone("+1234567890")
-                .roles(roles)
-                .enabled(true)
-                .locked(false)
-                .createdAt(now)
-                .updatedAt(now)
-                .lastLoginAt(now)
-                .build();
+        User user =
+                User.builder()
+                        .id(1L)
+                        .username("testuser")
+                        .email("test@example.com")
+                        .password("hashedpassword")
+                        .firstName("John")
+                        .lastName("Doe")
+                        .phone("+1234567890")
+                        .roles(roles)
+                        .enabled(true)
+                        .locked(false)
+                        .createdAt(now)
+                        .updatedAt(now)
+                        .lastLoginAt(now)
+                        .build();
 
         assertThat(user.getId()).isEqualTo(1L);
         assertThat(user.getUsername()).isEqualTo("testuser");
@@ -99,20 +99,21 @@ class UserEntityCoverageTest {
         Set<UserRole> roles = new HashSet<>();
         roles.add(UserRole.INVENTORY);
 
-        User user = new User(
-                3L,
-                "constructor",
-                "constructor@example.com",
-                "password",
-                "First",
-                "Last",
-                "+1111111111",
-                roles,
-                true,
-                false,
-                now,
-                now,
-                now);
+        User user =
+                new User(
+                        3L,
+                        "constructor",
+                        "constructor@example.com",
+                        "password",
+                        "First",
+                        "Last",
+                        "+1111111111",
+                        roles,
+                        true,
+                        false,
+                        now,
+                        now,
+                        now);
 
         assertThat(user.getId()).isEqualTo(3L);
         assertThat(user.getUsername()).isEqualTo("constructor");
@@ -212,11 +213,7 @@ class UserEntityCoverageTest {
     @Test
     @DisplayName("getFullName returns full name when both names set")
     void getFullNameReturnsFullNameWhenBothNamesSet() {
-        User user = User.builder()
-                .firstName("John")
-                .lastName("Doe")
-                .username("johndoe")
-                .build();
+        User user = User.builder().firstName("John").lastName("Doe").username("johndoe").build();
 
         assertThat(user.getFullName()).isEqualTo("John Doe");
     }
@@ -224,10 +221,7 @@ class UserEntityCoverageTest {
     @Test
     @DisplayName("getFullName returns first name only when last name null")
     void getFullNameReturnsFirstNameOnlyWhenLastNameNull() {
-        User user = User.builder()
-                .firstName("John")
-                .username("johndoe")
-                .build();
+        User user = User.builder().firstName("John").username("johndoe").build();
 
         assertThat(user.getFullName()).isEqualTo("John");
     }
@@ -235,10 +229,7 @@ class UserEntityCoverageTest {
     @Test
     @DisplayName("getFullName returns last name only when first name null")
     void getFullNameReturnsLastNameOnlyWhenFirstNameNull() {
-        User user = User.builder()
-                .lastName("Doe")
-                .username("johndoe")
-                .build();
+        User user = User.builder().lastName("Doe").username("johndoe").build();
 
         assertThat(user.getFullName()).isEqualTo("Doe");
     }
@@ -246,9 +237,7 @@ class UserEntityCoverageTest {
     @Test
     @DisplayName("getFullName returns username when both names null")
     void getFullNameReturnsUsernameWhenBothNamesNull() {
-        User user = User.builder()
-                .username("johndoe")
-                .build();
+        User user = User.builder().username("johndoe").build();
 
         assertThat(user.getFullName()).isEqualTo("johndoe");
     }

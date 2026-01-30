@@ -113,12 +113,17 @@ class JwtAuthenticationFilterTest {
                 MockServerWebExchange exchange = MockServerWebExchange.from(request);
 
                 GatewayFilterChain chain = mock(GatewayFilterChain.class);
-                when(chain.filter(any())).then(invocation -> {
-                        ServerWebExchange ex = invocation.getArgument(0);
-                        assertThat(ex.getRequest().getHeaders().getFirst("X-User-Id")).isEqualTo("42");
-                        assertThat(ex.getRequest().getHeaders().getFirst("X-User-Roles")).contains("ROLE_USER");
-                        return Mono.empty();
-                });
+                when(chain.filter(any()))
+                                .then(
+                                                invocation -> {
+                                                        ServerWebExchange ex = invocation.getArgument(0);
+                                                        assertThat(ex.getRequest().getHeaders().getFirst("X-User-Id"))
+                                                                        .isEqualTo("42");
+                                                        assertThat(ex.getRequest().getHeaders()
+                                                                        .getFirst("X-User-Roles"))
+                                                                        .contains("ROLE_USER");
+                                                        return Mono.empty();
+                                                });
 
                 filter.apply(new JwtAuthenticationFilter.Config()).filter(exchange, chain).block();
 

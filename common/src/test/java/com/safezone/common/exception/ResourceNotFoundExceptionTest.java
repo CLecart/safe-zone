@@ -21,8 +21,8 @@ class ResourceNotFoundExceptionTest {
         String fieldName = "id";
         Long fieldValue = 123L;
 
-        ResourceNotFoundException exception = new ResourceNotFoundException(
-                resourceName, fieldName, fieldValue);
+        ResourceNotFoundException exception =
+                new ResourceNotFoundException(resourceName, fieldName, fieldValue);
 
         assertThat(exception.getMessage()).isEqualTo("Product not found with id: '123'");
         assertThat(exception.getResourceName()).isEqualTo(resourceName);
@@ -33,8 +33,8 @@ class ResourceNotFoundExceptionTest {
     @Test
     @DisplayName("Should handle string field values")
     void shouldHandleStringFieldValues() {
-        ResourceNotFoundException exception = new ResourceNotFoundException(
-                "User", "username", "john.doe");
+        ResourceNotFoundException exception =
+                new ResourceNotFoundException("User", "username", "john.doe");
 
         assertThat(exception.getMessage()).isEqualTo("User not found with username: 'john.doe'");
         assertThat(exception.getFieldValue()).isEqualTo("john.doe");
