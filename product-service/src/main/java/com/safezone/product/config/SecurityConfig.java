@@ -62,20 +62,7 @@ public class SecurityConfig {
                 CommonSecurityConfigurer.applyDefaultSecurity(http, jwtTokenProvider, corsConfigurationSource)
                                 .authorizeHttpRequests(auth -> auth
                                                 // Public GET endpoints
-                                                .requestMatchers(HttpMethod.GET, "/api/v1/products/{id}").permitAll()
-                                                .requestMatchers(HttpMethod.GET, "/api/v1/products/category/{category}")
-                                                .permitAll()
-                                                .requestMatchers(HttpMethod.GET, "/api/v1/products/sku/{sku}")
-                                                .permitAll()
-                                                .requestMatchers(HttpMethod.GET, "/api/v1/products/active").permitAll()
-                                                .requestMatchers(HttpMethod.GET, "/api/v1/products/low-stock")
-                                                .permitAll()
-                                                .requestMatchers(HttpMethod.GET, "/api/v1/products/search").permitAll()
-                                                .requestMatchers(HttpMethod.GET, "/api/v1/products/{id}/availability")
-                                                .permitAll()
-                                                // GET /api/v1/products (listing) is public for pagination/sorting
-                                                .requestMatchers(HttpMethod.GET, "/api/v1/products").permitAll()
-                                                // All other requests require authentication
+                                                .requestMatchers(HttpMethod.GET, "/api/v1/products/**").permitAll()
                                                 .anyRequest().authenticated())
                                 .exceptionHandling(ex -> ex
                                                 .authenticationEntryPoint((request, response, authException) -> {
