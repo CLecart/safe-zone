@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -14,18 +13,19 @@ class ProductTest {
     @Test
     @DisplayName("Builder creates product with fields")
     void builderCreatesProduct() {
-        Product p = Product.builder()
-                .id(1L)
-                .name("N")
-                .description("D")
-                .price(BigDecimal.TEN)
-                .stockQuantity(3)
-                .sku("S")
-                .category(ProductCategory.ELECTRONICS)
-                .active(true)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
+        Product p =
+                Product.builder()
+                        .id(1L)
+                        .name("N")
+                        .description("D")
+                        .price(BigDecimal.TEN)
+                        .stockQuantity(3)
+                        .sku("S")
+                        .category(ProductCategory.ELECTRONICS)
+                        .active(true)
+                        .createdAt(LocalDateTime.now())
+                        .updatedAt(LocalDateTime.now())
+                        .build();
 
         assertThat(p.getName()).isEqualTo("N");
         assertThat(p.getStockQuantity()).isEqualTo(3);
@@ -35,13 +35,14 @@ class ProductTest {
     @Test
     @DisplayName("onCreate sets timestamps and defaults active")
     void onCreateSetsTimestampsAndActive() {
-        Product p = Product.builder()
-                .name("N")
-                .price(BigDecimal.ONE)
-                .stockQuantity(1)
-                .sku("S")
-                .category(ProductCategory.BOOKS)
-                .build();
+        Product p =
+                Product.builder()
+                        .name("N")
+                        .price(BigDecimal.ONE)
+                        .stockQuantity(1)
+                        .sku("S")
+                        .category(ProductCategory.BOOKS)
+                        .build();
 
         p.onCreate();
 
@@ -53,13 +54,14 @@ class ProductTest {
     @Test
     @DisplayName("onUpdate refreshes updatedAt")
     void onUpdateRefreshesUpdatedAt() {
-        Product p = Product.builder()
-                .name("N")
-                .price(BigDecimal.ONE)
-                .stockQuantity(1)
-                .sku("S")
-                .category(ProductCategory.BOOKS)
-                .build();
+        Product p =
+                Product.builder()
+                        .name("N")
+                        .price(BigDecimal.ONE)
+                        .stockQuantity(1)
+                        .sku("S")
+                        .category(ProductCategory.BOOKS)
+                        .build();
         p.onCreate();
         LocalDateTime before = p.getUpdatedAt();
         p.onUpdate();

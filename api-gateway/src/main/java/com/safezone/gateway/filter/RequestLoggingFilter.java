@@ -1,5 +1,7 @@
 package com.safezone.gateway.filter;
 
+import java.time.Duration;
+import java.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -10,15 +12,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import java.time.Duration;
-import java.time.Instant;
-
 /**
  * Global gateway filter for logging all incoming requests.
- * <p>
- * Logs request details including method, path, and source address.
- * Also tracks and logs response time for performance monitoring.
- * </p>
+ *
+ * <p>Logs request details including method, path, and source address. Also tracks and logs response
+ * time for performance monitoring.
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -32,9 +30,8 @@ public class RequestLoggingFilter implements GlobalFilter, Ordered {
 
     /**
      * Filters the request and logs its details.
-     * <p>
-     * Generates a unique request ID for tracing and measures execution time.
-     * </p>
+     *
+     * <p>Generates a unique request ID for tracing and measures execution time.
      *
      * @param exchange the server web exchange
      * @param chain the gateway filter chain
@@ -46,29 +43,31 @@ public class RequestLoggingFilter implements GlobalFilter, Ordered {
         String requestId = java.util.UUID.randomUUID().toString().substring(0, 8);
         Instant startTime = Instant.now();
 
-        logger.info("[{}] Incoming request: {} {} from {}",
+        logger.info(
+                "[{}] Incoming request: {} {} from {}",
                 requestId,
                 request.getMethod(),
                 request.getPath(),
                 request.getRemoteAddress());
 
         return chain.filter(exchange)
-                .doFinally(signalType -> {
-                    Duration duration = Duration.between(startTime, Instant.now());
-                    logger.info("[{}] Request completed: {} {} - Status: {} - Duration: {}ms",
-                            requestId,
-                            request.getMethod(),
-                            request.getPath(),
-                            exchange.getResponse().getStatusCode(),
-                            duration.toMillis());
-                });
+                .doFinally(
+                        signalType -> {
+                            Duration duration = Duration.between(startTime, Instant.now());
+                            logger.info(
+                                    "[{}] Request completed: {} {} - Status: {} - Duration: {}ms",
+                                    requestId,
+                                    request.getMethod(),
+                                    request.getPath(),
+                                    exchange.getResponse().getStatusCode(),
+                                    duration.toMillis());
+                        });
     }
 
     /**
      * Returns the filter order.
-     * <p>
-     * Returns -1 to ensure this filter runs early in the filter chain.
-     * </p>
+     *
+     * <p>Returns -1 to ensure this filter runs early in the filter chain.
      *
      * @return the filter order
      */

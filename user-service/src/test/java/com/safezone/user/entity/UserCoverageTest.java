@@ -5,14 +5,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * Coverage tests for {@link User} entity.
- * Tests builder patterns, field accessors, and role management.
+ * Coverage tests for {@link User} entity. Tests builder patterns, field accessors, and role
+ * management.
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -25,20 +24,21 @@ class UserCoverageTest {
 
     @BeforeEach
     void setUp() {
-        testUser = User.builder()
-                .id(1L)
-                .username("testuser")
-                .email("test@example.com")
-                .firstName("John")
-                .lastName("Doe")
-                .phone("+1234567890")
-                .password("encoded_password")
-                .roles(new HashSet<>(List.of(UserRole.USER)))
-                .enabled(true)
-                .locked(false)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
+        testUser =
+                User.builder()
+                        .id(1L)
+                        .username("testuser")
+                        .email("test@example.com")
+                        .firstName("John")
+                        .lastName("Doe")
+                        .phone("+1234567890")
+                        .password("encoded_password")
+                        .roles(new HashSet<>(List.of(UserRole.USER)))
+                        .enabled(true)
+                        .locked(false)
+                        .createdAt(LocalDateTime.now())
+                        .updatedAt(LocalDateTime.now())
+                        .build();
     }
 
     @Test
@@ -53,11 +53,12 @@ class UserCoverageTest {
     @Test
     @DisplayName("builder with minimal fields creates user")
     void builderWithMinimalFields() {
-        User minimal = User.builder()
-                .username("minimal")
-                .email("minimal@example.com")
-                .password("password")
-                .build();
+        User minimal =
+                User.builder()
+                        .username("minimal")
+                        .email("minimal@example.com")
+                        .password("password")
+                        .build();
 
         assertThat(minimal).isNotNull();
         assertThat(minimal.getUsername()).isEqualTo("minimal");
@@ -113,11 +114,12 @@ class UserCoverageTest {
     @Test
     @DisplayName("getFullName returns username when names null")
     void getFullNameReturnsUsernameWhenNamesNull() {
-        User noNames = User.builder()
-                .username("nonames")
-                .email("nonames@example.com")
-                .password("password")
-                .build();
+        User noNames =
+                User.builder()
+                        .username("nonames")
+                        .email("nonames@example.com")
+                        .password("password")
+                        .build();
 
         assertThat(noNames.getFullName()).isEqualTo("nonames");
     }
@@ -125,12 +127,13 @@ class UserCoverageTest {
     @Test
     @DisplayName("getFullName returns firstName only when lastName null")
     void getFullNameReturnsFirstNameOnly() {
-        User firstOnly = User.builder()
-                .username("firstonly")
-                .email("firstonly@example.com")
-                .password("password")
-                .firstName("OnlyFirst")
-                .build();
+        User firstOnly =
+                User.builder()
+                        .username("firstonly")
+                        .email("firstonly@example.com")
+                        .password("password")
+                        .firstName("OnlyFirst")
+                        .build();
 
         assertThat(firstOnly.getFullName()).isEqualTo("OnlyFirst");
     }
@@ -138,12 +141,13 @@ class UserCoverageTest {
     @Test
     @DisplayName("getFullName returns lastName only when firstName null")
     void getFullNameReturnsLastNameOnly() {
-        User lastOnly = User.builder()
-                .username("lastonly")
-                .email("lastonly@example.com")
-                .password("password")
-                .lastName("OnlyLast")
-                .build();
+        User lastOnly =
+                User.builder()
+                        .username("lastonly")
+                        .email("lastonly@example.com")
+                        .password("password")
+                        .lastName("OnlyLast")
+                        .build();
 
         assertThat(lastOnly.getFullName()).isEqualTo("OnlyLast");
     }
@@ -151,11 +155,12 @@ class UserCoverageTest {
     @Test
     @DisplayName("onCreate sets defaults for timestamps, status and roles")
     void onCreateSetsDefaults() {
-        User fresh = User.builder()
-                .username("fresh")
-                .email("fresh@example.com")
-                .password("password")
-                .build();
+        User fresh =
+                User.builder()
+                        .username("fresh")
+                        .email("fresh@example.com")
+                        .password("password")
+                        .build();
 
         fresh.onCreate();
 

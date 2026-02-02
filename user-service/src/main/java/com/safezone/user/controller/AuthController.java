@@ -17,10 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * REST controller for authentication operations.
- * <p>
- * Provides public endpoints for user registration and login.
- * Returns JWT tokens for authenticated sessions.
- * </p>
+ *
+ * <p>Provides public endpoints for user registration and login. Returns JWT tokens for
+ * authenticated sessions.
  *
  * @author SafeZone Team
  * @version 1.0.0

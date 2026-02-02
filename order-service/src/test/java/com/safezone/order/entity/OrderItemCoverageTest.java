@@ -3,14 +3,13 @@ package com.safezone.order.entity;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * Coverage tests for {@link OrderItem} entity.
- * Focuses on builder variations and all getter/setter combinations.
+ * Coverage tests for {@link OrderItem} entity. Focuses on builder variations and all getter/setter
+ * combinations.
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -23,15 +22,16 @@ class OrderItemCoverageTest {
 
     @BeforeEach
     void setUp() {
-        testItem = OrderItem.builder()
-                .id(1L)
-                .productId(1L)
-                .productName("Test Product")
-                .productSku("TEST-001")
-                .quantity(5)
-                .unitPrice(BigDecimal.valueOf(99.99))
-                .subtotal(BigDecimal.valueOf(499.95))
-                .build();
+        testItem =
+                OrderItem.builder()
+                        .id(1L)
+                        .productId(1L)
+                        .productName("Test Product")
+                        .productSku("TEST-001")
+                        .quantity(5)
+                        .unitPrice(BigDecimal.valueOf(99.99))
+                        .subtotal(BigDecimal.valueOf(499.95))
+                        .build();
     }
 
     @Test
@@ -45,14 +45,15 @@ class OrderItemCoverageTest {
     @Test
     @DisplayName("Builder with minimal fields")
     void builderWithMinimalFields() {
-        OrderItem item = OrderItem.builder()
-                .productId(2L)
-                .productName("Product 2")
-                .productSku("SKU-2")
-                .quantity(3)
-                .unitPrice(BigDecimal.valueOf(49.99))
-                .subtotal(BigDecimal.valueOf(149.97))
-                .build();
+        OrderItem item =
+                OrderItem.builder()
+                        .productId(2L)
+                        .productName("Product 2")
+                        .productSku("SKU-2")
+                        .quantity(3)
+                        .unitPrice(BigDecimal.valueOf(49.99))
+                        .subtotal(BigDecimal.valueOf(149.97))
+                        .build();
 
         assertThat(item)
                 .extracting("productId", "quantity", "unitPrice")
@@ -85,14 +86,15 @@ class OrderItemCoverageTest {
     @Test
     @DisplayName("Builder with zero quantity")
     void builderWithZeroQuantity() {
-        OrderItem item = OrderItem.builder()
-                .productId(1L)
-                .productName("Product")
-                .productSku("SKU")
-                .quantity(0)
-                .unitPrice(BigDecimal.ZERO)
-                .subtotal(BigDecimal.ZERO)
-                .build();
+        OrderItem item =
+                OrderItem.builder()
+                        .productId(1L)
+                        .productName("Product")
+                        .productSku("SKU")
+                        .quantity(0)
+                        .unitPrice(BigDecimal.ZERO)
+                        .subtotal(BigDecimal.ZERO)
+                        .build();
 
         assertThat(item.getQuantity()).isZero();
         assertThat(item.getUnitPrice()).isEqualTo(BigDecimal.ZERO);
@@ -101,14 +103,15 @@ class OrderItemCoverageTest {
     @Test
     @DisplayName("Builder with large quantity")
     void builderWithLargeQuantity() {
-        OrderItem item = OrderItem.builder()
-                .productId(1L)
-                .productName("Product")
-                .productSku("SKU")
-                .quantity(1000)
-                .unitPrice(BigDecimal.valueOf(999.99))
-                .subtotal(BigDecimal.valueOf(999990.00))
-                .build();
+        OrderItem item =
+                OrderItem.builder()
+                        .productId(1L)
+                        .productName("Product")
+                        .productSku("SKU")
+                        .quantity(1000)
+                        .unitPrice(BigDecimal.valueOf(999.99))
+                        .subtotal(BigDecimal.valueOf(999990.00))
+                        .build();
 
         assertThat(item.getQuantity()).isEqualTo(1000);
     }

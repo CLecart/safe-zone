@@ -1,11 +1,11 @@
 package com.safezone.common.exception;
 
 /**
- * Exception thrown when a business rule violation occurs.
- * Used for domain-specific errors that should be communicated to the client.
+ * Exception thrown when a business rule violation occurs. Used for domain-specific errors that
+ * should be communicated to the client.
  *
- * <p>Examples include: duplicate entries, invalid state transitions,
- * or business constraint violations.</p>
+ * <p>Examples include: duplicate entries, invalid state transitions, or business constraint
+ * violations.
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -29,7 +29,7 @@ public class BusinessException extends RuntimeException {
      * Constructs a BusinessException with custom error code.
      *
      * @param errorCode the error code for categorization
-     * @param message   the detail message
+     * @param message the detail message
      */
     public BusinessException(String errorCode, String message) {
         super(message);

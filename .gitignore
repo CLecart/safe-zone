@@ -57,3 +57,10 @@ docker-compose.override.yml
 secrets/
 *.pem
 *.key
+
+# Local caches and virtualenv
+.m2/
+.venv/
+
+# Sonar logs
+sonarqube_db*.log

@@ -13,20 +13,19 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * Entity representing a customer order in the e-commerce system.
- * Contains order details, status, items, and shipping information.
+ * Entity representing a customer order in the e-commerce system. Contains order details, status,
+ * items, and shipping information.
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -72,7 +71,11 @@ public class Order {
     private String billingAddress;
 
     /** List of items included in this order. */
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(
+            mappedBy = "order",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY)
     @Builder.Default
     private List<OrderItem> items = new ArrayList<>();
 
@@ -85,8 +88,8 @@ public class Order {
     private LocalDateTime updatedAt;
 
     /**
-     * JPA lifecycle callback executed before persisting a new entity.
-     * Sets timestamps and default status.
+     * JPA lifecycle callback executed before persisting a new entity. Sets timestamps and default
+     * status.
      */
     @PrePersist
     protected void onCreate() {
@@ -97,9 +100,7 @@ public class Order {
         }
     }
 
-    /**
-     * JPA lifecycle callback executed before updating an existing entity.
-     */
+    /** JPA lifecycle callback executed before updating an existing entity. */
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
@@ -125,12 +126,9 @@ public class Order {
         item.setOrder(null);
     }
 
-    /**
-     * Recalculates the total order amount from all items.
-     */
+    /** Recalculates the total order amount from all items. */
     public void calculateTotalAmount() {
-        this.totalAmount = items.stream()
-                .map(OrderItem::getSubtotal)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        this.totalAmount =
+                items.stream().map(OrderItem::getSubtotal).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

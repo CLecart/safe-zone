@@ -1,12 +1,12 @@
 package com.safezone.gateway.filter;
 
+import static org.mockito.Mockito.*;
+
 import org.junit.jupiter.api.Test;
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import org.springframework.mock.web.server.MockServerWebExchange;
-import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import reactor.core.publisher.Mono;
-
-import static org.mockito.Mockito.*;
 
 class RequestLoggingFilterTest {
 

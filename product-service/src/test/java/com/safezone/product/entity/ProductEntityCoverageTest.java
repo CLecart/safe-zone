@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -23,18 +22,19 @@ class ProductEntityCoverageTest {
     void productBuilderCreatesValidInstance() {
         LocalDateTime now = LocalDateTime.now();
 
-        Product product = Product.builder()
-                .id(1L)
-                .name("Test Product")
-                .description("Description")
-                .price(BigDecimal.valueOf(99.99))
-                .stockQuantity(100)
-                .sku("TEST-001")
-                .category(ProductCategory.ELECTRONICS)
-                .active(true)
-                .createdAt(now)
-                .updatedAt(now)
-                .build();
+        Product product =
+                Product.builder()
+                        .id(1L)
+                        .name("Test Product")
+                        .description("Description")
+                        .price(BigDecimal.valueOf(99.99))
+                        .stockQuantity(100)
+                        .sku("TEST-001")
+                        .category(ProductCategory.ELECTRONICS)
+                        .active(true)
+                        .createdAt(now)
+                        .updatedAt(now)
+                        .build();
 
         assertThat(product.getId()).isEqualTo(1L);
         assertThat(product.getName()).isEqualTo("Test Product");
@@ -82,17 +82,18 @@ class ProductEntityCoverageTest {
     void productAllArgsConstructorInitializesCorrectly() {
         LocalDateTime now = LocalDateTime.now();
 
-        Product product = new Product(
-                3L,
-                "All Args",
-                "Test Description",
-                BigDecimal.valueOf(50),
-                200,
-                "ALLARGS-001",
-                ProductCategory.ELECTRONICS,
-                true,
-                now,
-                now);
+        Product product =
+                new Product(
+                        3L,
+                        "All Args",
+                        "Test Description",
+                        BigDecimal.valueOf(50),
+                        200,
+                        "ALLARGS-001",
+                        ProductCategory.ELECTRONICS,
+                        true,
+                        now,
+                        now);
 
         assertThat(product.getId()).isEqualTo(3L);
         assertThat(product.getName()).isEqualTo("All Args");

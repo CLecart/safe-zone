@@ -44,6 +44,22 @@ docker-compose -f docker/docker-compose.sonarqube.yml up -d
 
 Wait for SonarQube to be ready at http://localhost:9000 (default credentials: admin/admin).
 
+### 1.5. Install local git hooks and prechecks
+
+Run the setup helper to install repository git hooks (Spotless checks and pre-push verification):
+
+> Note: SonarCloud supports _Automatic Analysis_ via the SonarCloud GitHub App. If Automatic Analysis is enabled for the project `CLecart_safe-zone`, do **not** run `sonar:sonar` from CI or in automated pipelines because that causes a conflict (SonarCloud will report an error). Instead rely on the SonarCloud app to analyse PRs automatically.
+
+For a local, manual analysis against a Sonar server (or to force a SonarCloud scan locally), use the helper script (requires `SONAR_TOKEN` in `.env`):
+
+```bash
+./scripts/setup.sh hooks
+# run a local analysis (will refuse against SonarCloud unless forced)
+FORCE_LOCAL_SONAR=1 source ./run-sonar-local.sh
+```
+
+This installs pre-commit (Spotless + unit tests) and pre-push (mvn verify) hooks to reduce non-conformant commits and pushes.
+
 ### 2. Build and Analyze
 
 > Note: SonarCloud supports _Automatic Analysis_ via the SonarCloud GitHub App. If Automatic Analysis is enabled for the project `CLecart_safe-zone`, do **not** run `sonar:sonar` from CI or in automated pipelines because that causes a conflict (SonarCloud will report an error). Instead rely on the SonarCloud app to analyse PRs automatically.

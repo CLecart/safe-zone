@@ -10,18 +10,17 @@ import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
 /**
- * Entity representing a product in the e-commerce catalog.
- * Contains all product information including pricing, inventory, and categorization.
+ * Entity representing a product in the e-commerce catalog. Contains all product information
+ * including pricing, inventory, and categorization.
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -79,8 +78,8 @@ public class Product {
     private LocalDateTime updatedAt;
 
     /**
-     * JPA lifecycle callback executed before persisting a new entity.
-     * Sets creation and update timestamps, and default active status.
+     * JPA lifecycle callback executed before persisting a new entity. Sets creation and update
+     * timestamps, and default active status.
      */
     @PrePersist
     protected void onCreate() {
@@ -92,8 +91,8 @@ public class Product {
     }
 
     /**
-     * JPA lifecycle callback executed before updating an existing entity.
-     * Updates the modification timestamp.
+     * JPA lifecycle callback executed before updating an existing entity. Updates the modification
+     * timestamp.
      */
     @PreUpdate
     protected void onUpdate() {

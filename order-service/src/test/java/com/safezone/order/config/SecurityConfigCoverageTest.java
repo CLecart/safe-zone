@@ -8,8 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 /**
- * Tests for {@link SecurityConfig}.
- * Verifies security configuration and bean creation.
+ * Tests for {@link SecurityConfig}. Verifies security configuration and bean creation.
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -19,8 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @DisplayName("SecurityConfig Tests")
 class SecurityConfigCoverageTest {
 
-    @Autowired
-    private SecurityConfig securityConfig;
+    @Autowired private SecurityConfig securityConfig;
 
     @Test
     @DisplayName("SecurityConfig bean is created")

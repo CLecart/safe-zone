@@ -1,17 +1,5 @@
 package com.safezone.order.service.impl;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Objects;
-import java.util.UUID;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.safezone.common.exception.BusinessException;
 import com.safezone.common.exception.ResourceNotFoundException;
 import com.safezone.order.client.ProductServiceClient;
@@ -25,15 +13,23 @@ import com.safezone.order.entity.OrderStatus;
 import com.safezone.order.mapper.OrderMapper;
 import com.safezone.order.repository.OrderRepository;
 import com.safezone.order.service.OrderService;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Objects;
+import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Implementation of the {@link OrderService} interface.
- * Provides order management business logic with transactional support.
+ * Implementation of the {@link OrderService} interface. Provides order management business logic
+ * with transactional support.
  *
- * <p>
- * Handles order lifecycle from creation through fulfillment,
- * integrating with Product Service for availability checks.
- * </p>
+ * <p>Handles order lifecycle from creation through fulfillment, integrating with Product Service
+ * for availability checks.
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -53,8 +49,8 @@ public class OrderServiceImpl implements OrderService {
     /**
      * Constructs an OrderServiceImpl with required dependencies.
      *
-     * @param orderRepository      repository for order persistence
-     * @param orderMapper          mapper for DTO/entity conversion
+     * @param orderRepository repository for order persistence
+     * @param orderMapper mapper for DTO/entity conversion
      * @param productServiceClient client for product service communication
      */
     public OrderServiceImpl(
@@ -70,13 +66,14 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponse createOrder(CreateOrderRequest request) {
         logger.info("Creating new order for user: {}", request.userId());
 
-        Order order = Order.builder()
-                .orderNumber(generateOrderNumber())
-                .userId(request.userId())
-                .status(OrderStatus.PENDING)
-                .shippingAddress(request.shippingAddress())
-                .billingAddress(request.billingAddress())
-                .build();
+        Order order =
+                Order.builder()
+                        .orderNumber(generateOrderNumber())
+                        .userId(request.userId())
+                        .status(OrderStatus.PENDING)
+                        .shippingAddress(request.shippingAddress())
+                        .billingAddress(request.billingAddress())
+                        .build();
 
         for (OrderItemRequest itemRequest : request.items()) {
             OrderItem item = createOrderItem(itemRequest);
@@ -104,8 +101,13 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     public OrderResponse getOrderByNumber(String orderNumber) {
         logger.debug("Fetching order by number: {}", orderNumber);
-        Order order = orderRepository.findByOrderNumber(orderNumber)
-                .orElseThrow(() -> new ResourceNotFoundException(ORDER_RESOURCE, "orderNumber", orderNumber));
+        Order order =
+                orderRepository
+                        .findByOrderNumber(orderNumber)
+                        .orElseThrow(
+                                () ->
+                                        new ResourceNotFoundException(
+                                                ORDER_RESOURCE, "orderNumber", orderNumber));
         return orderMapper.toResponse(order);
     }
 
@@ -113,7 +115,8 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     public Page<OrderResponse> getAllOrders(Pageable pageable) {
         logger.debug("Fetching all orders with pagination");
-        return orderRepository.findAll(Objects.requireNonNull(pageable))
+        return orderRepository
+                .findAll(Objects.requireNonNull(pageable))
                 .map(orderMapper::toResponse);
     }
 
@@ -121,16 +124,14 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     public Page<OrderResponse> getOrdersByUserId(Long userId, Pageable pageable) {
         logger.debug("Fetching orders for user: {}", userId);
-        return orderRepository.findByUserId(userId, pageable)
-                .map(orderMapper::toResponse);
+        return orderRepository.findByUserId(userId, pageable).map(orderMapper::toResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<OrderResponse> getOrdersByStatus(OrderStatus status, Pageable pageable) {
         logger.debug("Fetching orders by status: {}", status);
-        return orderRepository.findByStatus(status, pageable)
-                .map(orderMapper::toResponse);
+        return orderRepository.findByStatus(status, pageable).map(orderMapper::toResponse);
     }
 
     @Override
@@ -154,8 +155,8 @@ public class OrderServiceImpl implements OrderService {
         Order order = findOrderById(id);
 
         if (!canBeCancelled(order.getStatus())) {
-            throw new BusinessException("INVALID_STATUS",
-                    "Order cannot be cancelled in status: " + order.getStatus());
+            throw new BusinessException(
+                    "INVALID_STATUS", "Order cannot be cancelled in status: " + order.getStatus());
         }
 
         order.setStatus(OrderStatus.CANCELLED);
@@ -168,33 +169,43 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private Order findOrderById(Long id) {
-        return orderRepository.findById(Objects.requireNonNull(id))
+        return orderRepository
+                .findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new ResourceNotFoundException(ORDER_RESOURCE, "id", id));
     }
 
     private String generateOrderNumber() {
-        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+        String timestamp =
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
         String uuid = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         return "ORD-" + timestamp + "-" + uuid;
     }
 
     private OrderItem createOrderItem(OrderItemRequest request) {
-        ProductDto product = productServiceClient.getProductById(request.productId())
-                .orElseThrow(() -> new BusinessException("PRODUCT_NOT_FOUND",
-                        "Product not found with ID: " + request.productId()));
+        ProductDto product =
+                productServiceClient
+                        .getProductById(request.productId())
+                        .orElseThrow(
+                                () ->
+                                        new BusinessException(
+                                                "PRODUCT_NOT_FOUND",
+                                                "Product not found with ID: "
+                                                        + request.productId()));
 
-        if (!productServiceClient.checkProductAvailability(request.productId(), request.quantity())) {
-            throw new BusinessException("INSUFFICIENT_STOCK",
-                    "Insufficient stock for product: " + product.name());
+        if (!productServiceClient.checkProductAvailability(
+                request.productId(), request.quantity())) {
+            throw new BusinessException(
+                    "INSUFFICIENT_STOCK", "Insufficient stock for product: " + product.name());
         }
 
-        OrderItem item = OrderItem.builder()
-                .productId(product.id())
-                .productName(product.name())
-                .productSku(product.sku())
-                .quantity(request.quantity())
-                .unitPrice(product.price())
-                .build();
+        OrderItem item =
+                OrderItem.builder()
+                        .productId(product.id())
+                        .productName(product.name())
+                        .productSku(product.sku())
+                        .quantity(request.quantity())
+                        .unitPrice(product.price())
+                        .build();
 
         item.calculateSubtotal();
         return item;
@@ -202,33 +213,32 @@ public class OrderServiceImpl implements OrderService {
 
     private void reserveStock(Order order) {
         for (OrderItem item : order.getItems()) {
-            productServiceClient.updateStock(item.getProductId(), -item.getQuantity())
-                    .subscribe();
+            productServiceClient.updateStock(item.getProductId(), -item.getQuantity()).subscribe();
         }
     }
 
     private void releaseStock(Order order) {
         for (OrderItem item : order.getItems()) {
-            productServiceClient.updateStock(item.getProductId(), item.getQuantity())
-                    .subscribe();
+            productServiceClient.updateStock(item.getProductId(), item.getQuantity()).subscribe();
         }
     }
 
     private void validateStatusTransition(OrderStatus current, OrderStatus target) {
         if (current == OrderStatus.CANCELLED || current == OrderStatus.REFUNDED) {
-            throw new BusinessException("INVALID_STATUS_TRANSITION",
+            throw new BusinessException(
+                    "INVALID_STATUS_TRANSITION",
                     "Cannot change status from " + current + " to " + target);
         }
 
         if (current == OrderStatus.DELIVERED && target != OrderStatus.REFUNDED) {
-            throw new BusinessException("INVALID_STATUS_TRANSITION",
-                    "Delivered order can only be refunded");
+            throw new BusinessException(
+                    "INVALID_STATUS_TRANSITION", "Delivered order can only be refunded");
         }
     }
 
     private boolean canBeCancelled(OrderStatus status) {
-        return status == OrderStatus.PENDING ||
-                status == OrderStatus.CONFIRMED ||
-                status == OrderStatus.PROCESSING;
+        return status == OrderStatus.PENDING
+                || status == OrderStatus.CONFIRMED
+                || status == OrderStatus.PROCESSING;
     }
 }

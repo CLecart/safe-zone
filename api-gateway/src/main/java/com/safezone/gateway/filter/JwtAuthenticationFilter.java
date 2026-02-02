@@ -1,7 +1,7 @@
 package com.safezone.gateway.filter;
 
+import com.safezone.common.security.JwtTokenProvider;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -11,26 +11,22 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
-
-import com.safezone.common.security.JwtTokenProvider;
-
 import reactor.core.publisher.Mono;
 
 /**
  * Gateway filter for JWT token authentication.
- * <p>
- * Delegates token validation and claim extraction to `JwtTokenProvider` to
- * avoid duplication with other modules. Public endpoints are allowed without
- * authentication. Authenticated requests have user ID and roles added as
- * headers for downstream services.
- * </p>
+ *
+ * <p>Delegates token validation and claim extraction to `JwtTokenProvider` to avoid duplication
+ * with other modules. Public endpoints are allowed without authentication. Authenticated requests
+ * have user ID and roles added as headers for downstream services.
  *
  * @author SafeZone Team
  * @version 1.0.0
  * @since 2024-01-06
  */
 @Component
-public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAuthenticationFilter.Config> {
+public class JwtAuthenticationFilter
+        extends AbstractGatewayFilterFactory<JwtAuthenticationFilter.Config> {
 
     /** Logger for this class. */
     private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
@@ -53,10 +49,9 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
 
     /**
      * Creates the gateway filter that performs JWT authentication.
-     * <p>
-     * The filter validates the JWT token via `JwtTokenProvider` and adds user
-     * headers to the request. Public endpoints bypass authentication.
-     * </p>
+     *
+     * <p>The filter validates the JWT token via `JwtTokenProvider` and adds user headers to the
+     * request. Public endpoints bypass authentication.
      *
      * @param config the filter configuration
      * @return the configured gateway filter
@@ -72,7 +67,10 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
 
             String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
             if (authHeader == null || !authHeader.startsWith(BEARER_PREFIX)) {
-                return onError(exchange, "Missing or invalid Authorization header", HttpStatus.UNAUTHORIZED);
+                return onError(
+                        exchange,
+                        "Missing or invalid Authorization header",
+                        HttpStatus.UNAUTHORIZED);
             }
 
             String token = authHeader.substring(BEARER_PREFIX.length());
@@ -84,34 +82,38 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
             String username = jwtTokenProvider.extractUsername(token).orElse("");
             List<String> roles = jwtTokenProvider.extractRoles(token);
 
-            ServerHttpRequest modifiedRequest = request.mutate()
-                    .header("X-User-Id", username)
-                    .header("X-User-Roles", String.join(",", roles))
-                    .build();
+            ServerHttpRequest modifiedRequest =
+                    request.mutate()
+                            .header("X-User-Id", username)
+                            .header("X-User-Roles", String.join(",", roles))
+                            .build();
 
             return chain.filter(exchange.mutate().request(modifiedRequest).build());
         };
     }
 
     /**
-     * Checks if the given path is a public endpoint that doesn't require
-     * authentication.
+     * Checks if the given path is a public endpoint that doesn't require authentication.
      *
      * @param path the request path
      * @return true if the endpoint is public
      */
     private boolean isPublicEndpoint(String path) {
-        return path.contains("/api/v1/auth/") || path.contains("/actuator/") || path.contains("/swagger-ui")
+        return path.contains("/api/v1/auth/")
+                || path.contains("/actuator/")
+                || path.contains("/swagger-ui")
                 || path.contains("/v3/api-docs")
-                || (path.contains("/api/v1/products") && !path.contains("/stock") && !path.contains("/low-stock"));
+                || (path.contains("/api/v1/products")
+                        && !path.contains("/stock")
+                        && !path.contains("/low-stock"));
     }
 
     /**
      * Handles authentication errors by returning an error response.
      *
      * @param exchange the server web exchange
-     * @param message  the error message to log
-     * @param status   the HTTP status to return
+     * @param message the error message to log
+     * @param status the HTTP status to return
      * @return a Mono completing the error response
      */
     private Mono<Void> onError(ServerWebExchange exchange, String message, HttpStatus status) {
@@ -122,9 +124,8 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
 
     /**
      * Configuration class for the JWT authentication filter.
-     * <p>
-     * Can be extended for configurable options such as excluded paths.
-     * </p>
+     *
+     * <p>Can be extended for configurable options such as excluded paths.
      */
     public static class Config {
         /** Indicates if the filter is enabled. */

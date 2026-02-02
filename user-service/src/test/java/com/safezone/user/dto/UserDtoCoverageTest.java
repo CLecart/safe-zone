@@ -2,18 +2,16 @@ package com.safezone.user.dto;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.safezone.user.entity.UserRole;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.safezone.user.entity.UserRole;
-
 /**
- * Coverage tests for user DTOs (Data Transfer Objects).
- * Tests all user-related record types and their field access.
+ * Coverage tests for user DTOs (Data Transfer Objects). Tests all user-related record types and
+ * their field access.
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -28,18 +26,19 @@ class UserDtoCoverageTest {
         LocalDateTime now = LocalDateTime.now();
         Set<UserRole> roles = new HashSet<>(java.util.List.of(UserRole.USER));
 
-        UserResponse response = new UserResponse(
-                1L,
-                "testuser",
-                "test@example.com",
-                "John",
-                "Doe",
-                "+1234567890",
-                "John Doe",
-                roles,
-                true,
-                now,
-                now);
+        UserResponse response =
+                new UserResponse(
+                        1L,
+                        "testuser",
+                        "test@example.com",
+                        "John",
+                        "Doe",
+                        "+1234567890",
+                        "John Doe",
+                        roles,
+                        true,
+                        now,
+                        now);
 
         assertThat(response.id()).isEqualTo(1L);
         assertThat(response.username()).isEqualTo("testuser");
@@ -55,13 +54,14 @@ class UserDtoCoverageTest {
     @Test
     @DisplayName("RegisterRequest record constructor and accessors")
     void registerRequestConstructorAndAccessors() {
-        RegisterRequest request = new RegisterRequest(
-                "newuser",
-                "new@example.com",
-                "Password123",
-                "Jane",
-                "Smith",
-                "+1234567890");
+        RegisterRequest request =
+                new RegisterRequest(
+                        "newuser",
+                        "new@example.com",
+                        "Password123",
+                        "Jane",
+                        "Smith",
+                        "+1234567890");
 
         assertThat(request.username()).isEqualTo("newuser");
         assertThat(request.email()).isEqualTo("new@example.com");
@@ -74,11 +74,8 @@ class UserDtoCoverageTest {
     @Test
     @DisplayName("UpdateUserRequest record constructor and accessors")
     void updateUserRequestConstructorAndAccessors() {
-        UpdateUserRequest request = new UpdateUserRequest(
-                "Updated",
-                "Name",
-                "updated@example.com",
-                "+9876543210");
+        UpdateUserRequest request =
+                new UpdateUserRequest("Updated", "Name", "updated@example.com", "+9876543210");
 
         assertThat(request.firstName()).isEqualTo("Updated");
         assertThat(request.lastName()).isEqualTo("Name");
@@ -99,18 +96,19 @@ class UserDtoCoverageTest {
     @DisplayName("AuthResponse record and factory method")
     void authResponseRecordAndFactoryMethod() {
         LocalDateTime now = LocalDateTime.now();
-        UserResponse user = new UserResponse(
-                1L,
-                "testuser",
-                "test@example.com",
-                "John",
-                "Doe",
-                "+1234567890",
-                "John Doe",
-                new HashSet<>(java.util.List.of(UserRole.USER)),
-                true,
-                now,
-                now);
+        UserResponse user =
+                new UserResponse(
+                        1L,
+                        "testuser",
+                        "test@example.com",
+                        "John",
+                        "Doe",
+                        "+1234567890",
+                        "John Doe",
+                        new HashSet<>(java.util.List.of(UserRole.USER)),
+                        true,
+                        now,
+                        now);
 
         AuthResponse response = AuthResponse.of("token123", 3600L, user);
 

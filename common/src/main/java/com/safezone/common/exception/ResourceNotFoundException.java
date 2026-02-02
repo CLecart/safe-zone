@@ -1,13 +1,11 @@
 package com.safezone.common.exception;
 
 /**
- * Exception thrown when a requested resource cannot be found.
- * Typically results in an HTTP 404 response.
+ * Exception thrown when a requested resource cannot be found. Typically results in an HTTP 404
+ * response.
  *
- * <p>
- * Provides detailed information about which resource was not found
- * and the criteria used for the search.
- * </p>
+ * <p>Provides detailed information about which resource was not found and the criteria used for the
+ * search.
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -25,8 +23,8 @@ public class ResourceNotFoundException extends RuntimeException {
      * Constructs a ResourceNotFoundException with resource details.
      *
      * @param resourceName the type of resource (e.g., "Product", "User")
-     * @param fieldName    the field used for lookup (e.g., "id", "sku")
-     * @param fieldValue   the value that was searched for
+     * @param fieldName the field used for lookup (e.g., "id", "sku")
+     * @param fieldValue the value that was searched for
      */
     public ResourceNotFoundException(String resourceName, String fieldName, Object fieldValue) {
         super(String.format("%s not found with %s: '%s'", resourceName, fieldName, fieldValue));

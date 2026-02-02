@@ -1,19 +1,18 @@
 package com.safezone.user;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
  * Integration tests for the User Service Application.
- * <p>
- * Verifies that the Spring application context loads correctly
- * and all required beans are properly configured.
- * </p>
+ *
+ * <p>Verifies that the Spring application context loads correctly and all required beans are
+ * properly configured.
  *
  * @author SafeZone Team
  * @version 1.0.0
@@ -23,8 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("User Service Application Tests")
 class UserServiceApplicationTest {
 
-    @Autowired
-    private ApplicationContext applicationContext;
+    @Autowired private ApplicationContext applicationContext;
 
     @Test
     @DisplayName("Should load application context successfully")

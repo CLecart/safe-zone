@@ -36,6 +36,10 @@ jobs:
             echo "JWT_TEST_SECRET=$JWT_TEST_SECRET" >> $GITHUB_ENV
           fi
 
+      - name: Format check (Spotless)
+        run: |
+          echo 'Running Spotless format check...'
+          mvn -B -q spotless:check || { echo 'Spotless: formatting issues found. Run "mvn spotless:apply" and commit the result.'; exit 1; }
       - name: Build & test
         run: |
           mvn -B -q -DskipTests=false -Dmaven.project.sourceRoots.warningsDisabled=true clean verify
@@ -75,7 +79,6 @@ jobs:
             JWT_TEST_SECRET=$(head -c 48 /dev/urandom | base64)
             echo "JWT_TEST_SECRET=$JWT_TEST_SECRET" >> $GITHUB_ENV
           fi
-
       - name: SonarQube Scan (guarded - avoid double analysis)
         run: |
           if [ -z "${SONAR_TOKEN:-}" ] || [ -z "${SONAR_HOST_URL:-}" ]; then
