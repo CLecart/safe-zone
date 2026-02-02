@@ -1,5 +1,7 @@
 package com.safezone.user.config;
 
+import com.safezone.common.config.CommonSecurityConfigurer;
+import com.safezone.common.security.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -7,17 +9,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
-import com.safezone.common.config.CommonSecurityConfigurer;
-import com.safezone.common.security.JwtTokenProvider;
-
 /**
  * Security configuration for the User Service.
  *
- * <p>
- * Configures JWT-based authentication with stateless session management.
- * Provides password
- * encoder bean and security filter chain. Public endpoints include auth
- * endpoints, actuator, and
+ * <p>Configures JWT-based authentication with stateless session management. Provides password
+ * encoder bean and security filter chain. Public endpoints include auth endpoints, actuator, and
  * Swagger docs.
  *
  * @author SafeZone Team
@@ -50,15 +46,10 @@ public class SecurityConfig {
     /**
      * Configures the HTTP security filter chain for the User Service.
      *
-     * <p>
-     * CSRF protection is disabled intentionally because this service exposes a
-     * stateless JSON
-     * API secured by JWT bearer tokens. State-changing operations require a valid
-     * JWT and are
-     * therefore not vulnerable to browser-based CSRF attacks in this architecture.
-     * For the complete
-     * Sonar S4502 justification and reviewer guidance, see
-     * `.github/SONAR_S4502_JUSTIFICATION.md`.
+     * <p>CSRF protection is disabled intentionally because this service exposes a stateless JSON
+     * API secured by JWT bearer tokens. State-changing operations require a valid JWT and are
+     * therefore not vulnerable to browser-based CSRF attacks in this architecture. For the complete
+     * Sonar S4502 justification and reviewer guidance, see `.github/SONAR_S4502_JUSTIFICATION.md`.
      *
      * @param http the HttpSecurity builder to configure
      * @return the configured SecurityFilterChain
@@ -71,20 +62,21 @@ public class SecurityConfig {
             throws Exception {
         // Centralized default security configuration (CSRF/CORS/S4502 justification)
         CommonSecurityConfigurer.applyDefaultSecurity(
-                http, jwtTokenProvider, corsConfigurationSource)
+                        http, jwtTokenProvider, corsConfigurationSource)
                 .authorizeHttpRequests(
-                        auth -> auth
-                                // Common public endpoints (actuator & swagger) are
-                                // configured in
-                                // CommonSecurityConfigurer
-                                .requestMatchers("/api/v1/auth/**")
-                                .permitAll()
-                                .requestMatchers(
-                                        org.springframework.http.HttpMethod.GET,
-                                        "/api/v1/users/{id}")
-                                .permitAll()
-                                .anyRequest()
-                                .authenticated());
+                        auth ->
+                                auth
+                                        // Common public endpoints (actuator & swagger) are
+                                        // configured in
+                                        // CommonSecurityConfigurer
+                                        .requestMatchers("/api/v1/auth/**")
+                                        .permitAll()
+                                        .requestMatchers(
+                                                org.springframework.http.HttpMethod.GET,
+                                                "/api/v1/users/{id}")
+                                        .permitAll()
+                                        .anyRequest()
+                                        .authenticated());
         return http.build();
     }
 }
